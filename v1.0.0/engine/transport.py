@@ -179,7 +179,7 @@ def unload(w,key,c):
             raise OrderError('NO_DISEMBARK_SPACE')
         t['elapsed']-=500;id=t['ids'].pop(0);t['positions'].pop(0)
         s=w.soldiers[id];s.pos=WorldPos(x,y);s.carrier_id=None;s.task_state='IDLE'
-        v.passenger_ids.remove(id);w.emit('DISEMBARK_DONE',unit=id,vehicle=v.id)
+        v.passenger_ids.remove(id);w.emit('DISEMBARK_DONE',unit=id,vehicle=v.id,x_cm=x,y_cm=y)
     if not t['ids']:
         v.task_state='IDLE';return True
     return False

@@ -1,6 +1,7 @@
 import {Application,Container,Graphics} from 'pixi.js';
 import './style.css';
 import {visibleChunks} from './viewport.js';
+import {Timeline} from './timeline.js';
 const host=document.querySelector('#field');
 const app=new Application();await app.init({resizeTo:host,background:0x172c26,antialias:false});host.appendChild(app.canvas);
 const world=new Container();app.stage.addChild(world);world.scale.set(.6);world.position.set(20,20);
@@ -11,7 +12,12 @@ for(let row=0;row<Math.ceil(data.height_m/128);row++)for(let col=0;col<Math.ceil
  for(let ty=0;ty<32;ty++)for(let tx=0;tx<32;tx++){const tile=data.terrain[row*32+ty]?.[col*32+tx]??0;g.rect(tx*12,ty*12,12,12).fill(colors[tile]);}
  chunks.set(`${col},${row}`,g);world.addChild(g);
 }
-for(const u of data.units){const g=new Graphics();const size=u.size_px??[3,5];g.rect(-size[0]/2,-size[1]/2,...size).fill(u.team===0?0x6ec1ec:0xf28275);g.position.set(u.x_cm*.03,u.y_cm*.03);world.addChild(g);}
+const sprites=new Map();
+for(const u of data.units){const g=new Graphics();const size=u.size_px??[3,5];g.rect(-size[0]/2,-size[1]/2,...size).fill(u.team===0?0x6ec1ec:0xf28275);g.position.set(u.x_cm*.03,u.y_cm*.03);world.addChild(g);sprites.set(u.id,g);}
 let drag;host.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};host.setPointerCapture(e.pointerId);});host.addEventListener('pointerup',()=>drag=null);host.addEventListener('pointermove',e=>{if(!drag)return;world.x+=e.clientX-drag.x;world.y+=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};});
 host.addEventListener('wheel',e=>{e.preventDefault();const box=host.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top;const old=world.scale.x,next=Math.min(8,Math.max(.15,old*Math.exp(-e.deltaY*.001)));world.x=x-(x-world.x)*next/old;world.y=y-(y-world.y)*next/old;world.scale.set(next);},{passive:false});
 app.ticker.add(()=>{const visible=new Set(visibleChunks(world.x,world.y,world.scale.x,host.clientWidth,host.clientHeight,data.width_m).map(p=>p.join(',')));for(const [key,g] of chunks)g.visible=visible.has(key);});
+
+const timeline=data.initial?new Timeline(data):null;let elapsed=0,paused=false;
+document.querySelector('#pause').onclick=()=>{paused=!paused;document.querySelector('#pause').textContent=paused?'재생':'일시 정지';};
+app.ticker.add(ticker=>{if(!timeline)return;if(!paused)elapsed=Math.min(timeline.duration,elapsed+ticker.deltaMS/1000*Number(document.querySelector('#speed').value));const frame=timeline.at(elapsed);for(const u of frame.units){const g=sprites.get(u.id);if(g){g.position.set(u.x_cm*.03,u.y_cm*.03);g.visible=u.alive&&u.carrier_id===null;}}});
