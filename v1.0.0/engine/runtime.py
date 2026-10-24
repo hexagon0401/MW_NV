@@ -8,7 +8,7 @@ from .movement import move
 from .infantry import move_squad
 from .sensing import update_sensing, observation
 from .combat import update_combat
-from .objectives import update_capture
+from .objectives import update_capture, update_score
 
 
 class Engine:
@@ -32,12 +32,16 @@ class Engine:
         if not ms.is_finite() or ms < 0 or ms != ms.to_integral_value():
             raise ValueError('dt must be nonnegative whole milliseconds')
         w = self.world
+        if getattr(w,"ended",False):
+            return []
         begin = len(w.events)
         w.remainder_ms += int(ms)
-        while w.remainder_ms >= 200:
+        while w.remainder_ms >= 200 and not getattr(w,"ended",False):
             w.remainder_ms -= 200
             self._tick()
             w.tick += 1
+        if getattr(w,"ended",False):
+            w.remainder_ms=0
         return w.events[begin:]
 
     def _tick(self):
@@ -54,6 +58,7 @@ class Engine:
             update_sensing(w)
         update_combat(w)
         update_capture(w)
+        update_score(w)
 
     def observe(self,team):
         return observation(self.world,team)

@@ -1,0 +1,12 @@
+{
+  "seed": 0,
+  "ticks": 15000,
+  "sim_seconds": 3000.0,
+  "scores": {
+    "0": 0,
+    "1": 0
+  },
+  "winner": null,
+  "ended": true,
+  "checksum": "9d2d0a7c272fd9c04e5c204bb19882262af9e7e78e33f9d29e286c57a61e6751"
+}

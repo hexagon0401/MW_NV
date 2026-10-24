@@ -30,3 +30,40 @@ def update_capture(w):
             else:
                 f.owner=team;f.capturing=None
                 w.emit('OBJECTIVE_CAPTURED',objective=f.id,team=int(team))
+
+
+def update_score(w):
+    elapsed=w.tick+1
+    if not hasattr(w,'ended'):
+        w.ended=False;w.winner=None;w.overtime=False
+    objectives=sorted((f for f in w.facilities.values() if f.kind=='OBJECTIVE'),key=lambda f:f.id)
+    if elapsed%150==0 and objectives:
+        hot=objectives[(1+(elapsed-1)//1500)%len(objectives)].id
+        for f in objectives:
+            if f.owner is not None:
+                w.teams[f.owner].score+=1+int(f.id==hot)
+        w.emit('SCORE_TICK',scores={int(t):s.score for t,s in w.teams.items()})
+    scores={t:s.score for t,s in w.teams.items()}
+    high=max(scores.values())
+    leaders=[t for t in Team if scores[t]==high]
+    reason=None
+    if high>=100 and len(leaders)==1:
+        w.winner=leaders[0];reason='SCORE_LIMIT'
+    elif elapsed>=13500:
+        if not w.overtime and len(leaders)==1:
+            w.winner=leaders[0];reason='TIME_LIMIT'
+        else:
+            w.overtime=True
+            if elapsed>=15000:
+                w.winner=leaders[0] if len(leaders)==1 else None
+                reason='OVERTIME_LIMIT'
+    if reason:
+        w.ended=True
+        w.emit('MATCH_ENDED',winner=None if w.winner is None else int(w.winner),reason=reason)
+
+
+def summary(w):
+    return dict(seed=w.seed,ticks=w.tick,sim_seconds=w.tick/5,
+                scores={int(t):s.score for t,s in w.teams.items()},
+                winner=None if getattr(w,'winner',None) is None else int(w.winner),
+                ended=getattr(w,'ended',False),checksum=w.checksum())
