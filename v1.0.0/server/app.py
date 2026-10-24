@@ -15,6 +15,7 @@ def create_app(store=None):
         data=json.loads(path.read_text())
         if not data.get('summary',{}).get('ended'):raise HTTPException(404)
         return data
+    @app.get('/api/matches')
     @app.get('/matches')
     def matches():
         result=[]
@@ -23,13 +24,17 @@ def create_app(store=None):
             try:result.append(dict(id=id,summary=load(id)['summary']))
             except HTTPException:continue
         return result
+    @app.get('/api/matches/{id}')
     @app.get('/matches/{id}')
     def metadata(id:str):return dict(id=id,summary=load(id)['summary'])
+    @app.get('/api/matches/{id}/view')
     @app.get('/matches/{id}/view')
     def view(id:str):return load(id)
+    @app.get('/api/events')
     @app.get('/events')
     def events(match_id:str,after:int=Query(-1,ge=-1),limit:int=Query(1000,ge=1,le=10000)):
         return [e for e in load(match_id)['events'] if e['event_id']>after][:limit]
+    @app.get('/api/snapshot')
     @app.get('/snapshot')
     def snapshot(match_id:str):return load(match_id)['final']
     build=Path(__file__).resolve().parents[1]/'viewer'/'dist'

@@ -343,6 +343,9 @@ dependencies = [
 dev = [
     { name = "pytest" },
 ]
+inference = [
+    { name = "numpy" },
+]
 learning = [
     { name = "gymnasium" },
     { name = "numpy" },
@@ -363,6 +366,7 @@ requires-dist = [
     { name = "fastapi", marker = "extra == 'server'", specifier = "==0.128.0" },
     { name = "gymnasium", marker = "extra == 'learning'", specifier = "==1.2.3" },
     { name = "httpx", marker = "extra == 'server'", specifier = "==0.28.1" },
+    { name = "numpy", marker = "extra == 'inference'", specifier = "==2.2.6" },
     { name = "numpy", marker = "extra == 'learning'", specifier = "==2.2.6" },
     { name = "pettingzoo", marker = "extra == 'learning'", specifier = "==1.25.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = "==8.4.2" },
@@ -373,7 +377,7 @@ requires-dist = [
     { name = "torch", marker = "sys_platform != 'linux' and extra == 'learning'", specifier = "==2.8.0" },
     { name = "uvicorn", marker = "extra == 'server'", specifier = "==0.40.0" },
 ]
-provides-extras = ["dev", "server", "learning"]
+provides-extras = ["dev", "inference", "server", "learning"]
 
 [[package]]
 name = "networkx"

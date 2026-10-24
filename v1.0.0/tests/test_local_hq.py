@@ -33,3 +33,22 @@ def test_timeout_and_remote_endpoint_rejected():
     hq=LocalHQ(transport=timeout);hq.observe_and_issue(Engine(create_match()).observe(0))
     assert hq.last_decision['source']=='rules'
     with pytest.raises(ValueError):LocalHQ('https://api.example.com/v1')
+
+
+def test_real_http_protocol_loopback():
+    from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
+    from threading import Thread
+    class Handler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            payload=json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+            assert self.path=='/v1/chat/completions'
+            assert payload['temperature']==0
+            body=json.dumps({'choices':[{'message':{'content':'{"commands":[]}'}}]}).encode()
+            self.send_response(200);self.end_headers();self.wfile.write(body)
+        def log_message(self,*args):pass
+    server=ThreadingHTTPServer(('127.0.0.1',0),Handler);thread=Thread(target=server.serve_forever,daemon=True);thread.start()
+    try:
+        hq=LocalHQ(f'http://127.0.0.1:{server.server_port}/v1')
+        assert hq.observe_and_issue(Engine(create_match()).observe(0))==[]
+        assert hq.last_decision['source']=='llm'
+    finally:server.shutdown();server.server_close();thread.join()
