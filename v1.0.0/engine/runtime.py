@@ -8,7 +8,7 @@ from .movement import move
 from .infantry import move_squad
 from .sensing import update_sensing, observation
 from .combat import update_combat
-from .transport import move_vehicle
+from .transport import move_vehicle, embark, release_transfer_locks
 from .objectives import update_capture, update_score
 
 
@@ -47,6 +47,7 @@ class Engine:
 
     def _tick(self):
         w = self.world
+        release_transfer_locks(w)
         for key, c in w.queue.ready(w):
             if w.queue.status[key] not in ('QUEUED', 'RUNNING'):
                 continue
@@ -66,6 +67,10 @@ class Engine:
 
     def _execute(self, key, c):
         w = self.world
+        if c.op==Op.EMBARK:
+            w.queue.status[key]="RUNNING"
+            if embark(w,key,c):w.queue.finish(w,key)
+            return
         if c.op in (Op.CAPTURE,Op.DEFEND):
             f=w.facilities[c.target]
             if f.kind != "OBJECTIVE":
