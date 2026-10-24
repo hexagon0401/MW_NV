@@ -11,4 +11,5 @@ Storage: user chose Supabase private; R2 remains disabled
 External requirements: SETUP_ACTIONS.md and RELEASE_STATUS.md
 Git branch: dev/v1.0.0
 Next: secure keys + Access settings + model network, then external verification
+Fresh GitHub clone: 83 Python + 6 JS/build PASS; minimal without Torch 80 PASS / 2 optional SKIP
 Remaining Plus quota: UNKNOWN

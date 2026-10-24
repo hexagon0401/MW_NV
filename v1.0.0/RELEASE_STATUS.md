@@ -12,6 +12,9 @@
 - Functions 보안: RS256 issuer/audience/signature 검증, 미설정 시 차단.
   실제 로컬 Pages 런타임에서 HTML/리플레이/API 익명 요청 401 확인.
 
+새 GitHub clone의 전체 설치에서 Python 83개·JS 6개·생산 빌드 통과.
+PyTorch 없는 최소 설치는 80개 통과, 선택 모듈 2개 skipped였다.
+
 ## 외부 요구사항으로 남은 항목 — 출시 완료로 표시하지 않음
 
 - C21-L2/C36: GGUF 다운로드 접근을 열고 공식 출처·라이선스·SHA-256을 확정해야 한다.
