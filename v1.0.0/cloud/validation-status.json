@@ -40,5 +40,12 @@
     "stored_gzip_bytes": 1123550,
     "sha256": "942430566f6138369b4d42eb4fb1095ee797eb4af5186820c108b9e080f1f89f"
   },
-  "gzip_js_tests": 14
+  "gzip_js_tests": 14,
+  "nim_last_retry": {
+    "http": 401,
+    "error": "Unauthorized: Invalid JWT serialization: Missing dot delimiter(s)",
+    "decision_source": "algorithm fallback",
+    "user_instruction": "stop on failure",
+    "continuous_training_started": false
+  }
 }
