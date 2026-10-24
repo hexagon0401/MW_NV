@@ -1,5 +1,7 @@
 """Validated integer command boundary; game agents cannot execute code."""
 from dataclasses import fields
+from enum import IntEnum
+from collections.abc import MutableMapping
 from .types import Command, Team, Op
 
 
@@ -29,8 +31,10 @@ def parse_command(raw):
 
 
 def validate(world, command):
+    if not isinstance(command,(dict,Command)):
+        raise OrderError('SCHEMA_ERROR')
     c = parse_command(command if isinstance(command, dict) else {
-        f.name: int(getattr(command, f.name)) for f in fields(Command)})
+        f.name: (int(getattr(command, f.name)) if isinstance(getattr(command, f.name),IntEnum) else getattr(command, f.name)) for f in fields(Command)})
     if c.tick + c.ttl <= world.tick:
         raise OrderError('EXPIRED')
     if c.op in (Op.WAIT, Op.CANCEL):
@@ -48,10 +52,24 @@ def validate(world, command):
     return c
 
 
+class TeamMap(MutableMapping):
+    """Physically separate team stores behind the engine's indexed interface."""
+    def __init__(self):
+        self.by_team={'0':{},'1':{}}
+
+    def _store(self,key):return self.by_team[key.split(':',1)[0]]
+    def __getitem__(self,key):return self._store(key)[key]
+    def __setitem__(self,key,value):self._store(key)[key]=value
+    def __delitem__(self,key):del self._store(key)[key]
+    def __iter__(self):
+        for store in self.by_team.values():yield from store
+    def __len__(self):return sum(map(len,self.by_team.values()))
+
+
 class CommandQueue:
     def __init__(self):
-        self.commands = {}
-        self.status = {}
+        self.commands = TeamMap()
+        self.status = TeamMap()
 
     def submit(self, world, raw):
         c = validate(world, raw)

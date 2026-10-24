@@ -29,3 +29,14 @@ def test_capacity_foreign_team_and_reservations():
     w.vehicles[20].team=Team.B
     e.submit(dict(cmd_id=2,team=0,op=5,unit=30,target=20));e.step()
     assert w.events[-1]['payload']['reason']=='FOREIGN_UNIT'
+
+
+def test_ninth_apc_passenger_is_rejected_without_manifest_change():
+    e=boarding_engine();w=e.world;v=w.vehicles[20]
+    for id in range(1,9):
+        w.soldiers[id]=Soldier(id,Team.A,v.pos,carrier_id=v.id,task_state='ONBOARD')
+    v.passenger_ids=list(range(1,9))
+    w.soldiers[9]=Soldier(9,Team.A,WorldPos(3900,6400))
+    e.submit(dict(cmd_id=1,team=0,op=5,unit=9,target=20));e.step()
+    assert v.passenger_ids==list(range(1,9)) and w.soldiers[9].carrier_id is None
+    assert w.events[-1]['payload']['reason']=='NO_CAPACITY'

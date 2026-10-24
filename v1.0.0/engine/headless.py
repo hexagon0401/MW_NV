@@ -16,7 +16,7 @@ def run_match(seed=0,swap=False):
         observations={t:e.observe(t) for t in Team}
         for t in Team:
             for command in policies[t].observe_and_issue(observations[t]):
-                try:e.submit(command)
+                try:e.submit_for(t,command)
                 except OrderError:pass  # rejection remains in the event log
         e.step(30)
     result=summary(e.world)
@@ -29,9 +29,10 @@ def run_match(seed=0,swap=False):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--seeds',type=int,default=10)
     parser.add_argument('--swap',action='store_true');parser.add_argument('--output',type=Path)
+    parser.add_argument("--paired",action="store_true",help="run both side assignments for each seed")
     args=parser.parse_args()
     if args.seeds<1:parser.error('--seeds must be positive')
-    results=[run_match(seed,args.swap) for seed in range(args.seeds)]
+    results=[dict(seed=seed,normal=run_match(seed),swapped=run_match(seed,True)) for seed in range(args.seeds)] if args.paired else [run_match(seed,args.swap) for seed in range(args.seeds)]
     output=json.dumps(results,indent=2)+'\n'
     if args.output:args.output.write_text(output)
     else:print(output)

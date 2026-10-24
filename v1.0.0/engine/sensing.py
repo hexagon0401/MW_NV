@@ -41,11 +41,12 @@ def update_sensing(w):
 def observation(w,team):
     team=Team(team)
     visible=getattr(w,'visible',{}).get(team,[])
-    return deepcopy(dict(team=int(team),tick=w.tick,
+    return deepcopy(dict(team=int(team),color='blue' if team==Team.A else 'red',tick=w.tick,
         units=[s.to_dict() for s in sorted(w.soldiers.values(),key=lambda s:s.id) if s.team==team],
         squads=[s.to_dict() for s in w.squads.values() if s.team==team],
         vehicles=[s.to_dict() for s in w.vehicles.values() if s.team==team],
         enemies=[w.soldiers[i].to_dict() for i in visible if w.soldiers[i].alive],
         last_seen=list(getattr(w,'last_seen',{}).get(team,{}).values()),
         facilities=[asdict(f) for f in w.facilities.values()],
+        orders=[dict(cmd_id=c.cmd_id,status=w.queue.status[k]) for k,c in w.queue.commands.items() if c.team==team][-10:] if hasattr(w,'queue') else [],
         resources=asdict(w.teams[team]),scores={int(t):s.score for t,s in w.teams.items()}))

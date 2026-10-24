@@ -1,0 +1,352 @@
+[
+  {
+    "seed": 0,
+    "normal": {
+      "seed": 0,
+      "ticks": 15000,
+      "sim_seconds": 3000.0,
+      "scores": {
+        "0": 0,
+        "1": 0
+      },
+      "winner": null,
+      "ended": true,
+      "checksum": "14fb2b336e3f353212a94ce0e2bf4b88a05769885335a9653d835e5051f73ce4",
+      "swapped": false,
+      "captures": 0,
+      "invalid_commands": 0,
+      "attacks": 499
+    },
+    "swapped": {
+      "seed": 0,
+      "ticks": 15000,
+      "sim_seconds": 3000.0,
+      "scores": {
+        "0": 0,
+        "1": 0
+      },
+      "winner": null,
+      "ended": true,
+      "checksum": "060d80953d3c71c21cd4d3be2d1e37762d0e0bb46a172fc08fb127135ddbd328",
+      "swapped": true,
+      "captures": 0,
+      "invalid_commands": 0,
+      "attacks": 499
+    }
+  },
+  {
+    "seed": 1,
+    "normal": {
+      "seed": 1,
+      "ticks": 4650,
+      "sim_seconds": 930.0,
+      "scores": {
+        "0": 103,
+        "1": 0
+      },
+      "winner": 0,
+      "ended": true,
+      "checksum": "03800f6316977bff55d5424d89a25304c147bad66aa823d04f9f362845c11955",
+      "swapped": false,
+      "captures": 3,
+      "invalid_commands": 0,
+      "attacks": 498
+    },
+    "swapped": {
+      "seed": 1,
+      "ticks": 4650,
+      "sim_seconds": 930.0,
+      "scores": {
+        "0": 103,
+        "1": 0
+      },
+      "winner": 0,
+      "ended": true,
+      "checksum": "dee80045b9763d9ec29b511e6476dbefaaa300f9afcd44f30896410ba79e3bad",
+      "swapped": true,
+      "captures": 3,
+      "invalid_commands": 0,
+      "attacks": 498
+    }
+  },
+  {
+    "seed": 2,
+    "normal": {
+      "seed": 2,
+      "ticks": 5100,
+      "sim_seconds": 1020.0,
+      "scores": {
+        "0": 10,
+        "1": 103
+      },
+      "winner": 1,
+      "ended": true,
+      "checksum": "b3afcc2b6ff60770751c284c161706dd3bde89c9745e946a9d05ab0330dc7958",
+      "swapped": false,
+      "captures": 4,
+      "invalid_commands": 0,
+      "attacks": 540
+    },
+    "swapped": {
+      "seed": 2,
+      "ticks": 5100,
+      "sim_seconds": 1020.0,
+      "scores": {
+        "0": 10,
+        "1": 103
+      },
+      "winner": 1,
+      "ended": true,
+      "checksum": "b23da0d64334a5afde36d97c92588d2b008c225c17e1d0f5bf75a904ef657387",
+      "swapped": true,
+      "captures": 4,
+      "invalid_commands": 0,
+      "attacks": 540
+    }
+  },
+  {
+    "seed": 3,
+    "normal": {
+      "seed": 3,
+      "ticks": 12000,
+      "sim_seconds": 2400.0,
+      "scores": {
+        "0": 0,
+        "1": 100
+      },
+      "winner": 1,
+      "ended": true,
+      "checksum": "23c6b177c7e8b33b08c4fe71a5750a723a49978fcacfd4e47aa9d3029a79a9d8",
+      "swapped": false,
+      "captures": 1,
+      "invalid_commands": 0,
+      "attacks": 519
+    },
+    "swapped": {
+      "seed": 3,
+      "ticks": 12000,
+      "sim_seconds": 2400.0,
+      "scores": {
+        "0": 0,
+        "1": 100
+      },
+      "winner": 1,
+      "ended": true,
+      "checksum": "e28fdcadb9f71cb33713ea41c148313dea92451f1d6e0a1152f97aaaec280016",
+      "swapped": true,
+      "captures": 1,
+      "invalid_commands": 0,
+      "attacks": 519
+    }
+  },
+  {
+    "seed": 4,
+    "normal": {
+      "seed": 4,
+      "ticks": 15000,
+      "sim_seconds": 3000.0,
+      "scores": {
+        "0": 0,
+        "1": 0
+      },
+      "winner": null,
+      "ended": true,
+      "checksum": "e6edce1d269b68c7fb676f3dbcbc2dad0ba3b3b4fd0c481cf756077aa52508e6",
+      "swapped": false,
+      "captures": 0,
+      "invalid_commands": 0,
+      "attacks": 523
+    },
+    "swapped": {
+      "seed": 4,
+      "ticks": 15000,
+      "sim_seconds": 3000.0,
+      "scores": {
+        "0": 0,
+        "1": 0
+      },
+      "winner": null,
+      "ended": true,
+      "checksum": "e30593b6c582e5bef18d9f829cf57f33b287c37cdebb4dbdf958c87af721ba55",
+      "swapped": true,
+      "captures": 0,
+      "invalid_commands": 0,
+      "attacks": 523
+    }
+  },
+  {
+    "seed": 5,
+    "normal": {
+      "seed": 5,
+      "ticks": 4650,
+      "sim_seconds": 930.0,
+      "scores": {
+        "0": 0,
+        "1": 100
+      },
+      "winner": 1,
+      "ended": true,
+      "checksum": "c1380cd4f841fe8f24e20889a42bf6e2510597d25b5fe9f8e010b0e7ac4221dc",
+      "swapped": false,
+      "captures": 3,
+      "invalid_commands": 0,
+      "attacks": 473
+    },
+    "swapped": {
+      "seed": 5,
+      "ticks": 4650,
+      "sim_seconds": 930.0,
+      "scores": {
+        "0": 0,
+        "1": 100
+      },
+      "winner": 1,
+      "ended": true,
+      "checksum": "096dc3f16a1aacea3421e2be14f8dabef80f1f57e73d8779057b92e1a040a7ee",
+      "swapped": true,
+      "captures": 3,
+      "invalid_commands": 0,
+      "attacks": 473
+    }
+  },
+  {
+    "seed": 6,
+    "normal": {
+      "seed": 6,
+      "ticks": 15000,
+      "sim_seconds": 3000.0,
+      "scores": {
+        "0": 0,
+        "1": 0
+      },
+      "winner": null,
+      "ended": true,
+      "checksum": "c640d9e0f4168d4e5c505be1c4386f3a407f08aa82212ce1e18ae5bbeea4aab6",
+      "swapped": false,
+      "captures": 0,
+      "invalid_commands": 0,
+      "attacks": 489
+    },
+    "swapped": {
+      "seed": 6,
+      "ticks": 15000,
+      "sim_seconds": 3000.0,
+      "scores": {
+        "0": 0,
+        "1": 0
+      },
+      "winner": null,
+      "ended": true,
+      "checksum": "01a2e7cc90b3bc16ee7e28d9f2c2ffb9311115920fda30807d24649fe50a0161",
+      "swapped": true,
+      "captures": 0,
+      "invalid_commands": 0,
+      "attacks": 489
+    }
+  },
+  {
+    "seed": 7,
+    "normal": {
+      "seed": 7,
+      "ticks": 4650,
+      "sim_seconds": 930.0,
+      "scores": {
+        "0": 100,
+        "1": 0
+      },
+      "winner": 0,
+      "ended": true,
+      "checksum": "c0ba6ae48ec8fb096fac185e3e25ce148ff61ff5cb0fe534f7ef8e66bb1eccfc",
+      "swapped": false,
+      "captures": 3,
+      "invalid_commands": 0,
+      "attacks": 478
+    },
+    "swapped": {
+      "seed": 7,
+      "ticks": 4650,
+      "sim_seconds": 930.0,
+      "scores": {
+        "0": 100,
+        "1": 0
+      },
+      "winner": 0,
+      "ended": true,
+      "checksum": "040f610d3d4f837f79792c5d685daf27a6f6aa1f9b6babaf4cb105775e07c90e",
+      "swapped": true,
+      "captures": 3,
+      "invalid_commands": 0,
+      "attacks": 478
+    }
+  },
+  {
+    "seed": 8,
+    "normal": {
+      "seed": 8,
+      "ticks": 15000,
+      "sim_seconds": 3000.0,
+      "scores": {
+        "0": 0,
+        "1": 0
+      },
+      "winner": null,
+      "ended": true,
+      "checksum": "7d29d8104ceac678978ae593ad6e8d31183947cc0764a4ed0069b7677adbc3a4",
+      "swapped": false,
+      "captures": 0,
+      "invalid_commands": 0,
+      "attacks": 531
+    },
+    "swapped": {
+      "seed": 8,
+      "ticks": 15000,
+      "sim_seconds": 3000.0,
+      "scores": {
+        "0": 0,
+        "1": 0
+      },
+      "winner": null,
+      "ended": true,
+      "checksum": "77ae5232b16662b936a5206accb5e71533635eee705769dd85d83fadca557abc",
+      "swapped": true,
+      "captures": 0,
+      "invalid_commands": 0,
+      "attacks": 531
+    }
+  },
+  {
+    "seed": 9,
+    "normal": {
+      "seed": 9,
+      "ticks": 4800,
+      "sim_seconds": 960.0,
+      "scores": {
+        "0": 0,
+        "1": 100
+      },
+      "winner": 1,
+      "ended": true,
+      "checksum": "430b5776810c49d78bc2d9647385de9c6401d7d1f6d5e78931c7dd3285461b92",
+      "swapped": false,
+      "captures": 3,
+      "invalid_commands": 0,
+      "attacks": 474
+    },
+    "swapped": {
+      "seed": 9,
+      "ticks": 4800,
+      "sim_seconds": 960.0,
+      "scores": {
+        "0": 0,
+        "1": 100
+      },
+      "winner": 1,
+      "ended": true,
+      "checksum": "bf33344f5ace0d978d5f57a3798dd792181b021222fb45e19023b875e08e95dd",
+      "swapped": true,
+      "captures": 3,
+      "invalid_commands": 0,
+      "attacks": 474
+    }
+  }
+]

@@ -3,7 +3,7 @@ from decimal import Decimal
 from dataclasses import replace
 from .orders import CommandQueue, OrderError
 from .state import WorldState
-from .types import Op
+from .types import Op, Team, Command
 from .movement import move
 from .infantry import move_squad
 from .sensing import update_sensing, observation
@@ -24,16 +24,21 @@ class Engine:
 
     def submit(self, command):
         try:
-            key=self.world.queue.submit(self.world, command)
-            c=self.world.queue.commands[key]
-            if c.op not in (Op.WAIT,Op.CANCEL) and self.world.queue.status[key]=='QUEUED':
-                for other,previous in self.world.queue.commands.items():
-                    if other!=key and previous.team==c.team and previous.unit==c.unit:
-                        self.world.queue.finish(self.world,other,'CANCELLED')
-            return key
+            return self.world.queue.submit(self.world, command)
         except OrderError as exc:
             self.world.emit('ORDER_REJECTED', reason=str(exc))
             raise
+
+    def submit_for(self,team,command):
+        """Authenticated policy boundary: a policy may only submit its own team."""
+        team=Team(team)
+        if not isinstance(command,(dict,Command)):
+            raise OrderError('SCHEMA_ERROR')
+        claimed=command.get('team') if isinstance(command,dict) else command.team
+        if claimed!=team:
+            self.world.emit('ORDER_REJECTED',team=int(team),reason='FOREIGN_TEAM')
+            raise OrderError('FOREIGN_TEAM')
+        return self.submit(command)
 
     def step(self, dt=0.2):
         ms = Decimal(str(dt)) * 1000
@@ -55,7 +60,18 @@ class Engine:
     def _tick(self):
         w = self.world
         release_transfer_locks(w)
-        for key, c in w.queue.ready(w):
+        ready=w.queue.ready(w)
+        # Resolve replacement orders before moving anything during this tick.
+        winners={}
+        for key,c in ready:
+            if c.op in (Op.WAIT,Op.CANCEL):continue
+            actor=(c.team,c.unit)
+            if actor not in winners or (c.priority,c.tick,c.cmd_id)>winners[actor][0]:
+                winners[actor]=((c.priority,c.tick,c.cmd_id),key)
+        for key,c in ready:
+            if c.op not in (Op.WAIT,Op.CANCEL) and winners[(c.team,c.unit)][1]!=key:
+                w.queue.finish(w,key,'CANCELLED')
+        for key, c in ready:
             if w.queue.status[key] not in ('QUEUED', 'RUNNING'):
                 continue
             try:
@@ -117,6 +133,11 @@ class Engine:
                 return
         elif c.op == Op.CANCEL:
             w.queue.cancel(w, c.team, c.target)
-        elif c.op not in (Op.WAIT, Op.HOLD):
+        elif c.op==Op.HOLD:
+            ids=w.squads[c.unit].member_ids if c.unit in w.squads else [c.unit]
+            for id in ids:
+                unit=w.soldiers.get(id)
+                if unit is not None and unit.alive and unit.carrier_id is None:unit.task_state='HOLD'
+        elif c.op != Op.WAIT:
             raise OrderError('UNSUPPORTED_OP')
         w.queue.finish(w, key)

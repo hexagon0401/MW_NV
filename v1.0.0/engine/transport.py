@@ -106,6 +106,8 @@ def embark(w,key,c):
 
 def release_transfer_locks(w):
     for v in w.vehicles.values():
+        if v.task_state=='UNLOADING' and not any(t['ids'] and w.queue.commands[k].unit==v.id and w.queue.status.get(k) in ('QUEUED','RUNNING') for k,t in getattr(w,'unloads',{}).items()):
+            v.task_state='READY'
         if v.task_state=='WAITING_PASSENGERS' and not any(t['vehicle']==v.id and t['remaining'] and w.queue.status.get(k) in ('QUEUED','RUNNING') for k,t in getattr(w,'transfers',{}).items()):
             v.task_state='READY'
 
