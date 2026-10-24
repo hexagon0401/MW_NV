@@ -1,0 +1,70 @@
+LUV:
+  size_px:
+  - 15
+  - 9
+  footprint_cm:
+  - 500
+  - 300
+  speed_mps: 8
+  capacity: 4
+  cargo_capacity: 0
+  fuel_max: 100
+  fuel_per_100m: 2
+  cost: 100
+  grass_factor: 0.65
+APC:
+  size_px:
+  - 21
+  - 12
+  footprint_cm:
+  - 700
+  - 400
+  speed_mps: 5.5
+  capacity: 8
+  cargo_capacity: 0
+  fuel_max: 100
+  fuel_per_100m: 3
+  cost: 180
+  grass_factor: 0.7
+IFV:
+  size_px:
+  - 24
+  - 12
+  footprint_cm:
+  - 800
+  - 400
+  speed_mps: 5
+  capacity: 6
+  cargo_capacity: 0
+  fuel_max: 100
+  fuel_per_100m: 3.5
+  cost: 230
+  grass_factor: 0.9
+HEL:
+  size_px:
+  - 24
+  - 24
+  footprint_cm:
+  - 800
+  - 800
+  speed_mps: 11
+  capacity: 8
+  cargo_capacity: 0
+  fuel_max: 100
+  fuel_per_100m: 6
+  cost: 220
+  grass_factor: 1
+TRK:
+  size_px:
+  - 21
+  - 12
+  footprint_cm:
+  - 700
+  - 400
+  speed_mps: 5
+  capacity: 0
+  cargo_capacity: 120
+  fuel_max: 100
+  fuel_per_100m: 3
+  cost: 95
+  grass_factor: 0.7

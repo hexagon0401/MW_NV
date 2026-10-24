@@ -30,3 +30,16 @@ def make_soldier(id,team,pos,type_id='INF',specs=None):
     spec = (specs or load_units())[type_id]
     return Soldier(id,team,pos,type_id=type_id,hp=spec['hp'],ammo=spec['ammo'],
                    heal_pool=spec['heal_pool'],repair_pool=spec['repair_pool'])
+
+
+def load_vehicles(path=None):
+    data=yaml.safe_load(Path(path or CONFIG_DIR/'vehicles.yaml').read_text())
+    if set(data)!={'LUV','APC','IFV','HEL','TRK'}:
+        raise ValueError('vehicle types')
+    for spec in data.values():
+        for name in ('speed_mps','fuel_max','fuel_per_100m','cost','grass_factor'):
+            if not isfinite(spec[name]) or spec[name]<=0:
+                raise ValueError(name)
+        if len(spec['footprint_cm'])!=2 or any(x<=0 for x in spec['footprint_cm']):
+            raise ValueError('footprint_cm')
+    return data

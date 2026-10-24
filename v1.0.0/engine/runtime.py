@@ -8,6 +8,7 @@ from .movement import move
 from .infantry import move_squad
 from .sensing import update_sensing, observation
 from .combat import update_combat
+from .transport import move_vehicle
 from .objectives import update_capture, update_score
 
 
@@ -70,6 +71,12 @@ class Engine:
             if f.kind != "OBJECTIVE":
                 raise OrderError("INVALID_TARGET")
             c=replace(c,op=Op.MOVE,arg0=f.pos.x_cm//100,arg1=f.pos.y_cm//100)
+        if c.op in (Op.MOVE,Op.TRANSPORT) and c.unit in w.vehicles:
+            w.queue.status[key]="RUNNING"
+            if not move_vehicle(w,key,w.vehicles[c.unit],(c.arg0*100,c.arg1*100)):
+                return
+            w.queue.finish(w,key)
+            return
         if c.op in (Op.MOVE, Op.RETREAT):
             unit = w.soldiers.get(c.unit)
             if c.unit in w.squads:
