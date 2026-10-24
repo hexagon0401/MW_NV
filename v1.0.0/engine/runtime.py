@@ -5,6 +5,7 @@ from .state import WorldState
 from .types import Op
 from .movement import move
 from .infantry import move_squad
+from .sensing import update_sensing, observation
 
 
 class Engine:
@@ -45,6 +46,12 @@ class Engine:
                 self._execute(key, c)
             except OrderError as exc:
                 w.queue.finish(w, key, 'FAILED', str(exc))
+
+        if (w.tick+1) % 5 == 0:
+            update_sensing(w)
+
+    def observe(self,team):
+        return observation(self.world,team)
 
     def _execute(self, key, c):
         w = self.world
