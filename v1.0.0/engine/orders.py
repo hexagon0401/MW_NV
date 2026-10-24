@@ -64,3 +64,27 @@ class CommandQueue:
         self.status[key] = 'QUEUED'
         world.emit('ORDER_ACCEPTED', team=int(c.team), cmd_id=c.cmd_id)
         return key
+
+    def finish(self, world, key, status='COMPLETED', reason=None):
+        if self.status[key] not in ('QUEUED', 'RUNNING'):
+            return
+        self.status[key] = status
+        c = self.commands[key]
+        world.emit('ORDER_' + status, team=int(c.team), cmd_id=c.cmd_id, reason=reason)
+
+    def ready(self, world):
+        result = []
+        for key, c in self.commands.items():
+            if self.status[key] not in ('QUEUED', 'RUNNING'):
+                continue
+            if c.tick + c.ttl <= world.tick:
+                self.finish(world, key, 'FAILED', 'EXPIRED')
+            elif c.tick <= world.tick:
+                result.append((key, c))
+        return sorted(result, key=lambda item: (-item[1].priority, item[1].tick, int(item[1].team), item[1].cmd_id))
+
+    def cancel(self, world, team, cmd_id):
+        key = f'{int(team)}:{cmd_id}'
+        if key not in self.commands:
+            raise OrderError('INVALID_TARGET')
+        self.finish(world, key, 'CANCELLED')
