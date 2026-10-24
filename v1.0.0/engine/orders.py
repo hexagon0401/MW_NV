@@ -43,7 +43,7 @@ def validate(world, command):
     if c.op in (Op.MOVE, Op.RETREAT, Op.TRANSPORT, Op.DISEMBARK):
         if not (0 <= c.arg0 < world.config.map_width_m and 0 <= c.arg1 < world.config.map_height_m):
             raise OrderError('OUT_OF_BOUNDS')
-    if c.op in (Op.CAPTURE, Op.DEFEND, Op.RESUPPLY) and c.target not in world.facilities:
+    if c.op in (Op.CAPTURE, Op.DEFEND, Op.RESUPPLY) and c.target not in world.facilities and not (c.op==Op.RESUPPLY and c.target in world.vehicles):
         raise OrderError('INVALID_TARGET')
     return c
 

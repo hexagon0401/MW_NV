@@ -111,6 +111,7 @@ class Facility:
     radius_cm: int = 1000
     progress_ms: int = 0
     capturing: Team | None = None
+    supply_per_minute: int = 0
 
 
 @dataclass

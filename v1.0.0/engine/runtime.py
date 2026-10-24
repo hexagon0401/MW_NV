@@ -8,6 +8,7 @@ from .movement import move
 from .infantry import move_squad
 from .sensing import update_sensing, observation
 from .combat import update_combat
+from .logistics import resupply, heal, regenerate
 from .transport import move_vehicle, embark, unload, release_transfer_locks
 from .objectives import update_capture, update_score
 
@@ -61,12 +62,17 @@ class Engine:
         update_combat(w)
         update_capture(w)
         update_score(w)
+        regenerate(w)
 
     def observe(self,team):
         return observation(self.world,team)
 
     def _execute(self, key, c):
         w = self.world
+        if c.op in (Op.RESUPPLY,Op.HEAL):
+            w.queue.status[key]="RUNNING"
+            if (resupply if c.op==Op.RESUPPLY else heal)(w,key,c):w.queue.finish(w,key)
+            return
         if c.op==Op.DISEMBARK:
             w.queue.status[key]="RUNNING"
             if unload(w,key,c):w.queue.finish(w,key)
