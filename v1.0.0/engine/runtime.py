@@ -1,0 +1,53 @@
+"""Network-free fixed-step simulation. All times accumulate in integer ms."""
+from decimal import Decimal
+from .orders import CommandQueue, OrderError
+from .state import WorldState
+from .types import Op
+
+
+class Engine:
+    def __init__(self, world=None):
+        self.world = world if world is not None else WorldState()
+        if self.world.config.tick_s != 0.2:
+            raise ValueError('engine tick must be 0.2 seconds')
+        if not hasattr(self.world, 'queue'):
+            self.world.queue = CommandQueue()
+            self.world.remainder_ms = 0
+
+    def submit(self, command):
+        try:
+            return self.world.queue.submit(self.world, command)
+        except OrderError as exc:
+            self.world.emit('ORDER_REJECTED', reason=str(exc))
+            raise
+
+    def step(self, dt=0.2):
+        ms = Decimal(str(dt)) * 1000
+        if not ms.is_finite() or ms < 0 or ms != ms.to_integral_value():
+            raise ValueError('dt must be nonnegative whole milliseconds')
+        w = self.world
+        begin = len(w.events)
+        w.remainder_ms += int(ms)
+        while w.remainder_ms >= 200:
+            w.remainder_ms -= 200
+            self._tick()
+            w.tick += 1
+        return w.events[begin:]
+
+    def _tick(self):
+        w = self.world
+        for key, c in w.queue.ready(w):
+            if w.queue.status[key] not in ('QUEUED', 'RUNNING'):
+                continue
+            try:
+                self._execute(key, c)
+            except OrderError as exc:
+                w.queue.finish(w, key, 'FAILED', str(exc))
+
+    def _execute(self, key, c):
+        w = self.world
+        if c.op == Op.CANCEL:
+            w.queue.cancel(w, c.team, c.target)
+        elif c.op not in (Op.WAIT, Op.HOLD):
+            raise OrderError('UNSUPPORTED_OP')
+        w.queue.finish(w, key)
