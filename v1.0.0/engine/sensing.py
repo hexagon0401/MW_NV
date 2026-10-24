@@ -25,15 +25,24 @@ def can_see(w,observer,target):
 def update_sensing(w):
     if not hasattr(w,'visible'):
         w.visible={t:[] for t in Team};w.last_seen={t:{} for t in Team}
+    buckets={}
+    for s in w.soldiers.values():
+        if s.alive and s.carrier_id is None:buckets.setdefault((s.pos.x_cm//800,s.pos.y_cm//800),[]).append(s)
     for team in Team:
-        friends=[s for s in w.soldiers.values() if s.team==team]
-        visible=[]
-        for enemy in sorted(w.soldiers.values(),key=lambda s:s.id):
-            if enemy.team!=team and any(can_see(w,s,enemy) for s in friends):
-                visible.append(enemy.id)
-                w.last_seen[team][str(enemy.id)]=dict(id=enemy.id,x_cm=enemy.pos.x_cm,y_cm=enemy.pos.y_cm,seen_at_tick=w.tick)
-                if enemy.id not in w.visible[team]:
-                    w.emit('UNIT_SPOTTED',team=int(team),unit=enemy.id)
+        found=set()
+        for observer in w.soldiers.values():
+            if observer.team!=team or not observer.alive or observer.carrier_id is not None:continue
+            radius=ceil(w.unit_specs[observer.type_id]['detection_m']/8)
+            cx,cy=observer.pos.x_cm//800,observer.pos.y_cm//800
+            for x in range(cx-radius,cx+radius+1):
+                for y in range(cy-radius,cy+radius+1):
+                    for enemy in buckets.get((x,y),()):
+                        if enemy.team!=team and enemy.id not in found and can_see(w,observer,enemy):found.add(enemy.id)
+        visible=sorted(found)
+        for id in visible:
+            enemy=w.soldiers[id]
+            w.last_seen[team][str(id)]=dict(id=id,x_cm=enemy.pos.x_cm,y_cm=enemy.pos.y_cm,seen_at_tick=w.tick)
+            if id not in w.visible[team]:w.emit('UNIT_SPOTTED',team=int(team),unit=id)
         w.visible[team]=visible
         w.last_seen[team]={k:v for k,v in w.last_seen[team].items() if w.tick-v['seen_at_tick']<300}
 

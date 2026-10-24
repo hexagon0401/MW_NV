@@ -42,3 +42,29 @@ def create_match(seed=0,swap=False):
             if kind=='TRK':transfer_cargo(w,id,120)
     w.emit('MATCH_STARTED',seed=seed,swapped=swap)
     return w
+
+
+def create_release_match(seed=0,swap=False):
+    from .map import Terrain
+    w=create_match(seed,swap);w.config=GameConfig(1024,1024,.2)
+    for collection in (w.soldiers,w.squads,w.vehicles,w.facilities):
+        for unit in collection.values():unit.pos=WorldPos(unit.pos.x_cm*4,unit.pos.y_cm*4)
+    for f in w.facilities.values():f.radius_cm*=4
+    w.terrain=Terrain(1024,1024)
+    for row in range(256):
+        for col in range(128):
+            tile=2 if w.rng.random()<.025 else 0
+            if row in (127,128):tile=1
+            w.terrain.cells[row][col]=w.terrain.cells[row][255-col]=tile
+    for id,x,y,kind,owner in [(301,304,640,'HOSPITAL',Team.A),(302,720,640,'HOSPITAL',Team.B),
+      (303,304,320,'TOWER',Team.A),(304,720,320,'TOWER',Team.B),
+      (305,176,512,'GARAGE',Team.A),(306,848,512,'GARAGE',Team.B),
+      (307,152,416,'HELIPAD',Team.A),(308,872,416,'HELIPAD',Team.B)]:
+        w.facilities[id]=Facility(id,WorldPos(x*100,y*100),kind,owner)
+    for f in w.facilities.values():
+        if f.kind in ('HQ','HELIPAD','GARAGE'):
+            for row in range(max(0,f.pos.y_cm//400-5),min(256,f.pos.y_cm//400+6)):
+                for col in range(max(0,f.pos.x_cm//400-5),min(256,f.pos.x_cm//400+6)):w.terrain.cells[row][col]=0
+    for row in w.terrain.cells:
+        for col in range(128):row[col]=row[255-col]=min(row[col],row[255-col])
+    return w

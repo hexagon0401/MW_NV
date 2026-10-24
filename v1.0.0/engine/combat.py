@@ -10,7 +10,7 @@ def update_combat(w):
         attack=w.unit_specs[s.type_id]['attack']
         if not s.alive or s.carrier_id is not None or not attack or s.ammo<=0 or s.cooldown_ms or s.task_state not in ('IDLE','HOLD','DEFEND','ARRIVED','BLOCKED'):
             continue
-        candidates=[t for t in w.soldiers.values() if t.team!=s.team and t.id in getattr(w,'visible',{}).get(s.team,[]) and can_see(w,s,t) and hypot(t.pos.x_cm-s.pos.x_cm,t.pos.y_cm-s.pos.y_cm)<=attack['range_m']*100]
+        candidates=[w.soldiers[id] for id in getattr(w,'visible',{}).get(s.team,[]) if (t:=w.soldiers[id]).team!=s.team and can_see(w,s,t) and hypot(t.pos.x_cm-s.pos.x_cm,t.pos.y_cm-s.pos.y_cm)<=attack['range_m']*100]
         if not candidates:
             continue
         target=min(candidates,key=lambda t:(hypot(t.pos.x_cm-s.pos.x_cm,t.pos.y_cm-s.pos.y_cm),t.id))

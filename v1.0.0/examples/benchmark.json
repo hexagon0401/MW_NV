@@ -1,0 +1,32 @@
+[
+  {
+    "entities": 100,
+    "ticks": 100,
+    "ticks_per_second": 3184.7196640911225,
+    "max_rss_mb": 13.4296875,
+    "sample_wall_time_s": 0.03139993800004959,
+    "vehicles": 10,
+    "workload": "idle troops + 2 continuously moving infantry + 10 idle vehicles",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41"
+  },
+  {
+    "entities": 300,
+    "ticks": 100,
+    "ticks_per_second": 1012.7946756509814,
+    "max_rss_mb": 14.3046875,
+    "sample_wall_time_s": 0.09873669599983259,
+    "vehicles": 10,
+    "workload": "idle troops + 2 continuously moving infantry + 10 idle vehicles",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41"
+  },
+  {
+    "entities": 500,
+    "ticks": 100,
+    "ticks_per_second": 551.7400828389007,
+    "max_rss_mb": 14.6796875,
+    "sample_wall_time_s": 0.18124476200000572,
+    "vehicles": 10,
+    "workload": "idle troops + 2 continuously moving infantry + 10 idle vehicles",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41"
+  }
+]
