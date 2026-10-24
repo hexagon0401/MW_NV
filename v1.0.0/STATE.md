@@ -1,14 +1,13 @@
 # MW-NV v1.0.0 STATE
-Current task: CA05 combined-arms art and final integration
-Status: PASS functional; Mac hardware/model validation pending
-Completed: CA01 catalog/64+10, CA02 combat, CA03 hybrid/PPO, CA04 ledger, CA05 art
-Verified: Python 118 PASS; JS 11 PASS; production build PASS
-Browser: desktop/mobile, 128+20 scene, live casualty/reconnect and ended-game stats PASS
-Learning: 2x64-step train/parity; continuous frozen-opponent resume PASS
-Evaluation: held-out seed10000, policy alternates A/B, 0W/2L; no promotion
-Performance: SwiftShader software GPU only; see docs/combined-arms/verification.json
-Compatibility: versioned engine replay; old display replays supported
-Run Mac: bash scripts/mac-local.sh; viewer npm run dev; see COMBINED_ARMS.md
-Next: actual Intel Mac/model validation and larger held-out balance study
-Branch: dev/v1.0.0; deployment deferred
+Current task: V02 natural-light 2D refresh and ten-game soak analysis
+Status: art PASS; 10/10 games completed; systemic movement issues found
+Art: 4x unit / 3x facility / 2x ground atlases, cel shading/dither/contact shadows
+Verified: 11 JS tests, production build, Chromium 128+20/hover/mobile PASS
+Soak: seed0–4 x2 sides, algorithm HQ, unchanged .2s tick, no sleep
+Results: A5/B5, 290 simulated minutes / 310.809 wall seconds (~56x)
+Issues: 1701 vehicle path failures; 577 blocked; 52.4% accepted orders fail
+Invariants checked: 0 violations; no claim that all system errors are absent
+Evidence: docs/visual-refresh/REPORT.md, JSON, screenshots and DESIGN.md
+Next: parking/drop slots, traffic replanning, squad boarding queues; rerun same seeds
+Branch: dev/v1.0.0; no deployment; Mac/real LLM unverified
 Usage: UNKNOWN

@@ -1,5 +1,5 @@
 import {chromium} from 'playwright-core';import {spawn} from 'node:child_process';import net from 'node:net';import assert from 'node:assert/strict';import fs from 'node:fs';
-const root=new URL('../../',import.meta.url).pathname,output=root+'docs/combined-arms/';fs.mkdirSync(output,{recursive:true});
+const root=new URL('../../',import.meta.url).pathname,output=process.env.ARTIFACT_DIR??root+'docs/combined-arms/';fs.mkdirSync(output,{recursive:true});
 const port=await new Promise(resolve=>{const s=net.createServer();s.listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>resolve(p));});});
 const server=spawn(root+'.venv/bin/python',[root+'tests/combined_fixture.py'],{cwd:root,env:{...process.env,MW_NV_TEST_PORT:String(port)},stdio:['ignore','ignore','pipe']});let stderr='';server.stderr.on('data',d=>stderr+=d);
 const endpoint=`http://127.0.0.1:${port}`;let browser;
