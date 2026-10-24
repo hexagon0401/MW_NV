@@ -1,0 +1,40 @@
+"""Run local rule-HQ matches: python -m engine.headless --seeds 10."""
+import argparse,json
+from pathlib import Path
+from agents.rule_hq import RuleHQ
+from .runtime import Engine
+from .scenario import create_match
+from .types import Team
+from .orders import OrderError
+from .objectives import summary
+
+
+def run_match(seed=0,swap=False):
+    e=Engine(create_match(seed,swap));policies={t:RuleHQ() for t in Team}
+    while not getattr(e.world,'ended',False):
+        # Both policies see snapshots from the same simulation tick.
+        observations={t:e.observe(t) for t in Team}
+        for t in Team:
+            for command in policies[t].observe_and_issue(observations[t]):
+                try:e.submit(command)
+                except OrderError:pass  # rejection remains in the event log
+        e.step(30)
+    result=summary(e.world)
+    result.update(swapped=swap,captures=sum(x['event_kind']=='OBJECTIVE_CAPTURED' for x in e.world.events),
+                  invalid_commands=sum(x['event_kind']=='ORDER_REJECTED' for x in e.world.events),
+                  attacks=sum(x['event_kind']=='ABSTRACT_ATTACK' for x in e.world.events))
+    return result
+
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--seeds',type=int,default=10)
+    parser.add_argument('--swap',action='store_true');parser.add_argument('--output',type=Path)
+    args=parser.parse_args()
+    if args.seeds<1:parser.error('--seeds must be positive')
+    results=[run_match(seed,args.swap) for seed in range(args.seeds)]
+    output=json.dumps(results,indent=2)+'\n'
+    if args.output:args.output.write_text(output)
+    else:print(output)
+
+
+if __name__=='__main__':main()

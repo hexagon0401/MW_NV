@@ -24,7 +24,13 @@ class Engine:
 
     def submit(self, command):
         try:
-            return self.world.queue.submit(self.world, command)
+            key=self.world.queue.submit(self.world, command)
+            c=self.world.queue.commands[key]
+            if c.op not in (Op.WAIT,Op.CANCEL) and self.world.queue.status[key]=='QUEUED':
+                for other,previous in self.world.queue.commands.items():
+                    if other!=key and previous.team==c.team and previous.unit==c.unit:
+                        self.world.queue.finish(self.world,other,'CANCELLED')
+            return key
         except OrderError as exc:
             self.world.emit('ORDER_REJECTED', reason=str(exc))
             raise
