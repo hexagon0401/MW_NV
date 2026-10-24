@@ -1,3 +1,8 @@
+> 최신 결정: 사용자가 Access를 의도적으로 비활성화했으며 공개 관전을 승인했다.
+> `PUBLIC_VIEWER=true`이면 Access·사이트 비밀번호 없이 완료 경기 관전만 허용한다.
+> MW_NV_VIEWER_PASSWORD는 필요하지 않다. Supabase 서버 키는 계속 Pages Secret에만 둔다.
+> 아래 비밀번호 설정은 비공개 모드로 되돌릴 때만 적용한다.
+
 # NIM + 비공개 Pages 관전
 
 ## 현재 결과
@@ -51,3 +56,14 @@ uv run python -m cloud.publish --view data/완료경기.view.json --id 고유경
 ```
 
 현재 업로더는 단일 운영자용이며 동시에 업로드하지 않는다. manifest는 최근20개를 유지한다. SQLite 누적 전적은 엔진 로컬에 있으며 현재 Pages 배포에는 공유 전적 API를 추가하지 않았다. 공개 버킷/SQL 테이블/자동 학습 일정/유료 리소스는 만들지 않는다.
+
+## NIM 차단을 해제하는 정확한 설정
+
+Codex에서 이 작업에 연결된 MW_NV 환경의 설정을 연다. Network/인터넷 허용 도메인에
+`integrate.api.nvidia.com`을 추가한 초안은 저장했다. 기존 항목은 유지한다.
+Secrets/비밀값의 기존 **NvidiaNIM** 항목을 편집하고 Allowed destinations/허용 대상에도
+`integrate.api.nvidia.com`을 추가한다. 기존 `build.nvidia.com`은 포털 주소이고
+실제 추론 주소가 아니므로 이 항목만 있으면 API가 차단된다. 키를 다시 만들거나
+중복 비밀값을 만들 필요 없다. 기존 키 값은 유지한다. 저장하고 Publish가 표시되면
+환경을 Publish한다. 이 작업은 사이트 배포와 별개다. 적용 후 모델 목록·실제 지휘 요청을 재검증한다.
+기존 비밀값 목적지 변경은 설정 도구가 충돌로 거부하므로 사용자 설정 화면에서 해야 한다.
