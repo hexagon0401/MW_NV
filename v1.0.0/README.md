@@ -54,3 +54,20 @@ PURCHASE는 arg0=0..9(INF/REC/SUP/MED/ENG/LUV/APC/IFV/HEL/TRK), target=아군 HQ
 Engine.submit_for는 외부 정책의 팀을 인증하고, Engine.step은 0.2초 고정 tick을 실행한다.
 1024m 모드와 256m 학습 모드는 같은 엔진을 사용한다.
 STATE.md → DECISIONS.md → 현재 작업 카드 순서로 재개한다.
+
+## 디자인·진행 경기 관전
+
+Geist/NanumSquare, 스위스 그리드의 상단 status bar와 A/B 양쪽 패널을 사용한다.
+UI 4색과 밝은 전장 팔레트는 분리되어 있고, 전장 렌더는 12px/m의 공유 픽셀 아틀라스다.
+실제 게임 수치와 충돌 크기는 바꾸지 않았다. 자세한 디자인/조작/검증은 viewer/DESIGN.md에 있다.
+
+로컬 진행 경기를 보려면 기존 8000 포트의 일반 API 대신 다음 서버를 실행한다:
+
+```sh
+python -m server.live --seed 1 --hq rules --port 8000
+```
+
+viewer에서 npm run dev를 실행하고 '진행 경기'를 선택한다. 배포된 클라우드에서
+이 관리자용 LIVE 모드는 제공하지 않는다. 서버의 snapshot/SSE를 읽기만 하며
+병력 수·탑승·명령·교전 상태를 한 시점으로 갱신한다. 재생 조작은 리플레이에서만 표시한다.
+완료된 경기는 data/의 view/replay 파일로 기록된다. 오늘의 디자인 작업에서는 배포하지 않았다.

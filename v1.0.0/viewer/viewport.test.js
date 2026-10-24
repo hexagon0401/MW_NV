@@ -1,2 +1,2 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';import {visibleChunks} from './src/viewport.js';
-test('viewport culls chunks outside camera',()=>{assert.equal(visibleChunks(0,0,1,384,384).length,1);assert.equal(visibleChunks(0,0,1,768,768).length,4);assert.equal(visibleChunks(-3072,0,1,384,384).length,0);});
+test('12px/m viewport culls chunks outside camera',()=>{assert.equal(visibleChunks(0,0,1,1536,1536).length,1);assert.equal(visibleChunks(0,0,1,3072,3072).length,4);assert.equal(visibleChunks(-12288,0,1,1536,1536).length,0);assert.equal(visibleChunks(0,0,.25,384,384).length,1);assert.equal(visibleChunks(0,0,0,384,384).length,0);});

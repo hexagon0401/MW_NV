@@ -1,13 +1,13 @@
-"""Finished match files only; no write or simulation-control API."""
+"""Read-only completed matches, with optional loopback-only live routes."""
 import json,re
 from pathlib import Path
 from fastapi import FastAPI,HTTPException,Query
 from fastapi.staticfiles import StaticFiles
 
 
-def create_app(store=None):
+def create_app(store=None,live_runner=None,lifespan=None):
     root=Path(store or Path(__file__).resolve().parents[1]/'data').resolve()
-    app=FastAPI()
+    app=FastAPI(lifespan=lifespan)
     def load(id):
         if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}',id):raise HTTPException(404)
         path=root/(id+'.view.json')
@@ -37,6 +37,9 @@ def create_app(store=None):
     @app.get('/api/snapshot')
     @app.get('/snapshot')
     def snapshot(match_id:str):return load(match_id)['final']
+    if live_runner is not None:
+        from .live import mount_live
+        mount_live(app,live_runner)
     build=Path(__file__).resolve().parents[1]/'viewer'/'dist'
     if build.is_dir():app.mount('/viewer',StaticFiles(directory=build,html=True),name='viewer')
     return app

@@ -1,25 +1,54 @@
-"""Completed-match-only spectator frames and demo export."""
+"""Detached spectator frames and completed-match exports."""
 import json
+from copy import deepcopy
+from dataclasses import asdict
 from pathlib import Path
-from .replay import RecordingEngine,encode,decode
+from .replay import RecordingEngine
 from .scenario import create_release_match
 from .types import Team,WorldPos
 from .objectives import summary
 
 
 def frame(w):
-    units=[]
+    """Detached presentation snapshot. Reading it cannot alter world/checksum."""
+    units=[];attacks={}
+    for event in reversed(w.events):
+        if event['sim_tick']<w.tick-10:break
+        if event['event_kind']=='ABSTRACT_ATTACK':attacks.setdefault(event['payload']['unit'],event['sim_tick']+11)
     for collection in (w.soldiers,w.vehicles):
         for u in collection.values():
-            spec=(w.unit_specs if u.id in w.soldiers else w.vehicle_specs)[u.type_id]
-            units.append(dict(id=u.id,team=int(u.team),type_id=u.type_id,x_cm=u.pos.x_cm,y_cm=u.pos.y_cm,size_px=spec['size_px'],alive=getattr(u,'alive',True),carrier_id=getattr(u,'carrier_id',None)))
-    return dict(tick=w.tick,units=units,scores={int(t):s.score for t,s in w.teams.items()},facilities=[dict(id=f.id,kind=f.kind,x_cm=f.pos.x_cm,y_cm=f.pos.y_cm,owner=None if f.owner is None else int(f.owner),progress_ms=f.progress_ms) for f in w.facilities.values()])
+            soldier=u.id in w.soldiers
+            spec=(w.unit_specs if soldier else w.vehicle_specs)[u.type_id]
+            units.append(dict(id=u.id,team=int(u.team),type_id=u.type_id,x_cm=u.pos.x_cm,y_cm=u.pos.y_cm,
+                size_px=list(spec['size_px']),alive=getattr(u,'alive',True),carrier_id=getattr(u,'carrier_id',None),
+                task_state=u.task_state,activity='FIRING' if u.id in attacks and getattr(u,'alive',True) and getattr(u,'carrier_id',None) is None else None,activity_until_tick=attacks.get(u.id),squad_id=getattr(u,'squad_id',None),hp=getattr(u,'hp',None),
+                ammo=getattr(u,'ammo',None),fuel=getattr(u,'fuel',None)))
+    orders=[]
+    if hasattr(w,'queue'):
+        for team in Team:
+            commands=[c for c in w.queue.commands.values() if c.team==team][-10:]
+            for c in commands:
+                orders.append(dict(team=int(team),cmd_id=c.cmd_id,op=int(c.op),unit=c.unit,arg0=c.arg0,arg1=c.arg1,
+                    target=c.target,accepted_tick=c.tick,status=w.queue.status[f'{int(team)}:{c.cmd_id}']))
+    return dict(presentation_version=2,tick=w.tick,units=units,squads=[asdict(s) for s in w.squads.values()],orders=orders,
+        scores={int(t):s.score for t,s in w.teams.items()},facilities=[dict(id=f.id,kind=f.kind,
+        x_cm=f.pos.x_cm,y_cm=f.pos.y_cm,owner=None if f.owner is None else int(f.owner),
+        radius_cm=f.radius_cm,capturing=None if f.capturing is None else int(f.capturing),progress_ms=f.progress_ms)
+        for f in w.facilities.values()])
 
 
 def export_view(engine,initial):
     w=engine.world
     if not getattr(w,'ended',False):raise ValueError('only completed matches may be published')
-    return dict(version=1,width_m=w.config.map_width_m,height_m=w.config.map_height_m,terrain=w.terrain.cells,units=initial['units'],initial=initial,final=frame(w),events=w.events,summary=summary(w))
+    events=deepcopy(w.events)
+    for event in events:
+        p=event['payload']
+        if event['event_kind']=='ORDER_ACCEPTED' and hasattr(w,'queue'):
+            c=w.queue.commands.get(f"{p['team']}:{p['cmd_id']}")
+            if c is not None:p.update(op=int(c.op),unit=c.unit,arg0=c.arg0,arg1=c.arg1,target=c.target)
+    initial=deepcopy(initial)
+    return dict(version=1,presentation_version=2,width_m=w.config.map_width_m,height_m=w.config.map_height_m,
+        terrain=deepcopy(w.terrain.cells),units=initial['units'],initial=initial,final=frame(w),events=events,summary=summary(w))
 
 
 def demo(output):

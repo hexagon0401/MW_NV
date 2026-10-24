@@ -7,4 +7,4 @@ export const STATUS={IDLE:'대기',HOLD:'경계',DEFEND:'방어',MOVING:'이동 
 export const OPS=['대기','경계','이동','점령','거점 방어','승차','하차','수송','재보급','치료','후퇴','구매','취소'];
 export const ORDER_STATUS={QUEUED:'접수',RUNNING:'실행 중',ACCEPTED:'접수',COMPLETED:'완료',FAILED:'실패',CANCELLED:'취소'};
 export const typeOf=u=>TYPES[u.type_id]??{name:u.type_id??'알 수 없는 유닛',size:[12,20],kind:'infantry'};
-export const stateOf=u=>u.alive===false?'비활성':u.carrier_id!=null?'탑승 중':STATUS[u.task_state]??'—';
+export const stateOf=u=>u.alive===false?'비활성':u.carrier_id!=null?'탑승 중':STATUS[u.activity??u.task_state]??'—';

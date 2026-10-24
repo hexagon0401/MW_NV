@@ -1,0 +1,24 @@
+{
+  "test": "pixel atlas silhouettes / shared texture / 500 infantry",
+  "opaque": 2208,
+  "colors": 8,
+  "shared": true,
+  "fps": 13,
+  "scriptSeconds": 0.050994,
+  "taskSeconds": 0.142383,
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "errors": [],
+  "python_tests": 89,
+  "javascript_tests": 9,
+  "browser_checks": [
+    "self-hosted Geist and NanumSquare",
+    "fixed A/B rails",
+    "desktop hover and mobile tap",
+    "real engine casualties over SSE",
+    "unexpected server restart and reconnect",
+    "graceful SIGTERM shutdown within timeout and reconnect"
+  ],
+  "physics": "unchanged; observed/unobserved RuleHQ game checksums match",
+  "deployment": "deferred by user",
+  "performance_note": "13–17 FPS across software-GPU samples; actual Intel Mac performance unverified"
+}
