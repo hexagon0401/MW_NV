@@ -1,5 +1,6 @@
 """Network-free fixed-step simulation. All times accumulate in integer ms."""
 from decimal import Decimal
+from dataclasses import replace
 from .orders import CommandQueue, OrderError
 from .state import WorldState
 from .types import Op
@@ -7,6 +8,7 @@ from .movement import move
 from .infantry import move_squad
 from .sensing import update_sensing, observation
 from .combat import update_combat
+from .objectives import update_capture
 
 
 class Engine:
@@ -51,12 +53,18 @@ class Engine:
         if (w.tick+1) % 5 == 0:
             update_sensing(w)
         update_combat(w)
+        update_capture(w)
 
     def observe(self,team):
         return observation(self.world,team)
 
     def _execute(self, key, c):
         w = self.world
+        if c.op in (Op.CAPTURE,Op.DEFEND):
+            f=w.facilities[c.target]
+            if f.kind != "OBJECTIVE":
+                raise OrderError("INVALID_TARGET")
+            c=replace(c,op=Op.MOVE,arg0=f.pos.x_cm//100,arg1=f.pos.y_cm//100)
         if c.op in (Op.MOVE, Op.RETREAT):
             unit = w.soldiers.get(c.unit)
             if c.unit in w.squads:
