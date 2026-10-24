@@ -5,7 +5,8 @@ import hashlib
 import json
 import random
 from .config import GameConfig
-from .types import Soldier, Team, TeamState, WorldPos
+from .map import Terrain, alpha_terrain
+from .types import Soldier, Team, TeamState, WorldPos, Facility
 
 
 class WorldState:
@@ -20,7 +21,9 @@ class WorldState:
                          2: Soldier(2, Team.B, WorldPos(12000, 6400))}
         self.squads = {}
         self.vehicles = {}
-        self.facilities = {}
+        self.facilities = {101: Facility(101, WorldPos(800, 6400), "HQ", Team.A),
+                           102: Facility(102, WorldPos(12000, 6400), "HQ", Team.B)}
+        self.terrain = alpha_terrain() if self.config.map_width_m == self.config.map_height_m == 128 else Terrain(self.config.map_width_m, self.config.map_height_m)
         self.events = []
 
     def emit(self, kind, **payload):
