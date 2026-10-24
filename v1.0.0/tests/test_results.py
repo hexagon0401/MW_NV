@@ -7,7 +7,7 @@ from server.app import create_app
 
 
 def match(id,winner,mode='evaluation'):
-    return dict(kind='match',id=id,rules_version='combined-arms-1',policies={'A':'p1','B':'rules'},mode=mode,seed=1,winner=winner,scores=[100,20],ended=True)
+    return dict(kind='match',id=id,rules_version='combined-arms-2',policies={'A':'p1','B':'rules'},mode=mode,seed=1,winner=winner,scores=[100,20],ended=True)
 
 
 def test_wins_draws_steps_and_idempotent_import(tmp_path):
@@ -53,4 +53,4 @@ def test_training_run_and_frozen_checkpoint_share_actual_steps(tmp_path):
     record_training(db,'weights-hash',64,training_run='run-1')
     ledger=aggregate(db)
     assert all(g['training_steps']==64 for g in ledger['policies'] if g['policy'] in ('run-1','weights-hash'))
-    assert ledger['training']==[dict(rules_version='combined-arms-1',policy='weights-hash',steps=64)]
+    assert ledger['training']==[dict(rules_version='combined-arms-2',policy='weights-hash',steps=64)]

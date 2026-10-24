@@ -50,14 +50,16 @@ def update_sensing(w):
 
 
 def observation(w,team):
-    team=Team(team)
+    team=Team(team);orders=[]
+    if hasattr(w,'queue'):
+        own=[(k,c) for k,c in w.queue.commands.items() if c.team==team]
+        recent={k for k,c in own[-10:]}
+        orders=[dict(cmd_id=c.cmd_id,status=w.queue.status[k],unit=c.unit,op=int(c.op),target=c.target,arg0=c.arg0,arg1=c.arg1) for k,c in own if k in recent or w.queue.status[k] in ('QUEUED','RUNNING')]
     visible=getattr(w,'visible',{}).get(team,[])
     return deepcopy(dict(rules_version=w.rules_version,catalog=dict(units=w.unit_specs,vehicles=w.vehicle_specs,weapons=w.weapon_specs),team=int(team),map_width_m=w.config.map_width_m,map_height_m=w.config.map_height_m,color='blue' if team==Team.A else 'red',tick=w.tick,
         units=[s.to_dict() for s in sorted(w.soldiers.values(),key=lambda s:s.id) if s.team==team],
         squads=[s.to_dict() for s in w.squads.values() if s.team==team],
-        vehicles=[s.to_dict() for s in w.vehicles.values() if s.team==team],
-        enemies=[u.to_dict() for i in visible if (u:=w.soldiers.get(i) or w.vehicles.get(i)) is not None and u.alive],
-        last_seen=list(getattr(w,'last_seen',{}).get(team,{}).values()),
-        facilities=[asdict(f) for f in w.facilities.values()],
-        orders=[dict(cmd_id=c.cmd_id,status=w.queue.status[k],unit=c.unit,op=int(c.op),target=c.target) for k,c in w.queue.commands.items() if c.team==team][-10:] if hasattr(w,'queue') else [],
-        terrain=w.terrain.cells if w.config.map_width_m>=1024 else None,resources=asdict(w.teams[team]),scores={int(t):s.score for t,s in w.teams.items()}))
+        vehicles=[v.to_dict() for v in w.vehicles.values() if v.team==team],
+        enemies=[u.to_dict() for uid in visible if (u:=w.soldiers.get(uid) or w.vehicles.get(uid)) is not None and u.alive],
+        last_seen=list(getattr(w,'last_seen',{}).get(team,{}).values()),facilities=[asdict(f) for f in w.facilities.values()],orders=orders,
+        terrain=w.terrain.cells if w.config.map_width_m>=1024 else None,resources=asdict(w.teams[team]),scores={int(t):v.score for t,v in w.teams.items()}))

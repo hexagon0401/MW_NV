@@ -1,3 +1,4 @@
+from .version import RULES_VERSION
 """Deterministic state, including RNG state in clones and checksums."""
 from dataclasses import asdict
 from copy import deepcopy
@@ -16,7 +17,7 @@ class WorldState:
         self.unit_specs = load_units()
         self.vehicle_specs = load_vehicles()
         self.weapon_specs=load_weapons()
-        self.rules_version='combined-arms-1'
+        self.rules_version=RULES_VERSION
         self.catalog_version='combined-arms-1'
         self.artillery_rng=random.Random(seed ^ 0xA47111)
         self.projectiles=[]

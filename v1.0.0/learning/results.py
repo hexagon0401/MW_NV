@@ -1,3 +1,4 @@
+from engine.version import RULES_VERSION
 """Local completed-match ledger and idempotent portable JSONL records."""
 import argparse,json,sqlite3,uuid,hashlib
 from pathlib import Path
@@ -38,7 +39,7 @@ def record_world(db,w,mode,policies,match_id=None,steps=0):
 
 
 def record_training(db,policy,steps,opponent='algorithm',run_id=None,training_run=None):
-    return insert(db,dict(kind='training',id=run_id or uuid.uuid4().hex,rules_version='combined-arms-1',policies={'A':policy,'B':opponent},steps=int(steps),training_run=training_run))
+    return insert(db,dict(kind='training',id=run_id or uuid.uuid4().hex,rules_version=RULES_VERSION,policies={'A':policy,'B':opponent},steps=int(steps),training_run=training_run))
 
 
 def records(db):

@@ -1,6 +1,8 @@
+> 최신 픽셀아트·상태창: [ART](docs/pixel-refinement/ART.md), 수송 수정: [TRAFFIC](docs/pixel-refinement/TRAFFIC.md).
+
 # 제병협동 / 로컬 실행과 학습
 
-현재 규칙·카탈로그는 `combined-arms-1`, 후보·정책 계약은 `tactics-1`이다.
+현재 규칙은 `combined-arms-2`, 카탈로그는 `combined-arms-1`, 후보·정책 계약은 `tactics-1`이다.
 출시 맵은 1024m, 팀당 64명(8명×8분대)과 차량10대다.
 기존 256m 실험 환경과 구형 32차원 정책은 회귀·비교용으로 보존했다.
 

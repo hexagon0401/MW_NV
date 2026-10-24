@@ -108,6 +108,7 @@ class Vehicle(Entity):
     turret_heading: float = 0.0
     deployment: str = 'PACKED'
     deployment_ms: int = 0
+    needs_parking: bool = False
 
     def __post_init__(self):
         super().__post_init__()

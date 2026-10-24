@@ -26,7 +26,7 @@ def frame(w):
             units.append(dict(id=u.id,team=int(u.team),type_id=u.type_id,x_cm=u.pos.x_cm,y_cm=u.pos.y_cm,
                 size_px=list(spec['size_px']),alive=getattr(u,'alive',True),carrier_id=getattr(u,'carrier_id',None),
                 task_state=u.task_state,activity='FIRING' if u.id in attacks and getattr(u,'alive',True) and getattr(u,'carrier_id',None) is None else None,activity_until_tick=attacks.get(u.id),squad_id=getattr(u,'squad_id',None),hp=getattr(u,'hp',None),
-                armor=spec['armor'],weapon=spec['weapon'],role=spec['role'],cooldown_ms=u.cooldown_ms,deployment=getattr(u,'deployment',None),deployment_ms=getattr(u,'deployment_ms',None),turret_heading=getattr(u,'turret_heading',None),max_ammo=spec['ammo'],min_range_m=100 if u.type_id=='SPH' else 0,max_hp=spec.get('hp'),target_id=getattr(u,'target_id',None),range_m=(spec.get('attack') or {}).get('range_m'),ammo=getattr(u,'ammo',None),fuel=getattr(u,'fuel',None)))
+                armor=spec['armor'],weapon=spec['weapon'],role=spec['role'],cooldown_ms=u.cooldown_ms,deployment=getattr(u,'deployment',None),deployment_ms=getattr(u,'deployment_ms',None),turret_heading=getattr(u,'turret_heading',None),max_ammo=spec['ammo'],min_range_m=100 if u.type_id=='SPH' else 0,passenger_count=len(getattr(u,'passenger_ids',[])),max_hp=spec.get('hp'),target_id=getattr(u,'target_id',None),range_m=(spec.get('attack') or {}).get('range_m'),ammo=getattr(u,'ammo',None),fuel=getattr(u,'fuel',None)))
     decisions={}
     for event in reversed(w.events):
         if event['event_kind']=='HQ_DECISION':

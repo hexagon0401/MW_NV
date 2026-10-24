@@ -3,7 +3,7 @@ import {Texture,Rectangle} from 'pixi.js';
 const C={ground:'#cdd3c3',grass:'#bacbaa',ink:'#55625a',forest:'#76966d',road:'#aeb9bb',water:'#87b7c5',roof:'#9d9eac'};
 export function terrainAtlas(){const canvas=document.createElement('canvas');canvas.width=24*16;canvas.height=24*10;const c=canvas.getContext('2d');const r=(color,x,y,w=1,h=1)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));};
  for(let type=0;type<10;type++)for(let v=0;v<16;v++){c.save();c.translate(v*24,type*24);let seed=v*2317+type*7919+83;const rand=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};r(['#aeb99a','#9ca8a5','#aeb99a','#67796c','#a3b09e','#82afb4','#7198a9','#a7a18b','#a0b28c','#859685'][type],0,0,24,24);
- for(let i=0;i<30;i++)r(i%2?'#b5bda0':'#a5b092',rand()*23,rand()*23);
+ if([0,2,8].includes(type))for(let i=0;i<30;i++)r(i%2?'#b5bda0':'#a5b092',rand()*23,rand()*23);
  if(type===2){for(let i=0;i<1;i++){const cx=12+(v%3-1),cy=10+v%2,rad=8+v%2;r('#766b48',cx-1,cy+rad-2,3,6);r('#879872',cx-5,cy+rad+3,14,2);for(let y=-rad;y<=rad;y++)for(let x=-rad;x<=rad;x++){const d=x*x+y*y;if(d>rad*rad-((x+y+v)%3))continue;const light=(x+y)/rad;const color=light<-.65?'#b1be89':light<-.05?'#8ea574':light<.65?'#6d885c':'#496b4d';r(color,cx+x,cy+y);if(d>rad*rad*.4&&(x+y)%2===0&&light>.1)r('#5d7a53',cx+x,cy+y);}for(let j=0;j<7;j++){const lx=cx-5+(j*7+v)%11,ly=cy-5+(j*3+v)%10;r(j%2?'#829b65':'#a4b57e',lx,ly,3,2);if(j%2===0)r('#b8c490',lx,ly,2,1);}r('#c3ca9b',cx-2,cy-rad+1,3,1);}}
  if(type===5||type===6){for(let i=0;i<6;i++)r(i%2?'#a2c4c0':'#779fa9',rand()*18,rand()*23,3+Math.floor(rand()*3),1);}
  if(type===7){r('#687d70',0,0,2,24);r('#687d70',22,0,2,24);for(let y=2;y<24;y+=3)r('#bcb697',2,y,20,2);}

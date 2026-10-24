@@ -5,7 +5,7 @@ from collections import defaultdict
 
 CONTRACT='tactics-1'
 ROLES=('capture','defend','recon','anti_armor','fire','transport','supply','repair','retreat')
-BUSY=('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS','UNLOADING','DEPLOYING','PACKING')
+BUSY=('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS','UNLOADING','DEPLOYING','PACKING','WAITING_TRAFFIC')
 
 
 def distance(a,b):return hypot(a['pos']['x_cm']-b['pos']['x_cm'],a['pos']['y_cm']-b['pos']['y_cm'])/100
@@ -124,14 +124,21 @@ def candidates(obs):
                 depot=min((d for d in depots if d['id']!=v['id']),key=lambda d:distance(v,d),default=None)
                 if depot:
                     if distance(v,depot)<=3:add(v,'supply',140,'차량 연료·탄약 보급',8,target=depot['id'])
-                    elif v['deployment']=='PACKED':goto(v,'supply',depot,130,'차량 보급 이동',7)
-                    else:add(v,'supply',130,'보급 이동 전 철수',16)
+                    elif v['deployment']=='PACKED' and v['fuel']>0:goto(v,'supply',depot,130,'차량 보급 이동',7)
+                    elif v['deployment']!='PACKED':add(v,'supply',130,'보급 이동 전 철수',16)
+            continue
+        from engine.traffic import arrival_slot
+        if v.get('needs_parking') and not v['passenger_ids']:
+            slot=arrival_slot(obs,v,v['pos'],parking=True)
+            if slot:add(v,'transport',150,'하차 후 통행로 확보·분산 주차',7,x=slot[0],y=slot[1])
             continue
         if v['passenger_ids']:
             target=min((f for f in objectives if f['owner']!=obs['team']),key=lambda f:distance(v,f),default=objectives[0] if objectives else None)
             if target:
                 if distance(v,target)<=target['radius_cm']/100:add(v,'transport',145,'거점 도착·하차',6,x=v['pos']['x_cm']//100,y=v['pos']['y_cm']//100)
-                else:add(v,'transport',140,'탑승 분대 거점 수송',7,x=target['pos']['x_cm']//100+(-16 if obs['team']==0 else 16),y=target['pos']['y_cm']//100)
+                else:
+                    slot=arrival_slot(obs,v,target['pos'])
+                    if slot:add(v,'transport',140,'분산 하차 지점 수송',7,x=slot[0],y=slot[1])
             continue
         if v['type_id']=='SPH':
             sightings={e['id']:dict(x_cm=e['pos']['x_cm'],y_cm=e['pos']['y_cm'],seen_at_tick=obs['tick']) for e in enemies}
@@ -153,7 +160,9 @@ def candidates(obs):
             targets=[e for e in enemies if direct(v,e,vs)]
             if targets:
                 e=min(targets,key=lambda e:(distance(v,e),e['id']));add(v,'anti_armor',125,'직사 화력 지원',13,target=e['id'])
-            elif objectives:goto(v,'anti_armor',min(objectives,key=lambda f:distance(v,f)),65,'전선 화력 지원',7)
+            elif objectives:
+                target=min(objectives,key=lambda f:distance(v,f));slot=arrival_slot(obs,v,target['pos'])
+                if slot:add(v,'anti_armor',65,'분산 화력 배치',7,x=slot[0],y=slot[1])
     from engine.economy import PURCHASE_TYPES
     hq=next((f for f in obs['facilities'] if f['kind']=='HQ' and f['owner']==obs['team']),None)
     if hq:
@@ -187,7 +196,7 @@ def select(items,limit=4):
 
 
 def commands(obs,selected):
-    return [dict(c['command'],cmd_id=obs['tick']*100+i+1,team=obs['team'],tick=obs['tick'],ttl=750) for i,c in enumerate(selected)]
+    return [dict(c['command'],cmd_id=obs['tick']*100+i+1,team=obs['team'],tick=obs['tick'],ttl=3000 if c['command']['op'] in (5,7) else 750) for i,c in enumerate(selected)]
 
 
 def shortlist(items,limit=12):

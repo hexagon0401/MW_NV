@@ -117,7 +117,7 @@ class CommandQueue:
                 if soldier is not None and soldier.alive and soldier.task_state in ('MOVING','PATH_PENDING'):
                     soldier.task_state='HOLD';world.emit('UNIT_TASK_CHANGED',unit=uid,task_state='HOLD')
         actor=world.vehicles.get(c.unit)
-        if status in ('FAILED','CANCELLED') and actor is not None and actor.alive and actor.task_state in ('MOVING','TAKEOFF','LANDING','PATHING','DEPLOYING','PACKING'):
+        if status in ('FAILED','CANCELLED') and actor is not None and actor.alive and actor.task_state in ('MOVING','TAKEOFF','LANDING','PATHING','DEPLOYING','PACKING','WAITING_TRAFFIC'):
             if actor.deployment=='DEPLOYING':actor.deployment='PACKED'
             elif actor.deployment=='PACKING':actor.deployment='DEPLOYED'
             actor.task_state='READY'

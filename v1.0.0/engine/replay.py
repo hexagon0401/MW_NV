@@ -1,3 +1,4 @@
+from .version import RULES_VERSION
 """Versioned JSON checkpoints and command/timing journals, never pickle/eval."""
 import json,random
 from enum import IntEnum
@@ -56,7 +57,7 @@ class RecordingEngine(Engine):
 
 
 def replay(document):
-    if document.get('version')!=2 or document.get('rules_version')!='combined-arms-1' or document.get('catalog_version')!='combined-arms-1':raise ValueError('incompatible replay rules/catalog version')
+    if document.get('version')!=2 or document.get('rules_version')!=RULES_VERSION or document.get('catalog_version')!='combined-arms-1':raise ValueError('incompatible replay rules/catalog version')
     engine=Engine(decode(document['initial']))
     for action in document['journal']:
         if action['kind']=='submit':

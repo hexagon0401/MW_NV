@@ -1,3 +1,4 @@
+from engine.version import RULES_VERSION
 """Explicit CPU training and held-out evaluation for combined-arms candidates."""
 import argparse,json,uuid
 from pathlib import Path
@@ -34,7 +35,7 @@ def train(output,steps=64,controlled='A',opponent=None,seed=0,stats='data/result
     obs,_=env.reset(seed=7);mask=env.action_masks();action,_=model.predict(obs,deterministic=True,action_masks=mask)
     loaded=MaskablePPO.load(str(path),device='cpu');check,_=loaded.predict(obs,deterministic=True,action_masks=mask)
     assert int(action)==int(check)==CandidatePolicy(path.with_suffix('.npz')).predict(obs,mask)
-    path.with_suffix('.json').write_text(json.dumps(dict(contract='tactics-1',rules_version='combined-arms-1',steps=steps,seed=seed,controlled=controlled,opponent=opponent,selected=False,policy_id=CandidatePolicy(path.with_suffix('.npz')).policy_id,training_run=env.run_id),indent=2)+'\n')
+    path.with_suffix('.json').write_text(json.dumps(dict(contract='tactics-1',rules_version=RULES_VERSION,steps=steps,seed=seed,controlled=controlled,opponent=opponent,selected=False,policy_id=CandidatePolicy(path.with_suffix('.npz')).policy_id,training_run=env.run_id),indent=2)+'\n')
     if stats:
         from .results import record_training
         record_training(stats,CandidatePolicy(path.with_suffix('.npz')).policy_id,model.num_timesteps,env.opponent.policy_id if env.opponent else 'algorithm',training_run=env.run_id)

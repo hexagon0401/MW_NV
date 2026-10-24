@@ -1,8 +1,8 @@
 {
   "scenario": "128 infantry + 20 vehicles, synthetic packed rendering positions; actual release live counts verified",
-  "fps": 9,
-  "scriptSeconds": 0.143242,
-  "taskSeconds": 0.219889,
+  "fps": 7,
+  "scriptSeconds": 0.160032,
+  "taskSeconds": 0.21662900000000002,
   "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
   "errors": []
 }

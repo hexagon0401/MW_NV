@@ -1,3 +1,4 @@
+from engine.version import RULES_VERSION
 """Versioned 1056-feature / 65-action NumPy policy for hybrid tactical HQ."""
 import hashlib
 import numpy as np
@@ -19,7 +20,7 @@ def vector(obs,items):
 class CandidatePolicy:
     def __init__(self,path):
         with np.load(path,allow_pickle=False) as data:
-            if str(data['contract'].item())!=CONTRACT or str(data['rules_version'].item())!='combined-arms-1':raise ValueError('policy contract mismatch')
+            if str(data['contract'].item())!=CONTRACT or str(data['rules_version'].item())!=RULES_VERSION:raise ValueError('policy contract mismatch')
             self.weights={k:data[k].copy() for k in ('w0','b0','w1','b1','wo','bo')}
         expected={'w0':(128,OBS_SIZE),'b0':(128,),'w1':(128,128),'b1':(128,),'wo':(ACTIONS,128),'bo':(ACTIONS,)}
         if any(self.weights[k].shape!=shape or not np.isfinite(self.weights[k]).all() for k,shape in expected.items()):raise ValueError('invalid policy shape/values')
@@ -33,7 +34,7 @@ class CandidatePolicy:
 
 
 def export(model,path):
-    p=model.policy.state_dict();data=dict(contract=np.array(CONTRACT),rules_version=np.array('combined-arms-1'))
+    p=model.policy.state_dict();data=dict(contract=np.array(CONTRACT),rules_version=np.array(RULES_VERSION))
     for i,layer in enumerate((0,2)):
         data[f'w{i}']=p[f'mlp_extractor.policy_net.{layer}.weight'].cpu().numpy();data[f'b{i}']=p[f'mlp_extractor.policy_net.{layer}.bias'].cpu().numpy()
     data['wo']=p['action_net.weight'].cpu().numpy();data['bo']=p['action_net.bias'].cpu().numpy()
