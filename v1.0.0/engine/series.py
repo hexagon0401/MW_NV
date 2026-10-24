@@ -11,7 +11,7 @@ def run(output='data/series.jsonl',count=1):
     completed=0
     try:
         while count==0 or completed<count:
-            result=run_match(seed,swap=bool(seed%2))
+            result=run_match(seed,swap=bool(seed%2),release=True,stats=path.parent/'results.sqlite')
             with path.open('a') as stream:stream.write(json.dumps(result)+'\n');stream.flush()
             print(json.dumps(result),flush=True);seed+=1;completed+=1
     except KeyboardInterrupt:print('Stopped; completed matches retained.',flush=True)

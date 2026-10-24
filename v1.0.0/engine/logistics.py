@@ -20,7 +20,7 @@ def near(a,b):
 
 def transfer_cargo(w,truck_id,amount):
     truck=w.vehicles[truck_id]
-    if truck.type_id!='TRK' or type(amount) is not int or not any(f.kind in ('HQ','SUPPLY_NODE') and f.owner==truck.team and near(truck,f) for f in w.facilities.values()):
+    if not truck.alive or truck.type_id!='TRK' or type(amount) is not int or not any(f.kind in ('HQ','SUPPLY_NODE') and f.owner==truck.team and near(truck,f) for f in w.facilities.values()):
         raise OrderError('INVALID_TARGET')
     capacity=w.vehicle_specs['TRK']['cargo_capacity']
     if not 0<=truck.cargo_supply+amount<=capacity:
@@ -34,7 +34,7 @@ def resupply(w,key,c):
     node=w.facilities.get(c.target) or w.vehicles.get(c.target)
     if node is None or getattr(node,'owner',getattr(node,'team',None))!=c.team:
         raise OrderError('INVALID_TARGET')
-    if c.target in w.vehicles and node.type_id!='TRK':raise OrderError('INVALID_TARGET')
+    if c.target in w.vehicles and (node.type_id!='TRK' or not node.alive):raise OrderError('INVALID_TARGET')
     if c.target in w.facilities and node.kind not in ('HQ','SUPPLY_NODE') and not getattr(node,'supply_per_minute',0):raise OrderError('INVALID_TARGET')
     ids=w.squads[c.unit].member_ids if c.unit in w.squads else [c.unit]
     units=[w.soldiers.get(i) or w.vehicles.get(i) for i in ids]

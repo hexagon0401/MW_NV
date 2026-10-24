@@ -15,6 +15,13 @@ def create_app(store=None,live_runner=None,lifespan=None):
         data=json.loads(path.read_text())
         if not data.get('summary',{}).get('ended'):raise HTTPException(404)
         return data
+    @app.get('/api/stats')
+    @app.get('/stats')
+    def stats():
+        from learning.results import aggregate
+        import sqlite3
+        try:return aggregate(root/'results.sqlite')
+        except (sqlite3.Error,ValueError,KeyError):raise HTTPException(503,'results unavailable')
     @app.get('/api/matches')
     @app.get('/matches')
     def matches():

@@ -25,7 +25,7 @@ def purchase(w,c):
             x,y=hq.pos.x_cm+dx,hq.pos.y_cm+dy
             if not terrain.passable(x,y):continue
             if any(s.alive and s.carrier_id is None and hypot(s.pos.x_cm-x,s.pos.y_cm-y)<100 for s in w.soldiers.values()):continue
-            if any(abs(v.pos.x_cm-x)<(w.vehicle_specs[v.type_id]['footprint_cm'][0]+(100 if infantry else spec['footprint_cm'][0]))/2 and abs(v.pos.y_cm-y)<(w.vehicle_specs[v.type_id]['footprint_cm'][1]+(100 if infantry else spec['footprint_cm'][1]))/2 for v in w.vehicles.values()):continue
+            if any(abs(v.pos.x_cm-x)<(w.vehicle_specs[v.type_id]['footprint_cm'][0]+(100 if infantry else spec['footprint_cm'][0]))/2 and abs(v.pos.y_cm-y)<(w.vehicle_specs[v.type_id]['footprint_cm'][1]+(100 if infantry else spec['footprint_cm'][1]))/2 for v in w.vehicles.values() if v.alive):continue
             position=WorldPos(x,y);break
         if position:break
     if position is None:raise OrderError('NO_SPAWN_SPACE')
@@ -41,4 +41,7 @@ def purchase(w,c):
         else:
             destination.member_ids=[i for i in destination.member_ids if w.soldiers[i].alive]+[id]
         unit.squad_id=destination.id
-    w.emit('UNIT_SPAWNED' ,unit=id,entity=dict(id=id,team=int(c.team),type_id=kind,x_cm=position.x_cm,y_cm=position.y_cm,size_px=spec['size_px'],alive=True,carrier_id=None))
+    entity=unit.to_dict();entity.pop('pos',None)
+    entity.update(x_cm=position.x_cm,y_cm=position.y_cm,size_px=spec['size_px'],max_hp=spec['hp'],max_ammo=spec['ammo'],range_m=(spec['attack'] or {}).get('range_m'),min_range_m=100 if kind=='SPH' else 0,armor=spec['armor'],weapon=spec['weapon'],role=spec['role'])
+    from dataclasses import asdict
+    w.emit('UNIT_SPAWNED',unit=id,entity=entity,squad=asdict(destination) if infantry else None)

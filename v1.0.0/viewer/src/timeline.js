@@ -9,7 +9,7 @@ export class Timeline{
  }
  reset(){this.state=structuredClone(this.data.initial);this.units=new Map(this.state.units.map(u=>[u.id,u]));this.facilities=new Map(this.state.facilities.map(f=>[f.id,f]));this.commands=new Map((this.state.orders??[]).map(c=>[`${c.team}:${c.cmd_id}`,{...c}]));this.index=0;while(this.index<this.data.events.length&&(this.data.events[this.index].sim_tick+1)/5<=this.startTime)this.index++;this.lastTime=-1;}
  apply(e){const p=e.payload,u=this.units.get(p.unit),f=this.facilities.get(p.objective),kind=e.event_kind;
-  if(kind==='UNIT_SPAWNED'&&p.entity){const unit=structuredClone(p.entity);this.units.set(unit.id,unit);}
+  if(kind==='UNIT_SPAWNED'&&p.entity){const unit=structuredClone(p.entity);this.units.set(unit.id,unit);if(p.squad){this.state.squads=(this.state.squads??[]).filter(s=>s.id!==p.squad.id);this.state.squads.push(structuredClone(p.squad));}}
   if(kind==='UNIT_MOVED'&&u)u.task_state='MOVING';
   if(kind==='UNIT_ARRIVED'&&u){u.task_state='ARRIVED';for(const s of this.state.squads??[])if(s.member_ids.includes(u.id))for(const id of s.member_ids){const member=this.units.get(id);if(member?.alive&&member.carrier_id==null)member.task_state='ARRIVED';}}
   if(['INFANTRY_DISABLED','VEHICLE_DISABLED'].includes(kind)&&u){u.alive=false;u.task_state='DISABLED';}
@@ -23,6 +23,7 @@ export class Timeline{
   if(kind==='ARTILLERY_FIRED'){(this.state.projectiles??=[]).push({...p});if(u&&u.ammo!=null)u.ammo--;}
   if(kind==='ARTILLERY_IMPACT')(this.state.impacts??=[]).push({...p,tick:e.sim_tick+1});
   if(kind==='UNIT_DAMAGED'&&p.damage)(this.state.damage??=[]).push({...p,tick:e.sim_tick+1});
+  if(kind==='HQ_DECISION')(this.state.decisions??={})[p.team]=structuredClone(p.metadata);
   if(kind==='SCORE_TICK')this.state.scores={...p.scores};
   if(kind.startsWith('ORDER_')&&p.cmd_id!==undefined&&p.team!==undefined){const key=`${p.team}:${p.cmd_id}`,old=this.commands.get(key);this.commands.set(key,{...old,...p,status:kind.slice(6),accepted_tick:old?.accepted_tick??e.sim_tick});}
   if(f){if(kind==='CAPTURE_PROGRESS'){f.progress_ms=p.progress_ms;f.capturing=p.team;}if(kind==='OBJECTIVE_CAPTURED'){f.owner=p.team;f.progress_ms=0;f.capturing=null;}if(kind==='OBJECTIVE_NEUTRALIZED'){f.owner=null;f.progress_ms=0;}}

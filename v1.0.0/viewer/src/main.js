@@ -1,4 +1,4 @@
-import './style.css';import {configureCatalog} from './catalog.js';import {Timeline} from './timeline.js';import {Battlefield} from './battlefield.js';import {renderHud,tooltip} from './ui.js';
+import './style.css';import {refreshStats} from './stats.js';import {configureCatalog} from './catalog.js';import {Timeline} from './timeline.js';import {Battlefield} from './battlefield.js';import {renderHud,tooltip} from './ui.js';
 const $=id=>document.getElementById(id),host=$('field'),live=new URLSearchParams(location.search).get('mode')==='live';
 let scene,timeline,currentFrame,elapsed=0,paused=false,last=performance.now(),lastHud='',streamId,seq=-1,pointer=null,touchStart=null;const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function connection(text){$('connection').textContent=text;}
@@ -22,3 +22,5 @@ fetch('/api/matches').then(r=>{if(!r.ok)throw Error();return r.json();}).then(ma
 host.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||e.target.closest('button,select,input,#minimap'))return;touchStart={x:e.clientX,y:e.clientY,id:e.pointerId};pointer=null;tooltip(null);});
 host.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||touchStart?.id!==e.pointerId)return;const start=touchStart;touchStart=null;if(Math.hypot(e.clientX-start.x,e.clientY-start.y)>8)return;const r=host.getBoundingClientRect();pointer={x:e.clientX-r.left,y:e.clientY-r.top};tooltip(scene?.hit(pointer.x,pointer.y),pointer.x,pointer.y,host);});
 host.addEventListener('pointercancel',()=>{touchStart=null;pointer=null;tooltip(null);});
+
+refreshStats().then(()=>{lastHud="";});setInterval(()=>refreshStats().then(()=>{lastHud="";}),5000);
