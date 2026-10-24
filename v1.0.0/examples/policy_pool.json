@@ -29,8 +29,8 @@
   "selection": "maximum held-out mean score difference; rules wins ties",
   "holdout_complete": true,
   "artifact_sha256": {
-    "policy0.npz": "a2f811d0caa6eab7a1630a430c849ccb73b8530f4a88c23ea9a93bc5b3bf88d6",
-    "policy1.npz": "95f3327010eb5cffd6fdbeb78bf939a75c6b9b094973373ff5f7b3307b5d3557",
-    "policy2.npz": "8f7bc5fb5454c4114ff620b341cde9d565b844bc6cbe84cae5f469275b5f005c"
+    "policy0.npz": "ac6b10d22beb12958e5cd882d341e50309738d40cce202aa02cf742d476f9654",
+    "policy1.npz": "7fb43e6b9be45781d1661f2543888b2f2665842140dcee32b84bab84708f6e54",
+    "policy2.npz": "6d802255e43f70844a85fd897758e29f8089c604e61f7b9da43ab31fdee1eb49"
   }
 }

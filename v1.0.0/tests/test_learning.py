@@ -1,4 +1,6 @@
-import numpy as np
+import pytest
+np=pytest.importorskip("numpy")
+pytest.importorskip("pettingzoo")
 from pettingzoo.test import parallel_api_test
 from learning.env import HQEnv
 

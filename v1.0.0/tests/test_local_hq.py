@@ -21,7 +21,7 @@ def test_two_team_barrier_and_invalid_owner_fallback():
     assert policies[Team.A].last_decision['fallback_reason']=='INVALID_GAME_COMMAND'
 
 
-@pytest.mark.parametrize('response',['bad','{"commands":[{"op":11}]}','{"commands":[{"op":2,"shell":1}]}','{"commands":[{"op":true}]}'])
+@pytest.mark.parametrize('response',['bad','{"commands":[{"op":99}]}','{"commands":[{"op":2,"shell":1}]}','{"commands":[{"op":true}]}'])
 def test_malformed_model_output_falls_back(response):
     hq=LocalHQ(transport=lambda _:response)
     assert hq.observe_and_issue(Engine(create_match()).observe(0))

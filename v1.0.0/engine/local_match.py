@@ -2,14 +2,14 @@
 import argparse,json
 from pathlib import Path
 from .replay import RecordingEngine
-from .scenario import create_match
+from .scenario import create_release_match
 from .types import Team
 from .viewer_export import frame,export_view
 from agents.local_hq import LocalHQ,issue_hq_round
 
 
 def run(seed=0,endpoint='http://127.0.0.1:8080/v1',model='local',rounds=100,output='data/local'):
-    e=RecordingEngine(create_match(seed));initial=frame(e.world)
+    e=RecordingEngine(create_release_match(seed));initial=frame(e.world)
     policies={t:LocalHQ(endpoint,model=model) for t in Team}
     for _ in range(rounds):
         if getattr(e.world,'ended',False):break

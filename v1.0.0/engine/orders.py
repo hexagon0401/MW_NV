@@ -37,6 +37,13 @@ def validate(world, command):
         f.name: (int(getattr(command, f.name)) if isinstance(getattr(command, f.name),IntEnum) else getattr(command, f.name)) for f in fields(Command)})
     if c.tick + c.ttl <= world.tick:
         raise OrderError('EXPIRED')
+    if c.op==Op.PURCHASE:
+        from .economy import PURCHASE_TYPES
+        if not 0<=c.arg0<len(PURCHASE_TYPES):raise OrderError('INVALID_TARGET')
+        hq=world.facilities.get(c.target)
+        if hq is None or hq.kind!='HQ':raise OrderError('INVALID_TARGET')
+        if hq.owner!=c.team:raise OrderError('FOREIGN_UNIT')
+        return c
     if c.op in (Op.WAIT, Op.CANCEL):
         return c
     unit = world.soldiers.get(c.unit) or world.squads.get(c.unit) or world.vehicles.get(c.unit)

@@ -1,0 +1,34 @@
+[
+  {
+    "seed": 2,
+    "ticks": 15000,
+    "sim_seconds": 3000.0,
+    "scores": {
+      "0": 0,
+      "1": 0
+    },
+    "winner": null,
+    "ended": true,
+    "checksum": "9e669711c235fdad7130e473cf4923be26a3e310d862b9c042247a4ae67b502d",
+    "swapped": false,
+    "match_wall_time_s": 9.142307995999545,
+    "ticks_per_second": 1640.7235466759205,
+    "max_rss_mb": 62.0078125
+  },
+  {
+    "seed": 2,
+    "ticks": 6750,
+    "sim_seconds": 1350.0,
+    "scores": {
+      "0": 100,
+      "1": 0
+    },
+    "winner": 0,
+    "ended": true,
+    "checksum": "8f878d2f206b1b7462413a34fb4ac886db7067ca7c4de148c2ecf976eb88d8a8",
+    "swapped": true,
+    "match_wall_time_s": 4.000157266000315,
+    "ticks_per_second": 1687.4336560145305,
+    "max_rss_mb": 62.37890625
+  }
+]

@@ -22,5 +22,6 @@ def test_dynamic_wall_blocks_without_replanning_each_tick():
     e.step(1)
     e.world.terrain.set_tile(3,16,3)
     e.step(5)
-    assert e.world.queue.status['0:1']=='FAILED'
-    assert e.world.soldiers[1].pos.x_cm<1200
+    assert e.world.motions['0:1']['rerouted']
+    s=e.world.soldiers[1]
+    assert e.world.terrain.passable(s.pos.x_cm,s.pos.y_cm)

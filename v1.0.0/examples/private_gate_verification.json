@@ -1,0 +1,14 @@
+[
+  {
+    "path": "/",
+    "status": 401
+  },
+  {
+    "path": "/demo.json",
+    "status": 401
+  },
+  {
+    "path": "/api/matches",
+    "status": 401
+  }
+]

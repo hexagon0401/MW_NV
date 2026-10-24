@@ -1,53 +1,56 @@
 # MW-NV v1.0.0
 
-현재 C01–C21의 작업카드 완료 조건을 구현한 로컬 headless 게임 엔진이다.
-시드 기반 결정론, 명령 검증·팀별 큐, 지형/A*, 보병·분대 이동, 시야/추상 전투,
-점령/점수/연장, 수송 차량·헬기·승하차, 보급/치료, 양팀 규칙 HQ를 제공한다.
-로컬 LLM HQ, 리플레이 재생, 웹 관전, PPO는 다음 단계다.
+결정론적 픽셀 워게임 엔진과 읽기 전용 관전 화면이다. 보병·분대·차량 수송·시야·추상 전투·
+점령·보급과 규칙/로컬 LLM HQ, 리플레이, CPU PPO 학습·평가를 구현했다.
+**실제 LLM 모델, 외부 비공개 배포, Intel Mac 실기 검증은 아직 완료하지 않았다.**
+현재 상태와 필요한 조치는 RELEASE_STATUS.md, SETUP_ACTIONS.md를 참고한다.
 
-## 설치·실행
+## Intel Mac에서 내려받아 실행
 
-Git과 [uv](https://docs.astral.sh/uv/getting-started/installation/)를 설치한 후:
+Python 3.12, uv, Node 22.12 이상(또는 24), Git이 필요하다.
 
 ```sh
 git clone --branch dev/v1.0.0 https://github.com/hexagon0401/MW_NV.git
 cd MW_NV/v1.0.0
-uv sync --locked --extra dev
-uv run --locked --extra dev python -m pytest -q
-uv run --locked python -m engine.headless --seeds 1
-uv run --locked python -m engine.headless --seeds 10 --paired --output /tmp/mw-nv-scores.json
+uv sync --locked --extra dev --extra server --extra inference
+uv run --locked --extra server python -m pytest -q
+uv run --locked python -m engine.headless --seeds 1 --release
 ```
 
-Python 3.12가 없으면 uv가 관리형 Python을 준비한다. 최초 설치에 네트워크가
-필요하며, 이후 경기는 모델·API 키·외부 서비스 없이 CPU에서 실행된다.
-설치 후 `.venv/bin/python -m pytest -q`도 가능하다. 기존 clone은 작업을 보존한 뒤
-`git pull --ff-only`, `uv sync --locked --extra dev`로 갱신한다.
-검증 환경: Linux x86_64, Python 3.12.14. Intel Mac 실기 검증은 아직 하지 않았다.
+Linux 전체 검사에는 추가로 --extra learning을 설치한다. 학습 의존성이 없는 환경에서는
+해당 선택 테스트만 skipped로 표시된다. 핵심 엔진 테스트는 계속 실행된다.
+Intel Mac에서는 최신 PyTorch 학습 대신 NumPy 정책 추론을 사용한다.
+의존성은 uv.lock과 viewer/package-lock.json으로 고정한다.
 
-## 실행 계약
+## 관전
 
-- `Engine(WorldState(seed))`: 작은 128m 테스트 세계.
-- `Engine(create_match(seed, swap=False))`: 대칭 256m Beta, 팀당 16인·APC/HEL/TRK.
-- `Engine.submit_for(team, command)`: 외부 정책의 인증된 팀 번호와 명령 소유권 검사.
-- `Engine.step(dt)`: 0.2초 고정 tick을 밀리초 정밀도로 누적하고 이번 호출의 이벤트 반환.
-- `Engine.observe(team)`: 복사된 아군·현재 보이는 적·60초 이내 마지막 관측·팀 명령 상태.
-- `RuleHQ.observe_and_issue(obs)`: 읽기 전용 관측에서 최대 4개 명령 생성.
+```sh
+python -m engine.viewer_export
+cp viewer/public/demo.json data/demo.view.json
+python -m uvicorn server.app:app --host 127.0.0.1 --port 8000
+```
 
-명령은 원본 C.3 필드에 필수 정수 `cmd_id`, 선택 `priority`를 추가한다.
-`EMBARK/HEAL/RESUPPLY`는 `target`에 차량/환자/보급 지점 ID를 사용한다.
-`DISEMBARK/TRANSPORT/MOVE`는 `unit`과 미터 좌표 `arg0/arg1`을 사용한다.
-JSON 명령의 미등록 필드·실수·불리언을 거부한다. `PURCHASE`는 enum만 있고
-실행은 아직 `UNSUPPORTED_OP`로 거부한다. `Engine.submit`은 엔진 내부 테스트용이다.
+다른 터미널의 v1.0.0/viewer에서 npm ci 후 npm run dev를 실행한다.
+드래그/휠로 지도 이동·확대, 0.5/1/2/4배 재생, 경기 선택과 읽기 전용 HUD를 제공한다.
+GET /matches, /matches/{id}, /events, /snapshot은 완료 경기만 반환한다.
+실행법·API 상세는 server/README.md에 있다. npm test와 npm run build로 프런트엔드를 검사한다.
+실제 Chromium 검사는 viewer에서 node scripts/browser-smoke.mjs를 사용한다.
+CHROMIUM_PATH와 VIEWER_URL을 지정해 브라우저 경로와 테스트 대상을 바꿀 수 있다.
 
-기본 HQ는 30초마다 행동한다. 초기 편성 비용 787 credits/16 tickets와 트럭 적재
-120 supply를 실제 차감한다. 팀당 잔액은 213 credits, 54 tickets, 180 supply다.
-모든 수치는 가상의 아케이드 게임 값이다. 차량에 무장 동작은 없다.
+## 로컬 LLM·리플레이·학습
 
-## 검증·다음 작업
+- tools/README.md: 고정 버전 llama-server 빌드, 검증된 GGUF 다운로드, 50개 상태 측정.
+- python -m engine.local_match: 1024m 지도에서 양팀 로컬 LLM HQ 실행, 실패 시 규칙 HQ 복구.
+- 모델은 loopback 서버 하나를 공유하며 30 sim seconds마다 결정한다. 응답 중 게임 시간은 멈춘다.
+- engine.replay는 JSON 체크포인트와 명령/시간 저널로 재생하며 모델을 재호출하지 않는다.
+- learning/README.md: 제한된 CPU MaskablePPO 학습, 동결 상대와 3개 정책 풀, 독립 holdout 평가.
+- examples/EVALUATION.md: 실제 비교 결과. 성능 향상을 가정하지 않고 규칙 HQ를 기본으로 유지했다.
+- 모델·가중치·비밀키·실행 로그는 Git에 넣지 않는다. data/와 models/는 로컬 산출물이다.
 
-- `examples/team_swap_scores.json`: 10개 seed × 기본/위치 교환 = 20경기의 점수·해시.
-- `examples/headless_match_summary.json`: 작은 테스트 세계의 경기 종료 요약.
-- `IMPLEMENTATION_NOTES.md`: 구현 선택, 남은 전체 명세 항목 및 검증 한계.
-- `STATE.md` → `DECISIONS.md` → 해당 작업 카드로 재개한다. 다음은 C21-L1 로컬 LLM 어댑터다.
-- 실행 의존성 [PyYAML](https://github.com/yaml/pyyaml), 개발 의존성
-  [pytest](https://github.com/pytest-dev/pytest)는 MIT 라이선스이며 버전은 잠금 파일에 고정한다.
+## 명령 계약과 재개
+
+고정 정수 opcode는 원본 C절을 따른다. cmd_id는 팀별 정수이며 priority는 선택이다.
+PURCHASE는 arg0=0..9(INF/REC/SUP/MED/ENG/LUV/APC/IFV/HEL/TRK), target=아군 HQ다.
+Engine.submit_for는 외부 정책의 팀을 인증하고, Engine.step은 0.2초 고정 tick을 실행한다.
+1024m 모드와 256m 학습 모드는 같은 엔진을 사용한다.
+STATE.md → DECISIONS.md → 현재 작업 카드 순서로 재개한다.

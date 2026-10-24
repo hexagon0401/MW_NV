@@ -1,0 +1,10 @@
+{
+  "supabase_url": "https://gwxwntyxjcfbrrcpqgtj.supabase.co",
+  "cloudflare_account_id": "6974fa0dd5aeb87d1c8a95cd4e85e27d",
+  "pages_project": "mw-nv",
+  "r2_enabled": false,
+  "r2_endpoint": "https://6974fa0dd5aeb87d1c8a95cd4e85e27d.r2.cloudflarestorage.com",
+  "access_configured": false,
+  "visibility": "private",
+  "storage_provider": "supabase-private"
+}

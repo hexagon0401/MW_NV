@@ -4,6 +4,7 @@ export class Timeline {
   for(const u of frame.units){const track=this.tracks.get(u.id);let lo=0,hi=track.length;while(lo+1<hi){const m=(lo+hi)>>1;if(track[m].t<=t)lo=m;else hi=m;}const a=track[lo],b=track[lo+1];const f=b?Math.max(0,Math.min(1,(t-a.t)/(b.t-a.t||1))):0;u.x_cm=a.x+(b?b.x-a.x:0)*f;u.y_cm=a.y+(b?b.y-a.y:0)*f;}
   const byId=new Map(frame.units.map(u=>[u.id,u]));
   for(const e of this.data.events){if((e.sim_tick+1)/5>t)break;const p=e.payload;
+   if(e.event_kind==='UNIT_SPAWNED'&&p.entity){const u=structuredClone(p.entity);frame.units.push(u);byId.set(u.id,u);}
    if(e.event_kind==='SCORE_TICK')frame.scores=p.scores;
    if(e.event_kind==='ORDER_ACCEPTED'||e.event_kind==='ORDER_COMPLETED'||e.event_kind==='ORDER_FAILED'||e.event_kind==='ORDER_CANCELLED')frame.orders.push({team:p.team,cmd_id:p.cmd_id,status:e.event_kind,op:p.op});
    if(e.event_kind==='INFANTRY_DISABLED'&&byId.has(p.unit))byId.get(p.unit).alive=false;

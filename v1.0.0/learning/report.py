@@ -22,7 +22,7 @@ def run():
     records.sort(key=lambda r:(r['policy'],r['opponent'],r['seed']))
     output=Path('examples/holdout_evaluation.json');output.write_text(json.dumps(records,indent=2)+'\n')
     with Path('examples/holdout_evaluation.csv').open('w') as file:
-        writer=csv.DictWriter(file,fieldnames=records[0].keys());writer.writeheader();writer.writerows(records)
+        writer=csv.DictWriter(file,fieldnames=records[0].keys(),lineterminator="\n");writer.writeheader();writer.writerows(records)
     groups={}
     for r in records:groups.setdefault((r['policy'],r['opponent']),[]).append(r)
     lines=['# Held-out evaluation','', 'Training seeds: 0–49. Baselines: 1000–1049. Holdout: 10000–10099.', '', '| Policy | Opponent | Games | A wins | Draws | Mean score difference | Invalid actions |','|---|---|---:|---:|---:|---:|---:|']

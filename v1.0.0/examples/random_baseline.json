@@ -6,20 +6,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      0,
-      101
+      37,
+      102
     ],
     "unit_losses": [
-      15,
-      5
+      16,
+      4
     ],
     "supply_remaining": [
-      222,
-      298
+      349,
+      261
     ],
     "invalid_actions": 0,
-    "ticks": 4350,
-    "wall_time_s": 1.872767759999988
+    "ticks": 5850,
+    "wall_time_s": 2.9312511729995094
   },
   {
     "match_id": "189f4d71fa00c46c",
@@ -28,20 +28,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      2,
-      101
+      39,
+      100
     ],
     "unit_losses": [
       16,
-      0
+      3
     ],
     "supply_remaining": [
-      230,
-      298
+      349,
+      227
     ],
     "invalid_actions": 0,
-    "ticks": 4350,
-    "wall_time_s": 1.7902411919999395
+    "ticks": 5850,
+    "wall_time_s": 4.320275578000292
   },
   {
     "match_id": "1b17dd886af87314",
@@ -50,20 +50,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      48,
-      101
+      38,
+      102
     ],
     "unit_losses": [
       16,
-      5
+      3
     ],
     "supply_remaining": [
-      392,
-      240
+      349,
+      257
     ],
     "invalid_actions": 0,
-    "ticks": 6000,
-    "wall_time_s": 3.242008405999968
+    "ticks": 5850,
+    "wall_time_s": 2.136130026000501
   },
   {
     "match_id": "d794abc6dd9afc05",
@@ -72,20 +72,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      16,
+      34,
       101
     ],
     "unit_losses": [
-      15,
-      5
+      16,
+      3
     ],
     "supply_remaining": [
-      252,
-      316
+      314,
+      270
     ],
     "invalid_actions": 0,
-    "ticks": 4800,
-    "wall_time_s": 1.672045227000126
+    "ticks": 5550,
+    "wall_time_s": 1.7135859749996598
   },
   {
     "match_id": "c65cb868440df935",
@@ -94,20 +94,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      25,
-      103
+      42,
+      102
     ],
     "unit_losses": [
-      16,
-      4
+      11,
+      3
     ],
     "supply_remaining": [
-      282,
-      306
+      368,
+      248
     ],
     "invalid_actions": 0,
-    "ticks": 5400,
-    "wall_time_s": 1.6754291520001061
+    "ticks": 6000,
+    "wall_time_s": 4.952982443999645
   },
   {
     "match_id": "133a9bdf8ca37b5a",
@@ -117,7 +117,7 @@
     "winner": 1,
     "scores": [
       0,
-      102
+      101
     ],
     "unit_losses": [
       16,
@@ -129,7 +129,7 @@
     ],
     "invalid_actions": 0,
     "ticks": 4350,
-    "wall_time_s": 1.1959522480001397
+    "wall_time_s": 1.314313256000787
   },
   {
     "match_id": "edb9fa3ab0a68313",
@@ -138,140 +138,8 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      10,
-      101
-    ],
-    "unit_losses": [
-      16,
-      1
-    ],
-    "supply_remaining": [
-      231,
-      311
-    ],
-    "invalid_actions": 0,
-    "ticks": 5250,
-    "wall_time_s": 1.1396004440002798
-  },
-  {
-    "match_id": "9a359dada327770b",
-    "seed": 1007,
-    "policy": "random",
-    "opponent": "rules",
-    "winner": 1,
-    "scores": [
-      0,
-      102
-    ],
-    "unit_losses": [
-      16,
-      4
-    ],
-    "supply_remaining": [
-      225,
-      301
-    ],
-    "invalid_actions": 0,
-    "ticks": 4650,
-    "wall_time_s": 1.4713468869999815
-  },
-  {
-    "match_id": "25dd9544bea0bc5d",
-    "seed": 1008,
-    "policy": "random",
-    "opponent": "rules",
-    "winner": 1,
-    "scores": [
-      2,
-      102
-    ],
-    "unit_losses": [
-      15,
-      7
-    ],
-    "supply_remaining": [
-      225,
-      317
-    ],
-    "invalid_actions": 0,
-    "ticks": 4500,
-    "wall_time_s": 1.6135740970003098
-  },
-  {
-    "match_id": "d1029c8e099c280a",
-    "seed": 1009,
-    "policy": "random",
-    "opponent": "rules",
-    "winner": 1,
-    "scores": [
-      3,
+      5,
       100
-    ],
-    "unit_losses": [
-      16,
-      3
-    ],
-    "supply_remaining": [
-      230,
-      310
-    ],
-    "invalid_actions": 0,
-    "ticks": 4350,
-    "wall_time_s": 1.1519485070002702
-  },
-  {
-    "match_id": "6af4b15367446be9",
-    "seed": 1010,
-    "policy": "random",
-    "opponent": "rules",
-    "winner": 1,
-    "scores": [
-      0,
-      101
-    ],
-    "unit_losses": [
-      16,
-      1
-    ],
-    "supply_remaining": [
-      222,
-      318
-    ],
-    "invalid_actions": 0,
-    "ticks": 4350,
-    "wall_time_s": 0.8740468729997701
-  },
-  {
-    "match_id": "5ea0d6ef5e8ec41b",
-    "seed": 1011,
-    "policy": "random",
-    "opponent": "rules",
-    "winner": 1,
-    "scores": [
-      14,
-      103
-    ],
-    "unit_losses": [
-      16,
-      5
-    ],
-    "supply_remaining": [
-      228,
-      340
-    ],
-    "invalid_actions": 0,
-    "ticks": 4800,
-    "wall_time_s": 0.948069208999641
-  },
-  {
-    "match_id": "d1ae08d6506c4333",
-    "seed": 1012,
-    "policy": "random",
-    "opponent": "rules",
-    "winner": 1,
-    "scores": [
-      0,
-      101
     ],
     "unit_losses": [
       16,
@@ -283,7 +151,139 @@
     ],
     "invalid_actions": 0,
     "ticks": 4350,
-    "wall_time_s": 1.2831044220001786
+    "wall_time_s": 2.1261831060000986
+  },
+  {
+    "match_id": "9a359dada327770b",
+    "seed": 1007,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      87,
+      100
+    ],
+    "unit_losses": [
+      16,
+      2
+    ],
+    "supply_remaining": [
+      297,
+      297
+    ],
+    "invalid_actions": 0,
+    "ticks": 11700,
+    "wall_time_s": 2.9812607479998405
+  },
+  {
+    "match_id": "25dd9544bea0bc5d",
+    "seed": 1008,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      4,
+      100
+    ],
+    "unit_losses": [
+      16,
+      2
+    ],
+    "supply_remaining": [
+      225,
+      317
+    ],
+    "invalid_actions": 0,
+    "ticks": 4500,
+    "wall_time_s": 4.631709217000207
+  },
+  {
+    "match_id": "d1029c8e099c280a",
+    "seed": 1009,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      46,
+      100
+    ],
+    "unit_losses": [
+      16,
+      3
+    ],
+    "supply_remaining": [
+      384,
+      240
+    ],
+    "invalid_actions": 0,
+    "ticks": 6000,
+    "wall_time_s": 3.008881038000254
+  },
+  {
+    "match_id": "6af4b15367446be9",
+    "seed": 1010,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      10,
+      100
+    ],
+    "unit_losses": [
+      16,
+      2
+    ],
+    "supply_remaining": [
+      244,
+      316
+    ],
+    "invalid_actions": 0,
+    "ticks": 4800,
+    "wall_time_s": 1.1925670719992922
+  },
+  {
+    "match_id": "5ea0d6ef5e8ec41b",
+    "seed": 1011,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      4,
+      100
+    ],
+    "unit_losses": [
+      16,
+      0
+    ],
+    "supply_remaining": [
+      222,
+      306
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 1.057855023999764
+  },
+  {
+    "match_id": "d1ae08d6506c4333",
+    "seed": 1012,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      5,
+      100
+    ],
+    "unit_losses": [
+      16,
+      1
+    ],
+    "supply_remaining": [
+      241,
+      313
+    ],
+    "invalid_actions": 0,
+    "ticks": 4650,
+    "wall_time_s": 1.6563394639997568
   },
   {
     "match_id": "a1cd1eb696f2951b",
@@ -292,20 +292,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      7,
-      103
+      2,
+      100
     ],
     "unit_losses": [
-      11,
-      5
+      16,
+      0
     ],
     "supply_remaining": [
-      244,
-      316
+      222,
+      288
     ],
     "invalid_actions": 0,
-    "ticks": 4800,
-    "wall_time_s": 2.0204736360001334
+    "ticks": 4350,
+    "wall_time_s": 5.374479560000509
   },
   {
     "match_id": "830f0caf5eabdf22",
@@ -314,20 +314,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      5,
-      102
+      36,
+      101
     ],
     "unit_losses": [
-      11,
+      16,
       2
     ],
     "supply_remaining": [
-      228,
-      312
+      352,
+      256
     ],
     "invalid_actions": 0,
-    "ticks": 4800,
-    "wall_time_s": 1.5612235140001758
+    "ticks": 6150,
+    "wall_time_s": 3.937012405999667
   },
   {
     "match_id": "605777552667841b",
@@ -336,20 +336,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      32,
-      100
+      45,
+      102
     ],
     "unit_losses": [
-      14,
-      10
+      16,
+      4
     ],
     "supply_remaining": [
-      237,
-      357
+      243,
+      379
     ],
     "invalid_actions": 0,
-    "ticks": 5700,
-    "wall_time_s": 1.8375292589998935
+    "ticks": 6300,
+    "wall_time_s": 2.282579654000074
   },
   {
     "match_id": "5b03a948a161d6ef",
@@ -358,20 +358,20 @@
     "opponent": "rules",
     "winner": 0,
     "scores": [
-      100,
-      95
+      101,
+      60
     ],
     "unit_losses": [
-      11,
-      12
+      16,
+      8
     ],
     "supply_remaining": [
-      546,
-      282
+      414,
+      246
     ],
     "invalid_actions": 0,
-    "ticks": 10200,
-    "wall_time_s": 2.221430235999833
+    "ticks": 6600,
+    "wall_time_s": 1.6493012910004836
   },
   {
     "match_id": "0adf492d4f8345c8",
@@ -381,7 +381,7 @@
     "winner": 1,
     "scores": [
       0,
-      102
+      101
     ],
     "unit_losses": [
       16,
@@ -389,11 +389,11 @@
     ],
     "supply_remaining": [
       222,
-      306
+      318
     ],
     "invalid_actions": 0,
     "ticks": 4350,
-    "wall_time_s": 1.0861437710000246
+    "wall_time_s": 1.9748549109999658
   },
   {
     "match_id": "6dfbdd0a7ad1c661",
@@ -403,11 +403,11 @@
     "winner": 1,
     "scores": [
       50,
-      101
+      100
     ],
     "unit_losses": [
-      15,
-      8
+      16,
+      4
     ],
     "supply_remaining": [
       392,
@@ -415,7 +415,7 @@
     ],
     "invalid_actions": 0,
     "ticks": 6150,
-    "wall_time_s": 2.667326831000082
+    "wall_time_s": 1.5203518910002458
   },
   {
     "match_id": "144c14e69460e24a",
@@ -425,19 +425,19 @@
     "winner": 1,
     "scores": [
       0,
-      101
+      100
     ],
     "unit_losses": [
       16,
-      5
+      7
     ],
     "supply_remaining": [
       225,
-      313
+      283
     ],
     "invalid_actions": 0,
     "ticks": 4500,
-    "wall_time_s": 0.9018755639999654
+    "wall_time_s": 1.3151794879995578
   },
   {
     "match_id": "1f233c66baa8a69f",
@@ -446,20 +446,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      0,
+      91,
       100
     ],
     "unit_losses": [
       16,
-      3
+      5
     ],
     "supply_remaining": [
-      225,
-      313
+      294,
+      294
     ],
     "invalid_actions": 0,
-    "ticks": 4500,
-    "wall_time_s": 0.93561162900005
+    "ticks": 11400,
+    "wall_time_s": 1.8034219159999338
   },
   {
     "match_id": "79558e663f4c55fc",
@@ -469,7 +469,7 @@
     "winner": 1,
     "scores": [
       3,
-      102
+      101
     ],
     "unit_losses": [
       16,
@@ -481,29 +481,29 @@
     ],
     "invalid_actions": 0,
     "ticks": 4500,
-    "wall_time_s": 0.9951886649996595
+    "wall_time_s": 1.159708154999862
   },
   {
     "match_id": "192be8a0766240af",
     "seed": 1022,
     "policy": "random",
     "opponent": "rules",
-    "winner": 1,
+    "winner": 0,
     "scores": [
-      24,
-      100
+      102,
+      64
     ],
     "unit_losses": [
-      12,
+      11,
       8
     ],
     "supply_remaining": [
-      295,
-      279
+      376,
+      262
     ],
     "invalid_actions": 0,
-    "ticks": 5100,
-    "wall_time_s": 1.7198261759999696
+    "ticks": 6600,
+    "wall_time_s": 2.9467868799993084
   },
   {
     "match_id": "7a2b9ee77e212ae5",
@@ -512,20 +512,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      43,
-      102
+      0,
+      100
     ],
     "unit_losses": [
-      16,
-      3
+      13,
+      4
     ],
     "supply_remaining": [
-      240,
-      384
+      225,
+      301
     ],
     "invalid_actions": 0,
-    "ticks": 6150,
-    "wall_time_s": 1.3512262680001186
+    "ticks": 4500,
+    "wall_time_s": 2.3446853289997307
   },
   {
     "match_id": "3df6c11e0aaadf28",
@@ -535,19 +535,19 @@
     "winner": 1,
     "scores": [
       4,
-      101
+      102
     ],
     "unit_losses": [
       16,
-      1
+      2
     ],
     "supply_remaining": [
-      241,
-      283
+      244,
+      324
     ],
     "invalid_actions": 0,
-    "ticks": 4650,
-    "wall_time_s": 2.308577050000167
+    "ticks": 4800,
+    "wall_time_s": 2.0674219200000152
   },
   {
     "match_id": "e8c9d2991d848251",
@@ -556,20 +556,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      44,
+      66,
       101
     ],
     "unit_losses": [
-      16,
-      7
+      14,
+      1
     ],
     "supply_remaining": [
-      376,
-      240
+      417,
+      249
     ],
     "invalid_actions": 0,
-    "ticks": 6000,
-    "wall_time_s": 1.61891285899992
+    "ticks": 6900,
+    "wall_time_s": 3.9892961659998036
   },
   {
     "match_id": "6497f3be8b3ea5dc",
@@ -579,11 +579,11 @@
     "winner": 1,
     "scores": [
       3,
-      101
+      100
     ],
     "unit_losses": [
-      16,
-      3
+      15,
+      2
     ],
     "supply_remaining": [
       230,
@@ -591,51 +591,51 @@
     ],
     "invalid_actions": 0,
     "ticks": 4350,
-    "wall_time_s": 2.31339273399999
+    "wall_time_s": 2.369343069000024
   },
   {
     "match_id": "a0f7e175ff9894bf",
     "seed": 1027,
     "policy": "random",
     "opponent": "rules",
-    "winner": 0,
+    "winner": 1,
     "scores": [
-      100,
-      51
+      59,
+      100
     ],
     "unit_losses": [
-      9,
-      9
+      14,
+      5
     ],
     "supply_remaining": [
-      344,
-      268
+      267,
+      359
     ],
     "invalid_actions": 0,
-    "ticks": 6150,
-    "wall_time_s": 1.9107341049998467
+    "ticks": 6450,
+    "wall_time_s": 3.550743873999636
   },
   {
     "match_id": "da32b5246553b14c",
     "seed": 1028,
     "policy": "random",
     "opponent": "rules",
-    "winner": 1,
+    "winner": 0,
     "scores": [
-      9,
-      103
+      101,
+      74
     ],
     "unit_losses": [
       16,
-      10
+      6
     ],
     "supply_remaining": [
-      247,
-      303
+      404,
+      260
     ],
     "invalid_actions": 0,
-    "ticks": 5100,
-    "wall_time_s": 2.605495201999929
+    "ticks": 7350,
+    "wall_time_s": 2.397513237999192
   },
   {
     "match_id": "4bdd0f9b6d7a1ce8",
@@ -644,20 +644,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      12,
-      101
+      0,
+      103
     ],
     "unit_losses": [
       16,
-      7
+      0
     ],
     "supply_remaining": [
-      255,
-      303
+      234,
+      314
     ],
     "invalid_actions": 0,
-    "ticks": 5100,
-    "wall_time_s": 2.043393570000262
+    "ticks": 5400,
+    "wall_time_s": 1.4466093719993296
   },
   {
     "match_id": "bbb2b2d3a117f83e",
@@ -667,19 +667,19 @@
     "winner": 0,
     "scores": [
       100,
-      61
+      32
     ],
     "unit_losses": [
-      15,
-      7
+      13,
+      8
     ],
     "supply_remaining": [
-      414,
-      234
+      370,
+      222
     ],
     "invalid_actions": 0,
-    "ticks": 6750,
-    "wall_time_s": 3.86585601600018
+    "ticks": 5400,
+    "wall_time_s": 2.347053329999653
   },
   {
     "match_id": "bdcbce09d0903bef",
@@ -688,20 +688,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      18,
-      103
+      96,
+      100
     ],
     "unit_losses": [
       16,
-      10
+      8
     ],
     "supply_remaining": [
-      279,
-      311
+      579,
+      279
     ],
     "invalid_actions": 0,
-    "ticks": 5100,
-    "wall_time_s": 3.043509887000255
+    "ticks": 11100,
+    "wall_time_s": 2.192352485999436
   },
   {
     "match_id": "183d591c11e55dc0",
@@ -710,42 +710,42 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      9,
-      103
+      37,
+      101
     ],
     "unit_losses": [
       16,
-      7
+      5
     ],
     "supply_remaining": [
-      257,
-      293
+      349,
+      257
     ],
     "invalid_actions": 0,
-    "ticks": 4650,
-    "wall_time_s": 2.7990963289998945
+    "ticks": 5700,
+    "wall_time_s": 1.705215789000249
   },
   {
     "match_id": "097a8b28b28fce95",
     "seed": 1033,
     "policy": "random",
     "opponent": "rules",
-    "winner": 0,
+    "winner": 1,
     "scores": [
-      102,
-      70
+      95,
+      100
     ],
     "unit_losses": [
-      10,
-      16
+      16,
+      6
     ],
     "supply_remaining": [
-      410,
-      274
+      574,
+      294
     ],
     "invalid_actions": 0,
-    "ticks": 7800,
-    "wall_time_s": 2.7780717850000656
+    "ticks": 11400,
+    "wall_time_s": 3.226126387000477
   },
   {
     "match_id": "922799d7b02e7708",
@@ -754,20 +754,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      5,
-      100
+      46,
+      101
     ],
     "unit_losses": [
       16,
-      2
+      1
     ],
     "supply_remaining": [
-      238,
-      310
+      384,
+      236
     ],
     "invalid_actions": 0,
-    "ticks": 4350,
-    "wall_time_s": 2.010763135999696
+    "ticks": 6000,
+    "wall_time_s": 2.1148878639996838
   },
   {
     "match_id": "7c64aa14705a98af",
@@ -777,11 +777,11 @@
     "winner": 1,
     "scores": [
       0,
-      101
+      100
     ],
     "unit_losses": [
-      16,
-      4
+      15,
+      6
     ],
     "supply_remaining": [
       222,
@@ -789,7 +789,7 @@
     ],
     "invalid_actions": 0,
     "ticks": 4350,
-    "wall_time_s": 2.812123012000029
+    "wall_time_s": 3.0833707980000327
   },
   {
     "match_id": "5b0891b26b2838e7",
@@ -798,20 +798,20 @@
     "opponent": "rules",
     "winner": 0,
     "scores": [
-      102,
-      72
+      101,
+      79
     ],
     "unit_losses": [
-      16,
+      13,
       6
     ],
     "supply_remaining": [
-      385,
-      281
+      264,
+      372
     ],
     "invalid_actions": 0,
-    "ticks": 7050,
-    "wall_time_s": 3.3081728239999393
+    "ticks": 8400,
+    "wall_time_s": 5.107129046999944
   },
   {
     "match_id": "c083ab0863fe1438",
@@ -824,38 +824,38 @@
       100
     ],
     "unit_losses": [
-      14,
-      4
+      10,
+      2
     ],
     "supply_remaining": [
-      228,
-      324
+      225,
+      301
     ],
     "invalid_actions": 0,
-    "ticks": 4800,
-    "wall_time_s": 2.8694421430000148
+    "ticks": 4500,
+    "wall_time_s": 3.7776997600003597
   },
   {
     "match_id": "e37af91489a5e1e8",
     "seed": 1038,
     "policy": "random",
     "opponent": "rules",
-    "winner": 0,
+    "winner": 1,
     "scores": [
-      100,
-      75
+      43,
+      100
     ],
     "unit_losses": [
-      15,
-      8
+      16,
+      3
     ],
     "supply_remaining": [
-      420,
-      252
+      376,
+      240
     ],
     "invalid_actions": 0,
-    "ticks": 7200,
-    "wall_time_s": 3.322946115000377
+    "ticks": 6000,
+    "wall_time_s": 3.0864950739996857
   },
   {
     "match_id": "9f7534e26bda68be",
@@ -864,20 +864,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      5,
-      100
+      6,
+      103
     ],
     "unit_losses": [
       11,
       0
     ],
     "supply_remaining": [
-      230,
-      310
+      233,
+      321
     ],
     "invalid_actions": 0,
-    "ticks": 4350,
-    "wall_time_s": 2.232054860000062
+    "ticks": 4500,
+    "wall_time_s": 3.520354655999654
   },
   {
     "match_id": "63bc6ebfc47914a1",
@@ -886,7 +886,7 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      2,
+      6,
       100
     ],
     "unit_losses": [
@@ -894,12 +894,12 @@
       3
     ],
     "supply_remaining": [
-      225,
-      271
+      231,
+      311
     ],
     "invalid_actions": 0,
-    "ticks": 4650,
-    "wall_time_s": 1.6965473049999673
+    "ticks": 5250,
+    "wall_time_s": 3.314543655000307
   },
   {
     "match_id": "8be6a47827d5e397",
@@ -908,20 +908,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      6,
-      100
+      29,
+      102
     ],
     "unit_losses": [
-      14,
-      7
+      8,
+      3
     ],
     "supply_remaining": [
-      233,
-      305
+      322,
+      266
     ],
     "invalid_actions": 0,
-    "ticks": 4650,
-    "wall_time_s": 1.3676369719996728
+    "ticks": 5550,
+    "wall_time_s": 1.676519976000236
   },
   {
     "match_id": "6d78ac867f4613cd",
@@ -930,20 +930,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      51,
-      101
+      36,
+      103
     ],
     "unit_losses": [
-      15,
-      8
+      16,
+      4
     ],
     "supply_remaining": [
-      384,
-      240
+      325,
+      273
     ],
     "invalid_actions": 0,
-    "ticks": 6150,
-    "wall_time_s": 1.6187756509998508
+    "ticks": 5700,
+    "wall_time_s": 1.9945499730001757
   },
   {
     "match_id": "7de777feb1196d95",
@@ -952,20 +952,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      10,
-      103
+      40,
+      100
     ],
     "unit_losses": [
-      9,
-      7
+      16,
+      3
     ],
     "supply_remaining": [
-      244,
-      316
+      357,
+      223
     ],
     "invalid_actions": 0,
-    "ticks": 4950,
-    "wall_time_s": 1.443497035999826
+    "ticks": 5850,
+    "wall_time_s": 3.43663888699939
   },
   {
     "match_id": "24d8e7787c181005",
@@ -974,20 +974,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      48,
+      34,
       101
     ],
     "unit_losses": [
-      6,
-      8
+      16,
+      5
     ],
     "supply_remaining": [
-      240,
-      384
+      234,
+      350
     ],
     "invalid_actions": 0,
-    "ticks": 6000,
-    "wall_time_s": 2.1944403659999807
+    "ticks": 5550,
+    "wall_time_s": 4.087058346000049
   },
   {
     "match_id": "c3ecdf4d9f4fa304",
@@ -997,19 +997,19 @@
     "winner": 1,
     "scores": [
       0,
-      102
+      101
     ],
     "unit_losses": [
       16,
-      0
+      1
     ],
     "supply_remaining": [
       222,
-      288
+      318
     ],
     "invalid_actions": 0,
     "ticks": 4350,
-    "wall_time_s": 1.042521810999915
+    "wall_time_s": 1.0976601319998736
   },
   {
     "match_id": "cfe8fa9a82f4e127",
@@ -1018,20 +1018,20 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      0,
+      1,
       101
     ],
     "unit_losses": [
       16,
-      2
+      6
     ],
     "supply_remaining": [
       225,
       313
     ],
     "invalid_actions": 0,
-    "ticks": 4500,
-    "wall_time_s": 2.6701442949997727
+    "ticks": 4650,
+    "wall_time_s": 1.3396540849998928
   },
   {
     "match_id": "85929d4e8495d1c1",
@@ -1041,41 +1041,41 @@
     "winner": 1,
     "scores": [
       5,
-      100
+      103
     ],
     "unit_losses": [
       16,
-      0
+      3
     ],
     "supply_remaining": [
-      249,
+      239,
       313
     ],
     "invalid_actions": 0,
-    "ticks": 4500,
-    "wall_time_s": 3.1308638509999582
+    "ticks": 4650,
+    "wall_time_s": 4.432287501999781
   },
   {
     "match_id": "3bf379eca326b107",
     "seed": 1048,
     "policy": "random",
     "opponent": "rules",
-    "winner": 0,
+    "winner": 1,
     "scores": [
-      102,
-      77
+      43,
+      100
     ],
     "unit_losses": [
-      12,
-      9
+      16,
+      3
     ],
     "supply_remaining": [
-      420,
-      252
+      376,
+      240
     ],
     "invalid_actions": 0,
-    "ticks": 7350,
-    "wall_time_s": 2.101921088000381
+    "ticks": 6000,
+    "wall_time_s": 1.8881434690001697
   },
   {
     "match_id": "437125e822ea3bfe",
@@ -1084,19 +1084,19 @@
     "opponent": "rules",
     "winner": 1,
     "scores": [
-      14,
-      102
+      5,
+      100
     ],
     "unit_losses": [
       16,
-      3
+      1
     ],
     "supply_remaining": [
-      260,
-      308
+      233,
+      301
     ],
     "invalid_actions": 0,
-    "ticks": 4800,
-    "wall_time_s": 1.4502508450000278
+    "ticks": 4500,
+    "wall_time_s": 3.011451090999799
   }
 ]

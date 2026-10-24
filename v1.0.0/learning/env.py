@@ -25,7 +25,7 @@ class HQEnv(ParallelEnv):
         for index,group in enumerate(sorted(obs['squads'],key=lambda g:g['id'])[:4]):
             members=[byid[i] for i in group['member_ids'] if byid[i]['alive']]
             if not members:continue
-            p=members[0]['pos'];v[index*5:index*5+5]=[p['x_cm']/25600,p['y_cm']/25600,len(members)/5,sum(u['ammo'] for u in members)/max(1,len(members)*45),1]
+            p=members[0]['pos'];v[index*5:index*5+5]=[p['x_cm']/(obs['map_width_m']*100),p['y_cm']/(obs['map_height_m']*100),len(members)/5,sum(u['ammo'] for u in members)/max(1,len(members)*45),1]
         v[20:24]=[obs['scores'][0]/100,obs['scores'][1]/100,obs['resources']['supply']/1000,obs['tick']/15000]
         for i,f in enumerate(f for f in obs['facilities'] if f['kind']=='OBJECTIVE'):
             v[24+i]=0 if f['owner'] is None else 1 if f['owner']==obs['team'] else -1

@@ -15,6 +15,7 @@ def download(manifest,destination,opener=urlopen):
     try:
         h=hashlib.sha256();size=0
         with opener(url,timeout=60) as response,temporary.open('wb') as output:
+            if hasattr(response,'geturl') and urlparse(response.geturl()).scheme!='https':raise ValueError('HTTPS redirect required')
             while block:=response.read(1024*1024):
                 size+=len(block)
                 if size>4*1024**3:raise ValueError('model exceeds size limit')

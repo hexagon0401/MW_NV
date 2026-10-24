@@ -24,3 +24,12 @@ def test_bad_heli_landing():
     e.submit(dict(cmd_id=1,team=0,op=7,unit=20,arg0=80,arg1=64));e.step()
     assert w.queue.status['0:1']=='FAILED'
     assert w.events[-1]['payload']['reason']=='LANDING_INVALID'
+
+
+def test_heli_cannot_land_over_another_vehicle():
+    from engine.types import Vehicle,Team,WorldPos
+    e=boarding_engine();w=e.world;w.vehicles[20].type_id='HEL'
+    w.vehicles[40]=Vehicle(40,Team.A,WorldPos(8000,6400))
+    e.submit(dict(cmd_id=1,team=0,op=7,unit=20,arg0=80,arg1=64));e.step()
+    assert w.queue.status['0:1']=='FAILED'
+    assert w.events[-1]['payload']['reason']=='LANDING_INVALID'

@@ -23,12 +23,29 @@ def move(world, key, unit, destination, speed_mps=1.6, ignore_ids=()):
         amount = min(distance,budget)
         nx,ny = (tx,ty) if distance <= amount else (x+(tx-x)*amount/distance,y+(ty-y)*amount/distance)
         candidate = WorldPos(round(nx),round(ny))
-        if not world.terrain.segment_clear((unit.pos.x_cm,unit.pos.y_cm),(candidate.x_cm,candidate.y_cm)):
-            unit.task_state = 'BLOCKED'
-            raise OrderError('BLOCKED')
-        if any(s.id != unit.id and s.id not in ignore_ids and s.alive and s.carrier_id is None and
+        blocked_terrain = not world.terrain.segment_clear((unit.pos.x_cm,unit.pos.y_cm),(candidate.x_cm,candidate.y_cm))
+        blocked_unit = any(s.id != unit.id and s.id not in ignore_ids and s.alive and s.carrier_id is None and
                hypot(s.pos.x_cm-candidate.x_cm,s.pos.y_cm-candidate.y_cm)<84
-               for s in world.soldiers.values()):
+               for s in world.soldiers.values())
+        if blocked_terrain or blocked_unit:
+            if not motion.get('rerouted',False):
+                motion['rerouted']=True
+                destination=route[-1]
+                if blocked_terrain:
+                    try:
+                        motion['route']=find_path(world.terrain,(unit.pos.x_cm,unit.pos.y_cm),destination)
+                        return False
+                    except OrderError:pass
+                else:
+                    length=hypot(tx-x,ty-y) or 1
+                    for sign in (1,-1):
+                        waypoint=(round(x-sign*(ty-y)/length*150),round(y+sign*(tx-x)/length*150))
+                        if not world.terrain.segment_clear((unit.pos.x_cm,unit.pos.y_cm),waypoint):continue
+                        if any(s.id!=unit.id and s.id not in ignore_ids and s.alive and s.carrier_id is None and hypot(s.pos.x_cm-waypoint[0],s.pos.y_cm-waypoint[1])<84 for s in world.soldiers.values()):continue
+                        try:
+                            motion['route']=[waypoint]+find_path(world.terrain,waypoint,destination)
+                            return False
+                        except OrderError:pass
             unit.task_state = 'BLOCKED'
             raise OrderError('BLOCKED')
         unit.pos = candidate

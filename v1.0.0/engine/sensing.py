@@ -15,6 +15,8 @@ def can_see(w,observer,target):
     if not observer.alive or not target.alive or observer.carrier_id is not None or target.carrier_id is not None:
         return False
     radius=w.unit_specs[observer.type_id]['detection_m']*100
+    if any((f.kind=='TOWER' or f.id==201 and f.kind=='OBJECTIVE') and f.owner==observer.team and hypot(f.pos.x_cm-observer.pos.x_cm,f.pos.y_cm-observer.pos.y_cm)<=f.radius_cm for f in w.facilities.values()):
+        radius*=1.2
     if w.terrain.tile(observer.pos.x_cm,observer.pos.y_cm)==Tile.FOREST:
         radius*=.7
     if w.terrain.tile(target.pos.x_cm,target.pos.y_cm)==Tile.FOREST:
@@ -32,7 +34,7 @@ def update_sensing(w):
         found=set()
         for observer in w.soldiers.values():
             if observer.team!=team or not observer.alive or observer.carrier_id is not None:continue
-            radius=ceil(w.unit_specs[observer.type_id]['detection_m']/8)
+            radius=ceil(w.unit_specs[observer.type_id]['detection_m']*1.2/8)
             cx,cy=observer.pos.x_cm//800,observer.pos.y_cm//800
             for x in range(cx-radius,cx+radius+1):
                 for y in range(cy-radius,cy+radius+1):
@@ -50,7 +52,7 @@ def update_sensing(w):
 def observation(w,team):
     team=Team(team)
     visible=getattr(w,'visible',{}).get(team,[])
-    return deepcopy(dict(team=int(team),color='blue' if team==Team.A else 'red',tick=w.tick,
+    return deepcopy(dict(team=int(team),map_width_m=w.config.map_width_m,map_height_m=w.config.map_height_m,color='blue' if team==Team.A else 'red',tick=w.tick,
         units=[s.to_dict() for s in sorted(w.soldiers.values(),key=lambda s:s.id) if s.team==team],
         squads=[s.to_dict() for s in w.squads.values() if s.team==team],
         vehicles=[s.to_dict() for s in w.vehicles.values() if s.team==team],

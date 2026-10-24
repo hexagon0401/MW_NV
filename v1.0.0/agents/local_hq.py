@@ -26,7 +26,7 @@ class LocalHQ:
         compact=dict(team=obs['team'],tick=obs['tick'],resources=obs['resources'],facilities=obs['facilities'],squads=obs['squads'],
                      units=[{k:u[k] for k in ('id','type_id','pos','hp','ammo','alive','carrier_id')} for u in obs['units']],
                      vehicles=obs['vehicles'],enemies=obs['enemies'])
-        prompt='Return JSON {"commands":[...]}, maximum 4 commands. Each command has integer op, unit, arg0, arg1, target as needed. Opcodes: 0 WAIT,1 HOLD,2 MOVE(x/y metres),3 CAPTURE(target objective),4 DEFEND,5 EMBARK(target carrier),6 DISEMBARK,7 TRANSPORT,8 RESUPPLY,9 HEAL,10 RETREAT,12 CANCEL. Use only own units. No shell, prose, or extra fields.'
+        prompt='Return JSON {"commands":[...]}, maximum 4 commands. Each command has integer op, unit, arg0, arg1, target as needed. Opcodes: 0 WAIT,1 HOLD,2 MOVE(x/y metres),3 CAPTURE(target objective),4 DEFEND,5 EMBARK(target carrier),6 DISEMBARK,7 TRANSPORT,8 RESUPPLY,9 HEAL,10 RETREAT,11 PURCHASE(arg0 type 0..9 INF/REC/SUP/MED/ENG/LUV/APC/IFV/HEL/TRK, target owned HQ),12 CANCEL. Use only own units. No shell, prose, or extra fields.'
         payload=dict(model=self.model,messages=[dict(role='system',content=prompt),dict(role='user',content=json.dumps(compact,separators=(',',':')))],temperature=0,max_tokens=512,response_format={'type':'json_object'})
         try:
             content=self.transport(payload)
@@ -35,7 +35,7 @@ class LocalHQ:
                 raise ValueError('command envelope')
             commands=[]
             for index,c in enumerate(value['commands']):
-                if not isinstance(c,dict) or set(c)-{'op','unit','arg0','arg1','target'} or c.get('op')==11:
+                if not isinstance(c,dict) or set(c)-{'op','unit','arg0','arg1','target'}:
                     raise ValueError('command fields')
                 raw=c | dict(cmd_id=obs['tick']*100+index+1,team=obs['team'],tick=obs['tick'],ttl=750)
                 parse_command(raw);commands.append(raw)

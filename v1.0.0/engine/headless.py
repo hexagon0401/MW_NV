@@ -3,14 +3,14 @@ import argparse,json
 from pathlib import Path
 from agents.rule_hq import RuleHQ
 from .runtime import Engine
-from .scenario import create_match
+from .scenario import create_match,create_release_match
 from .types import Team
 from .orders import OrderError
 from .objectives import summary
 
 
-def run_match(seed=0,swap=False):
-    e=Engine(create_match(seed,swap));policies={t:RuleHQ() for t in Team}
+def run_match(seed=0,swap=False,release=False):
+    e=Engine((create_release_match if release else create_match)(seed,swap));policies={t:RuleHQ() for t in Team}
     while not getattr(e.world,'ended',False):
         # Both policies see snapshots from the same simulation tick.
         observations={t:e.observe(t) for t in Team}
@@ -30,9 +30,10 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('--seeds',type=int,default=10)
     parser.add_argument('--swap',action='store_true');parser.add_argument('--output',type=Path)
     parser.add_argument("--paired",action="store_true",help="run both side assignments for each seed")
+    parser.add_argument("--release",action="store_true",help="use the 1024m release map")
     args=parser.parse_args()
     if args.seeds<1:parser.error('--seeds must be positive')
-    results=[dict(seed=seed,normal=run_match(seed),swapped=run_match(seed,True)) for seed in range(args.seeds)] if args.paired else [run_match(seed,args.swap) for seed in range(args.seeds)]
+    results=[dict(seed=seed,normal=run_match(seed,release=args.release),swapped=run_match(seed,True,args.release)) for seed in range(args.seeds)] if args.paired else [run_match(seed,args.swap,args.release) for seed in range(args.seeds)]
     output=json.dumps(results,indent=2)+'\n'
     if args.output:args.output.write_text(output)
     else:print(output)

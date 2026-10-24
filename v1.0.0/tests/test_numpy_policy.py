@@ -1,5 +1,7 @@
-import numpy as np
-import torch
+import pytest
+np=pytest.importorskip("numpy")
+torch=pytest.importorskip("torch")
+pytest.importorskip("sb3_contrib")
 from sb3_contrib import MaskablePPO
 from learning.train import TrainingEnv
 from learning.policies import NumpyPolicy,export_numpy

@@ -13,7 +13,7 @@ Mac에는 Git, CMake, C++ compiler(Xcode command line tools)가 필요하다.
     cmake -S ../llama-runtime -B ../llama-runtime/build -DCMAKE_BUILD_TYPE=Release -DGGML_NATIVE=OFF -DGGML_METAL=OFF -DLLAMA_CURL=OFF
     cmake --build ../llama-runtime/build --target llama-server -j 2
     python tools/model_download.py
-    ../llama-runtime/build/bin/llama-server -m models/hq.gguf --host 127.0.0.1 --port 8080 -c 4096 -np 1 -t 4
+    ../llama-runtime/build/bin/llama-server -m models/hq.gguf --host 127.0.0.1 --port 8080 --alias local -c 4096 -np 1 -t 4
 
 다른 터미널의 v1.0.0 디렉터리에서:
 

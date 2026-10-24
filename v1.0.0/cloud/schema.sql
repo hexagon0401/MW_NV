@@ -1,7 +1,7 @@
--- Apply through the Supabase SQL editor after review. No secrets in this schema.
-create table if not exists public.matches (
+-- Fresh application table. Apply through Supabase SQL editor after review.
+-- Operator-only writes; no end-user Auth account is required.
+create table if not exists public.mw_nv_matches (
  id text primary key,
- owner_id uuid not null references auth.users(id),
  started_at timestamptz not null default now(),
  winner smallint check (winner in (0,1)),
  scores jsonb not null,
@@ -10,12 +10,10 @@ create table if not exists public.matches (
  sha256 text not null check (sha256 ~ '^[0-9a-f]{64}$'),
  published boolean not null default false
 );
-alter table public.matches enable row level security;
-revoke all on public.matches from anon, authenticated;
-grant select on public.matches to anon;
-grant select, insert, update, delete on public.matches to authenticated;
-create policy published_matches on public.matches for select to anon using (published);
-create policy owner_read on public.matches for select to authenticated using (published or owner_id=auth.uid());
-create policy owner_insert on public.matches for insert to authenticated with check (owner_id=auth.uid());
-create policy owner_update on public.matches for update to authenticated using (owner_id=auth.uid()) with check (owner_id=auth.uid());
-create policy owner_delete on public.matches for delete to authenticated using (owner_id=auth.uid());
+alter table public.mw_nv_matches enable row level security;
+revoke all on public.mw_nv_matches from anon, authenticated;
+grant select on public.mw_nv_matches to anon, authenticated;
+grant all on public.mw_nv_matches to service_role;
+drop policy if exists mw_nv_published_matches on public.mw_nv_matches;
+create policy mw_nv_published_matches on public.mw_nv_matches for select to anon, authenticated using (published);
+-- No insert/update/delete policies for end users. service_role is server-only.

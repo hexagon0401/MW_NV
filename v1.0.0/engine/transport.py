@@ -116,8 +116,10 @@ def fly(w,key,v,destination):
     if not hasattr(w,'flights'):w.flights={}
     spec=w.vehicle_specs['HEL']
     landing=FootprintTerrain(w.terrain,[1000,1000])
+    def clear_landing(point):
+        return landing.passable(*point) and not any(o.id!=v.id and abs(o.pos.x_cm-point[0])<(w.vehicle_specs[o.type_id]['footprint_cm'][0]+800)/2 and abs(o.pos.y_cm-point[1])<(w.vehicle_specs[o.type_id]['footprint_cm'][1]+800)/2 for o in w.vehicles.values())
     if key not in w.flights:
-        if not landing.passable(*destination) or not landing.passable(v.pos.x_cm,v.pos.y_cm):
+        if not clear_landing(destination) or not clear_landing((v.pos.x_cm,v.pos.y_cm)):
             raise OrderError('LANDING_INVALID')
         if v.task_state in ('WAITING_PASSENGERS','UNLOADING'):
             raise OrderError('ILLEGAL_STATE')
@@ -127,7 +129,7 @@ def fly(w,key,v,destination):
         f['elapsed']+=200
         if f['elapsed']>=4000:
             if f['stage']=='LANDING':
-                if not landing.passable(v.pos.x_cm,v.pos.y_cm):raise OrderError('LANDING_INVALID')
+                if not clear_landing((v.pos.x_cm,v.pos.y_cm)):raise OrderError('LANDING_INVALID')
                 v.task_state='ARRIVED';w.emit('UNIT_ARRIVED',unit=v.id)
                 return True
             f['stage']='MOVING';f['elapsed']=0
@@ -138,7 +140,9 @@ def fly(w,key,v,destination):
     distance=hypot(tx-x,ty-y)
     amount=min(distance,spec['speed_mps']*20,v.fuel/spec['fuel_per_100m']*10000)
     nx,ny=(tx,ty) if amount>=distance else (x+(tx-x)*amount/distance,y+(ty-y)*amount/distance)
-    if not w.terrain.inside(round(nx),round(ny)) or [round(nx)//400,round(ny)//400] in getattr(w.terrain,'no_fly',[]):
+    samples=max(1,ceil(amount/50))
+    crosses_no_fly=any([round(x+(nx-x)*i/samples)//400,round(y+(ny-y)*i/samples)//400] in getattr(w.terrain,'no_fly',[]) for i in range(samples+1))
+    if not w.terrain.inside(round(nx),round(ny)) or crosses_no_fly:
         raise OrderError('NO_FLY')
     v.pos=WorldPos(round(nx),round(ny));f['x'],f['y']=nx,ny
     v.fuel=max(0,v.fuel-amount/10000*spec['fuel_per_100m'])

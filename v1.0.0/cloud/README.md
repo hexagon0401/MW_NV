@@ -1,12 +1,22 @@
-# 비공개 테스트 배포 — 아직 외부 계정 검증 전
+# 비공개 관전 연동
 
-1. Supabase SQL editor에서 schema.sql 검토 후 적용한다. published 기본값은 false다.
-2. R2 버킷은 private로 유지한다. 업로드 credentials는 버킷 범위로 제한한다.
-3. Pages 도메인에 Cloudflare Access를 설정하고, 인증 없이 GET이 차단되는지 확인한다.
-   Pages가 기본적으로 비공개인 것은 아니다. Access 확인 전 비공개 리플레이를 배포하지 않는다.
-4. 사용자 제공 프로젝트·계정·버킷 정보로 환경 설정과 허용 도메인을 추가한다.
-5. 익명으로 published=false 행 조회 거부, 소유자 조회 허용, 타인 쓰기 거부를 실제 API에서 검증한다.
-6. viewer에서 npm ci, npm run build 후 빌드 결과만 지정한 Pages 프로젝트에 배포한다.
+설정 절차는 ../SETUP_ACTIONS.md, 대상 식별자는 deployment.json에 있다.
 
-schema.sql은 실제 Supabase에서 아직 실행하지 않았다. 파일 존재나 정적 검사만으로
-RLS가 검증됐다고 주장하지 않는다. R2 업로드/다운로드와 Access도 계정 제공 후 검증한다.
+- schema.sql은 새 mw_nv_matches 테이블에 공개 경기만 익명 읽기, 관리자만 쓰기를 허용한다.
+- supabase.py는 서버 전용 메타데이터 클라이언트다.
+- storage.py는 S3/R2 클라이언트 주입 방식의 gzip·read-back checksum·영구 retry queue다.
+- supabase_storage.py는 비공개 Supabase Storage 대안이다. 공개 버킷을 만들지 않는다.
+- viewer/functions는 RS256 Access JWT를 검증한 뒤 정적 관전 및 서버 전용 조회를 허용한다.
+- 현재 private object 경로 계약은 supabase://mw-nv-replays/경기.view.json이다.
+  R2 선택 시 별도 바인딩/객체 조회 연결을 완료해야 한다.
+
+실제 배포 전 로컬 검사:
+
+    cd viewer
+    npm ci
+    npm test
+    npm run build
+    WRANGLER_SEND_METRICS=false npx wrangler pages functions build --outdir ../data/functions-build
+
+실제 배포는 계정 API 토큰, Access 팀/AUD, 서버 전용 키를 안전하게 설정하고
+무료 사용량을 확인한 뒤 지정한 mw-nv 프로젝트에 수행한다. 현재 실제 배포는 하지 않았다.
