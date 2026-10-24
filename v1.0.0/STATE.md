@@ -1,15 +1,11 @@
 # MW-NV v1.0.0 STATE
-Current task: G01 gameplay, transport, local LLM launch and repeat training
-Status: functional checks PASS; Mac/model inference unverified
-Completed: ranged engagement/retreat, carrier detours, 28-person release teams
-Viewer: HP/shot lines/targets, directional soldiers, darker district map/effect labels
-Verified: Python 92 PASS; JS 9 PASS; production build PASS
-Browser: desktop/mobile/fonts/tooltips and live casualty/reconnect PASS
-Transport: release run observed embark/disembark; follow-up landing/HQ fixes tested separately
-Learning: three 64-step PPO rounds, frozen-opponent resume/save/NumPy parity PASS
-Run Mac: bash scripts/mac-local.sh; viewer npm run dev; see GAMEPLAY_UPDATE.md
-Run repeat: python -m engine.series --count 0
-Run CPU learning: python -m learning.continuous --rounds 0
-Next: Mac model validation and balance/held-out evaluation; deployment deferred
-Git branch: dev/v1.0.0
+Current task: CA01 combined-arms catalog and release roster
+Status: catalog/roster/logistics checks PASS; CA02 combat integration in progress
+Completed: 64 infantry/10 vehicles per team, AT/MBT/SPH data, HP/ammo/armor fields
+Economy: initial grant; 96/14 caps, squad reinforcement, ammo resupply and engineer repair
+Compatibility: combined-arms-1 rules/catalog; old view replays remain readable
+Verified: catalog, roster, types, logistics, purchase, release map and replay tests
+Next: finish direct fire/artillery/evacuation and viewer events
+Branch: dev/v1.0.0; no deployment
+Mac: real inference/performance unverified
 Usage: UNKNOWN

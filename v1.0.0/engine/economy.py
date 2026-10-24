@@ -1,12 +1,12 @@
 """Atomic purchase of individual arcade units at an owned HQ."""
 from math import hypot
-from .types import Team,WorldPos,Vehicle
+from .types import Team,WorldPos,Vehicle,Squad
 from .catalog import make_soldier
 from .logistics import debit
 from .orders import OrderError
 from .transport import FootprintTerrain
 
-PURCHASE_TYPES=('INF','REC','SUP','MED','ENG','LUV','APC','IFV','HEL','TRK')
+PURCHASE_TYPES=('INF','REC','SUP','MED','ENG','LUV','APC','IFV','HEL','TRK','AT','MBT','SPH')
 
 
 def purchase(w,c):
@@ -16,7 +16,7 @@ def purchase(w,c):
     kind=PURCHASE_TYPES[c.arg0];infantry=kind in w.unit_specs
     collection=w.soldiers if infantry else w.vehicles
     active=sum(u.team==c.team and getattr(u,'alive',True) for u in collection.values())
-    if active>=(40 if infantry else 7):raise OrderError('NO_CAPACITY')
+    if active>=(96 if infantry else 14):raise OrderError('NO_CAPACITY')
     spec=(w.unit_specs if infantry else w.vehicle_specs)[kind]
     terrain=w.terrain if infantry else FootprintTerrain(w.terrain,spec['footprint_cm'])
     position=None
@@ -33,4 +33,12 @@ def purchase(w,c):
     id=max([0,*w.soldiers,*w.vehicles,*w.squads,*w.facilities])+1
     unit=make_soldier(id,c.team,position,kind,w.unit_specs) if infantry else Vehicle(id,c.team,position,kind)
     collection[id]=unit
-    w.emit('UNIT_SPAWNED',unit=id,entity=dict(id=id,team=int(c.team),type_id=kind,x_cm=position.x_cm,y_cm=position.y_cm,size_px=spec['size_px'],alive=True,carrier_id=None))
+    if infantry:
+        groups=sorted((g for g in w.squads.values() if g.team==c.team and any(w.soldiers[i].type_id==kind for i in g.member_ids)),key=lambda g:g.id)
+        destination=next((g for g in groups if sum(w.soldiers[i].alive for i in g.member_ids)<8),None)
+        if destination is None:
+            gid=id+1;destination=Squad(gid,c.team,position,[id]);w.squads[gid]=destination
+        else:
+            destination.member_ids=[i for i in destination.member_ids if w.soldiers[i].alive]+[id]
+        unit.squad_id=destination.id
+    w.emit('UNIT_SPAWNED' ,unit=id,entity=dict(id=id,team=int(c.team),type_id=kind,x_cm=position.x_cm,y_cm=position.y_cm,size_px=spec['size_px'],alive=True,carrier_id=None))

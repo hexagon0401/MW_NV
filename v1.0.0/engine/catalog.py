@@ -9,7 +9,7 @@ CONFIG_DIR = Path(__file__).resolve().parents[1] / 'config'
 
 def load_units(path=None):
     data = yaml.safe_load(Path(path or CONFIG_DIR/'units.yaml').read_text())
-    if set(data) != {'INF','REC','SUP','MED','ENG'}:
+    if set(data) != {'INF','REC','SUP','MED','ENG','AT'}:
         raise ValueError('unit types')
     for name, spec in data.items():
         for field in ('hp','speed_mps','detection_m','cost'):
@@ -34,12 +34,28 @@ def make_soldier(id,team,pos,type_id='INF',specs=None):
 
 def load_vehicles(path=None):
     data=yaml.safe_load(Path(path or CONFIG_DIR/'vehicles.yaml').read_text())
-    if set(data)!={'LUV','APC','IFV','HEL','TRK'}:
+    if set(data)!={'LUV','APC','IFV','HEL','TRK','MBT','SPH'}:
         raise ValueError('vehicle types')
     for spec in data.values():
-        for name in ('speed_mps','fuel_max','fuel_per_100m','cost','grass_factor'):
+        for name in ('speed_mps','fuel_max','fuel_per_100m','cost','grass_factor','hp','detection_m'):
             if not isfinite(spec[name]) or spec[name]<=0:
                 raise ValueError(name)
+        if spec['armor'] not in ('soft','light','medium','heavy','air'):raise ValueError('armor')
+        if spec['weapon'] not in (None,'rifle','cannon','ap','he'):raise ValueError('weapon')
+        if type(spec['ammo']) is not int or spec['ammo']<0:raise ValueError('ammo')
+        if spec['attack'] and (any(spec['attack'][k]<=0 for k in ('range_m','interval_ms','damage')) or not 0<=spec['attack']['hit_probability']<=1):raise ValueError('attack')
         if len(spec['footprint_cm'])!=2 or any(x<=0 for x in spec['footprint_cm']):
             raise ValueError('footprint_cm')
     return data
+
+
+def load_weapons():
+    data=yaml.safe_load((CONFIG_DIR/'weapons.yaml').read_text())
+    for weapon,table in data['multipliers'].items():
+        if set(table)!={'soft','light','medium','heavy','air'} or any(not isinstance(v,(int,float)) or not isfinite(v) or v<0 for v in table.values()):raise ValueError('damage multipliers')
+    if any(type(v) is not int or v<=0 for v in data['artillery'].values()):raise ValueError('artillery settings')
+    return data
+
+
+def catalog_document():
+    return dict(version='combined-arms-1',units=load_units(),vehicles=load_vehicles(),weapons=load_weapons())

@@ -52,11 +52,11 @@ class RecordingEngine(Engine):
         return self.world.emit(kind,**payload)
 
     def document(self):
-        return dict(version=1,initial=self.initial,journal=self.journal,checksum=self.world.checksum())
+        return dict(version=2,rules_version=self.world.rules_version,catalog_version=self.world.catalog_version,initial=self.initial,journal=self.journal,checksum=self.world.checksum())
 
 
 def replay(document):
-    if document['version']!=1:raise ValueError('replay version')
+    if document.get('version')!=2 or document.get('rules_version')!='combined-arms-1' or document.get('catalog_version')!='combined-arms-1':raise ValueError('incompatible replay rules/catalog version')
     engine=Engine(decode(document['initial']))
     for action in document['journal']:
         if action['kind']=='submit':

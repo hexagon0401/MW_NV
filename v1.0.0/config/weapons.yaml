@@ -1,0 +1,34 @@
+version: combined-arms-1
+multipliers:
+  rifle:
+    soft: 1
+    light: 0.1
+    medium: 0
+    heavy: 0
+    air: 0.25
+  cannon:
+    soft: 1
+    light: 0.7
+    medium: 0.35
+    heavy: 0.1
+    air: 0.25
+  ap:
+    soft: 0.4
+    light: 1
+    medium: 0.85
+    heavy: 0.7
+    air: 0
+  he:
+    soft: 1
+    light: 0.7
+    medium: 0.35
+    heavy: 0.2
+    air: 0
+artillery:
+  min_range_m: 100
+  deploy_ms: 6000
+  pack_ms: 4000
+  flight_ticks: 15
+  scatter_m: 8
+  blast_m: 12
+  observation_ticks: 50

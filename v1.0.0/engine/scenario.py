@@ -77,5 +77,30 @@ def create_release_match(seed=0,swap=False):
             else:continue
             if any(abs(f.pos.x_cm//400-col)<8 and abs(f.pos.y_cm//400-row)<8 for f in w.facilities.values()):continue
             w.terrain.cells[row][col]=w.terrain.cells[row][255-col]=tile
+    # Release roster is an initial grant, separate from purchase resources.
+    from .types import TeamState
+    w.soldiers.clear();w.squads.clear();w.vehicles.clear()
+    roles=[['INF']*5+['SUP','AT','MED'] for _ in range(4)]+[['INF']*3+['AT']*3+['ENG','MED'] for _ in range(2)]+[['REC']*6+['INF','MED'],['INF']*3+['SUP']*2+['ENG']*2+['MED']]
+    kinds=['LUV','APC','APC','IFV','IFV','MBT','MBT','SPH','HEL','TRK']
+    for team in Team:
+        side=int(team)^int(swap);base=10000+int(team)*10000
+        def point(x,y):return WorldPos(x if side==0 else 102400-x,y)
+        for gi,group in enumerate(roles):
+            gid=base+100+gi;ids=[]
+            for i,role in enumerate(group):
+                uid=base+gi*8+i+1;ids.append(uid)
+                soldier=make_soldier(uid,team,point(9600+(i//2)*150,26000+gi*6000+(i%2)*150),role,w.unit_specs)
+                soldier.squad_id=gid;w.soldiers[uid]=soldier
+            w.squads[gid]=Squad(gid,team,w.soldiers[ids[0]].pos,ids)
+        for i,kind in enumerate(kinds):
+            uid=base+200+i;v=Vehicle(uid,team,point(16000+(i%2)*1600,27000+(i//2)*10000),kind)
+            if kind=='TRK':v.cargo_supply=240
+            w.vehicles[uid]=v
+        w.teams[team]=TeamState(credits=1000,tickets=32,supply=600)
+    # Spawn and facility pads must fit every footprint and formation.
+    for u in [*w.soldiers.values(),*w.vehicles.values(),*w.facilities.values()]:
+        for row in range(max(0,u.pos.y_cm//400-4),min(256,u.pos.y_cm//400+5)):
+            for col in range(max(0,u.pos.x_cm//400-4),min(256,u.pos.x_cm//400+5)):
+                w.terrain.cells[row][col]=w.terrain.cells[row][255-col]=0
     w.terrain.cache.clear()
     return w

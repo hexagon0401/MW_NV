@@ -38,7 +38,7 @@ def resupply(w,key,c):
     if c.target in w.facilities and node.kind not in ('HQ','SUPPLY_NODE') and not getattr(node,'supply_per_minute',0):raise OrderError('INVALID_TARGET')
     ids=w.squads[c.unit].member_ids if c.unit in w.squads else [c.unit]
     units=[w.soldiers.get(i) or w.vehicles.get(i) for i in ids]
-    if any(u is None or u.team!=c.team or not near(u,node) or u.task_state in ('MOVING','ONBOARD') for u in units):
+    if any(u is None or not getattr(u,'alive',True) or u.team!=c.team or not near(u,node) or u.task_state in ('MOVING','ONBOARD') for u in units):
         raise OrderError('ILLEGAL_STATE')
     if not hasattr(w,'supply_timers'):w.supply_timers={}
     w.supply_timers[key]=w.supply_timers.get(key,0)+200
@@ -49,8 +49,8 @@ def resupply(w,key,c):
             fields={'ammo':spec['ammo'],'heal_pool':spec['heal_pool'],'repair_pool':spec['repair_pool']}
             cost+=ceil(max(0,fields['ammo']-u.ammo)/10)*2+ceil(max(0,fields['heal_pool']-u.heal_pool)/10)+ceil(max(0,fields['repair_pool']-u.repair_pool)/10)
         else:
-            fields={'fuel':w.vehicle_specs[u.type_id]['fuel_max']}
-            cost+=ceil(max(0,fields['fuel']-u.fuel)/10)*3
+            fields={'fuel':w.vehicle_specs[u.type_id]['fuel_max'],'ammo':w.vehicle_specs[u.type_id]['ammo']}
+            cost+=ceil(max(0,fields['fuel']-u.fuel)/10)*3+ceil(max(0,fields['ammo']-u.ammo)/10)*2
         changes.append((u,fields))
     stock=node.cargo_supply if c.target in w.vehicles else w.teams[c.team].supply
     if stock<cost:raise OrderError('INSUFFICIENT_SUPPLY')
@@ -87,3 +87,18 @@ def regenerate(w):
             amount=3+sum(getattr(f,'supply_per_minute',0) for f in w.facilities.values() if f.owner==team)
             w.teams[team].supply+=amount
             w.emit('SUPPLY_CHANGED',team=int(team),amount=amount)
+
+
+def repair(w,key,c):
+    eng=w.soldiers.get(c.unit);target=w.vehicles.get(c.target)
+    if eng is None or eng.type_id!='ENG' or not eng.alive or eng.carrier_id is not None or target is None or target.team!=c.team or not target.alive or not near(eng,target):raise OrderError('INVALID_TARGET')
+    if eng.task_state=='MOVING' or target.task_state in ('MOVING','TAKEOFF','LANDING'):raise OrderError('ILLEGAL_STATE')
+    missing=w.vehicle_specs[target.type_id]['hp']-target.hp
+    if missing<=0:return True
+    if eng.repair_pool<10 or w.teams[c.team].supply<2:raise OrderError('INSUFFICIENT_SUPPLY')
+    if not hasattr(w,'repair_timers'):w.repair_timers={}
+    w.repair_timers[key]=w.repair_timers.get(key,0)+200
+    if w.repair_timers[key]>=2000:
+        w.repair_timers[key]-=2000;debit(w,c.team,supply=2);eng.repair_pool-=10;target.hp+=min(10,missing)
+        w.emit('UNIT_REPAIRED',unit=target.id,amount=min(10,missing),hp=target.hp)
+    return target.hp==w.vehicle_specs[target.type_id]['hp']

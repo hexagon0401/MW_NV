@@ -19,9 +19,9 @@ def test_move_stops_at_range_and_attack_explains_damage():
 
 def test_expanded_release_roster_and_transport_orders():
     w=create_release_match(1);e=Engine(w)
-    assert sum(s.team==0 for s in w.soldiers.values())==28
+    assert sum(s.team==0 for s in w.soldiers.values())==64
     # Place carrier near its intact eight-person squad.
-    w.vehicles[1070].pos=WorldPos(12000,40000)
+    w.vehicles[10201].pos=WorldPos(12000,26000)
     commands=RuleHQ().observe_and_issue(e.observe(0))
     assert any(c['op']==5 for c in commands)
     assert w.facilities[203].supply_per_minute==8

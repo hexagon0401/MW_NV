@@ -22,6 +22,11 @@ class Op(IntEnum):
     RETREAT = 10
     PURCHASE = 11
     CANCEL = 12
+    ATTACK_TARGET = 13
+    FIRE_MISSION = 14
+    DEPLOY = 15
+    PACK_UP = 16
+    REPAIR = 17
 
 
 def natural(value, name, minimum=0):
@@ -70,7 +75,7 @@ class Soldier(Entity):
 
     def __post_init__(self):
         super().__post_init__()
-        if self.type_id not in ('INF', 'REC', 'SUP', 'MED', 'ENG'):
+        if self.type_id not in ('INF', 'REC', 'SUP', 'MED', 'ENG', 'AT'):
             raise ValueError('type_id')
         natural(self.hp, 'hp')
         natural(self.ammo, 'ammo')
@@ -95,10 +100,26 @@ class Vehicle(Entity):
     passenger_ids: list[int] = field(default_factory=list)
     cargo_supply: int = 0
     task_state: str = 'IDLE'
+    hp: int | None = None
+    alive: bool = True
+    ammo: int | None = None
+    target_id: int | None = None
+    cooldown_ms: int = 0
+    turret_heading: float = 0.0
+    deployment: str = 'PACKED'
+    deployment_ms: int = 0
 
     def __post_init__(self):
         super().__post_init__()
-        if self.type_id not in ('LUV', 'APC', 'IFV', 'HEL', 'TRK'):
+        # Direct constructors and purchased vehicles use the same catalog defaults.
+        from .catalog import load_vehicles
+        specs=load_vehicles()
+        if self.type_id not in specs:raise ValueError('type_id')
+        spec=specs[self.type_id]
+        if self.hp is None:self.hp=spec['hp']
+        if self.ammo is None:self.ammo=spec['ammo']
+        natural(self.hp,'hp');natural(self.ammo,'ammo')
+        if self.type_id not in ('LUV', 'APC', 'IFV', 'HEL', 'TRK', 'MBT', 'SPH'):
             raise ValueError('type_id')
 
 
