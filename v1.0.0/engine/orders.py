@@ -65,6 +65,11 @@ def validate(world, command):
         target=world.soldiers.get(c.target) or world.vehicles.get(c.target)
         if target is None or not target.alive or target.team==c.team:raise OrderError('INVALID_TARGET')
         if c.target not in getattr(world,'visible',{}).get(c.team,[]):raise OrderError('UNOBSERVED_TARGET')
+        from .sensing import can_see
+        from .combat import spec,multiplier
+        from math import hypot
+        weapon=spec(world,unit)['attack']
+        if not weapon or not can_see(world,unit,target) or hypot(unit.pos.x_cm-target.pos.x_cm,unit.pos.y_cm-target.pos.y_cm)>weapon['range_m']*100 or multiplier(world,unit,target)<=0:raise OrderError('OUT_OF_RANGE')
     return c
 
 

@@ -1,0 +1,178 @@
+"""Pure, bounded tactical candidates derived exclusively from team observations."""
+from math import hypot,ceil
+from collections import defaultdict
+
+CONTRACT='tactics-1'
+ROLES=('capture','defend','recon','anti_armor','fire','transport','supply','repair','retreat')
+BUSY=('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS','UNLOADING','DEPLOYING','PACKING')
+
+
+def distance(a,b):return hypot(a['pos']['x_cm']-b['pos']['x_cm'],a['pos']['y_cm']-b['pos']['y_cm'])/100
+
+
+def candidates(obs):
+    catalog=obs['catalog'];own=[u for u in obs['units'] if u['alive']];vehicles=[v for v in obs['vehicles'] if v['alive']]
+    own_by={u['id']:u for u in own};enemies=obs['enemies'];objectives=sorted((f for f in obs['facilities'] if f['kind']=='OBJECTIVE'),key=lambda f:f['id'])
+    depots=[f for f in obs['facilities'] if f['owner']==obs['team'] and (f['kind']=='HQ' or f.get('supply_per_minute',0))]+[v for v in vehicles if v['type_id']=='TRK' and v['cargo_supply']>0]
+    result=[]
+    def clear(a,b):
+        terrain=obs.get('terrain')
+        if terrain is None:return True
+        n=max(1,ceil(distance(a,b)))
+        return all(terrain[round(a['pos']['y_cm']+(b['pos']['y_cm']-a['pos']['y_cm'])*i/n)//400][round(a['pos']['x_cm']+(b['pos']['x_cm']-a['pos']['x_cm'])*i/n)//400] not in (3,4) for i in range(n+1))
+
+    def add(actor,role,score,reason,op,target=0,x=0,y=0,reservations=None):
+        members=actor.get('member_ids',[]);troops=[own_by[i] for i in members if i in own_by]
+        representative=troops[0] if troops else actor
+        pos=representative['pos'];kind=representative.get('type_id','INF');spec=(catalog['units'] if kind in catalog['units'] else catalog['vehicles'])[kind]
+        threat=sum(max(0,1-distance(representative,e)/160) for e in enemies)
+        health=sum(u['hp']/catalog['units'][u['type_id']]['hp'] for u in troops)/len(troops) if troops else representative.get('hp',spec['hp'])/spec['hp']
+        ammo=representative.get('ammo',0)/max(1,spec.get('ammo',0))
+        features=[score/200,pos['x_cm']/(obs['map_width_m']*100),pos['y_cm']/(obs['map_height_m']*100),health,ammo,representative.get('fuel',100)/100,min(1,threat/4),len(troops)/8,float(kind in catalog['vehicles']),float(role=='fire'),float(role=='anti_armor'),float(role=='transport'),float(role=='supply'),float(role=='retreat'),x/obs['map_width_m'],y/obs['map_height_m']]
+        cost=0
+        if op==17:cost=2
+        elif op==9:cost=1
+        elif op==8:
+            if troops:
+                cost=sum(2*ceil(max(0,catalog['units'][u['type_id']]['ammo']-u['ammo'])/10)+ceil(max(0,catalog['units'][u['type_id']]['heal_pool']-u['heal_pool'])/10)+ceil(max(0,catalog['units'][u['type_id']]['repair_pool']-u['repair_pool'])/10) for u in troops)
+            elif kind in catalog['vehicles']:cost=ceil(max(0,spec['fuel_max']-representative['fuel'])/10)*3+ceil(max(0,spec['ammo']-representative['ammo'])/10)*2
+        budget=obs['resources']['supply']
+        if cost>budget:return
+        result.append(dict(supply_cost=cost,supply_budget=budget,role=role,score=round(score,4),reason=reason,command=dict(op=op,unit=actor['id'],target=target,arg0=x,arg1=y),features=features,locks=sorted(set([actor['id'],*members,*(reservations or [])]))) )
+    def goto(actor,role,target,score,reason,op=2):
+        add(actor,role,score,reason,op,x=target['pos']['x_cm']//100,y=target['pos']['y_cm']//100)
+    for g in sorted(obs['squads'],key=lambda g:g['id']):
+        troops=[own_by[i] for i in g['member_ids'] if i in own_by];dismounted=[u for u in troops if u['carrier_id'] is None]
+        if not troops or not dismounted:continue
+        if any(o.get('unit')==g['id'] and o.get('op')==5 and o['status'] in ('QUEUED','RUNNING') for o in obs.get('orders',[])):continue
+        if len(dismounted)!=len(troops):continue
+        actor=troops[0];hp=sum(u['hp']/catalog['units'][u['type_id']]['hp'] for u in troops)/len(troops)
+        nearby=[e for e in enemies if distance(actor,e)<130]
+        for f in objectives:
+            d=distance(actor,f);role='defend' if f['owner']==obs['team'] else 'capture'
+            score=70-d*.12+(15 if role=='capture' else 0)+min(20,len(troops)*2)
+            if role=='defend' and not nearby:score-=30
+            add(g,role,score,'거점 확보' if role=='capture' else '거점 방어',3 if role=='capture' else 4,target=f['id'])
+        if any(u['type_id']=='REC' for u in troops) and objectives:
+            f=objectives[(g['id']+obs['tick']//150)%len(objectives)];goto(g,'recon',f,70-distance(actor,f)*.1,'거점 접근 정찰')
+        if hp<.35 and depots:goto(g,'retreat',min(depots,key=lambda d:distance(actor,d)),115,'분대 체력 부족',10)
+        low=any(catalog['units'][u['type_id']]['ammo'] and u['ammo']<max(1,catalog['units'][u['type_id']]['ammo']*.2) for u in troops)
+        if low and depots:
+            depot=min(depots,key=lambda d:distance(actor,d))
+            if all(distance(u,depot)<=3 for u in troops):add(g,'supply',125,'탄약 부족·재보급',8,target=depot['id'])
+            else:goto(g,'supply',depot,110-distance(actor,depot)*.1,'탄약 부족·보급 이동')
+        if objectives:
+            objective=min((f for f in objectives if f['owner']!=obs['team']),key=lambda f:distance(actor,f),default=objectives[0])
+            if distance(actor,objective)>150:
+                carriers=[v for v in vehicles if v['type_id'] in ('APC','IFV','HEL') and v['task_state'] not in BUSY and not v['passenger_ids'] and catalog['vehicles'][v['type_id']]['capacity']>=len(troops) and distance(actor,v)<100]
+                if carriers:
+                    v=min(carriers,key=lambda v:(distance(actor,v),v['id']));add(g,'transport',100-distance(actor,v)*.15,'완편 분대 수송',5,target=v['id'],reservations=[v['id']])
+        for u in troops:
+            us=catalog['units'][u['type_id']]
+            if u['type_id']=='AT':
+                targets=[e for e in enemies if e['type_id'] in catalog['vehicles'] and distance(u,e)<=us['attack']['range_m'] and distance(u,e)<=us['detection_m'] and clear(u,e)]
+                if targets:
+                    e=min(targets,key=lambda e:(distance(u,e),e['id']));add(u,'anti_armor',130,'확인된 장갑 위협 대응',13,target=e['id'])
+            if u['type_id']=='ENG' and u['repair_pool']>=10 and obs['resources']['supply']>=2:
+                damaged=[v for v in vehicles if v['hp']<catalog['vehicles'][v['type_id']]['hp'] and v['task_state'] not in BUSY]
+                if damaged:
+                    v=min(damaged,key=lambda v:distance(u,v))
+                    if distance(u,v)<=3:add(u,'repair',120,'손상 차량 수리',17,target=v['id'],reservations=[v['id']])
+                    else:goto(u,'repair',v,80-distance(u,v)*.1,'손상 차량 접근')
+            if u['type_id']=='MED' and u['heal_pool']>=8:
+                wounded=[s for s in troops if s['hp']<catalog['units'][s['type_id']]['hp'] and distance(u,s)<=3 and s['task_state']!='MOVING']
+                if wounded:add(u,'repair',110,'부상병 치료',9,target=wounded[0]['id'],reservations=[wounded[0]['id']])
+    for v in sorted(vehicles,key=lambda v:v['id']):
+        vs=catalog['vehicles'][v['type_id']]
+        if v['task_state'] in BUSY:continue
+        if v['fuel']<20 or vs['ammo'] and v['ammo']<max(1,vs['ammo']*.2):
+            if depots:
+                depot=min((d for d in depots if d['id']!=v['id']),key=lambda d:distance(v,d),default=None)
+                if depot:
+                    if distance(v,depot)<=3:add(v,'supply',140,'차량 연료·탄약 보급',8,target=depot['id'])
+                    elif v['deployment']=='PACKED':goto(v,'supply',depot,130,'차량 보급 이동',7)
+                    else:add(v,'supply',130,'보급 이동 전 철수',16)
+            continue
+        if v['passenger_ids']:
+            target=min((f for f in objectives if f['owner']!=obs['team']),key=lambda f:distance(v,f),default=objectives[0] if objectives else None)
+            if target:
+                if distance(v,target)<=target['radius_cm']/100:add(v,'transport',145,'거점 도착·하차',6,x=v['pos']['x_cm']//100,y=v['pos']['y_cm']//100)
+                else:add(v,'transport',140,'탑승 분대 거점 수송',7,x=target['pos']['x_cm']//100+(-16 if obs['team']==0 else 16),y=target['pos']['y_cm']//100)
+            continue
+        if v['type_id']=='SPH':
+            sightings={e['id']:dict(x_cm=e['pos']['x_cm'],y_cm=e['pos']['y_cm'],seen_at_tick=obs['tick']) for e in enemies}
+            for s in obs.get('last_seen',[]):
+                if 0<=obs['tick']-s['seen_at_tick']<=50:sightings.setdefault(s['id'],s)
+            valid=[]
+            for target in sightings.values():
+                point=dict(pos=target);d=distance(v,point)
+                if 100<=d<=420 and not any(distance(f,point)<20 for f in [*own,*vehicles]):valid.append(target)
+            if valid and v['ammo']:
+                if v['deployment']=='DEPLOYED':
+                    for t in valid[:4]:add(v,'fire',135,'포격 가능·관측 유효·아군 없음',14,x=t['x_cm']//100,y=t['y_cm']//100)
+                else:add(v,'fire',130,'관측 표적 대응·포병 설치',15)
+            elif v['deployment']!='PACKED':add(v,'fire',75,'표적 없음·포병 철수',16)
+            elif objectives:
+                f=min(objectives,key=lambda f:distance(v,f));x=f['pos']['x_cm']//100+(-220 if obs['team']==0 else 220)
+                if abs(v['pos']['x_cm']//100-x)>30:add(v,'fire',65,'포병 사거리 확보',7,x=max(12,min(obs['map_width_m']-12,x)),y=f['pos']['y_cm']//100)
+        elif vs['attack']:
+            targets=[e for e in enemies if distance(v,e)<=min(vs['attack']['range_m'],vs['detection_m']) and clear(v,e)]
+            if targets:
+                e=min(targets,key=lambda e:(distance(v,e),e['id']));add(v,'anti_armor',125,'직사 화력 지원',13,target=e['id'])
+            elif objectives:goto(v,'anti_armor',min(objectives,key=lambda f:distance(v,f)),65,'전선 화력 지원',7)
+    # Fair role allocation keeps scarce support actions in the bounded candidate set.
+    buckets=defaultdict(list)
+    for item in sorted(result,key=lambda c:(-c['score'],c['command']['unit'],c['command']['op'],c['command']['target'],c['command']['arg0'],c['command']['arg1'])):buckets[item['role']].append(item)
+    chosen=[]
+    while len(chosen)<64 and any(buckets.values()):
+        for role in ROLES:
+            if buckets[role] and len(chosen)<64:chosen.append(buckets[role].pop(0))
+    for i,c in enumerate(chosen):c['id']=i
+    return chosen
+
+
+def compatible(items,selected):
+    locks={uid for c in selected for uid in c['locks']}
+    return [c for c in items if not locks.intersection(c['locks']) and c.get('supply_cost',0)+sum(s.get('supply_cost',0) for s in selected)<=c.get('supply_budget',10**9)]
+
+
+def select(items,limit=4):
+    selected=[]
+    for c in sorted(items,key=lambda c:(-c.get('policy_score',c['score']),c['id'])):
+        if c in compatible([c],selected):selected.append(c)
+        if len(selected)==limit:break
+    return selected
+
+
+def commands(obs,selected):
+    return [dict(c['command'],cmd_id=obs['tick']*100+i+1,team=obs['team'],tick=obs['tick'],ttl=750) for i,c in enumerate(selected)]
+
+
+def shortlist(items,limit=12):
+    output=[]
+    for role in ROLES:
+        best=sorted((c for c in items if c['role']==role),key=lambda c:(-c.get('policy_score',c['score']),c['id']))
+        if best:output.append(best[0])
+    for c in sorted(items,key=lambda c:(-c.get('policy_score',c['score']),c['id'])):
+        if len(output)>=limit:break
+        if c not in output:output.append(c)
+    return output[:limit]
+
+
+class TacticalHQ:
+    def __init__(self,policy=None):self.policy=policy;self.last_decision={};self.model=None;self.policy_error=False
+    def ranked(self,obs):
+        items=candidates(obs);policy_status='algorithm'
+        if self.policy:
+            try:
+                from learning.candidate_policy import CandidatePolicy,vector
+                if self.policy_error:raise ValueError('incompatible policy')
+                if self.model is None:self.model=CandidatePolicy(self.policy)
+                model=self.model;scores=model.logits(vector(obs,items))
+                for c in items:c['policy_score']=float(scores[c['id']])
+                policy_status=model.policy_id
+            except (OSError,ValueError,KeyError,ImportError):self.policy_error=True;policy_status='incompatible_policy_fallback'
+        self.policy_status=policy_status;return items
+    def observe_and_issue(self,obs):
+        selected=select(self.ranked(obs));self.last_decision=dict(source='algorithm',policy=self.policy_status,contract=CONTRACT,reasons=[dict(unit=c['command']['unit'],candidate_id=c['id'],reason=c['reason'],score=c['score']) for c in selected])
+        return commands(obs,selected)

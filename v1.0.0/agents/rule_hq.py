@@ -8,6 +8,9 @@ _vehicle_specs=lru_cache(maxsize=1)(load_vehicles)
 
 class RuleHQ:
     def observe_and_issue(self,obs):
+        if obs['map_width_m']>=1024:
+            from .tactics import TacticalHQ
+            hq=TacticalHQ();result=hq.observe_and_issue(obs);self.last_decision=hq.last_decision;return result
         commands=[];team=obs['team'];tick=obs['tick']
         units={u['id']:u for u in obs['units'] if u['alive']}
         reserved=set()

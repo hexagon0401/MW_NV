@@ -1,12 +1,12 @@
 # MW-NV v1.0.0 STATE
-Current task: CA02 direct/indirect combined-arms combat
-Status: PASS; CA03 tactical candidates and learning in progress
-Completed: CA01 catalog/64+10 roster; armor, vehicle targeting, observed artillery
-Combat: deploy/pack, separate seeded scatter, friendly blast damage, emergency evacuation
-Viewer: HP/ammo/reload/deployment fields, shot/impact events, range rings, catalog
-Verified: 35 catalog/core checks; combat/live/replay/transport regression checks PASS
-Frontend: 9 JS tests and production build PASS
-Next: candidate-ID hybrid HQ, 1056-feature/65-action PPO and versioned NumPy policies
+Current task: CA03 tactical candidates / PPO / hybrid HQ
+Status: PASS; CA04 results API/UI in progress
+Completed: catalog/64+10 roster, combined-arms combat, bounded candidate-ID HQ
+AI: 64 candidates, 12 LLM offers, 4 orders, locks/LOS/supply/friendly-blast filtering
+Learning: separate 1056-feature/65-action version; 128x128 MLP NumPy deployment
+Verified: 19 HQ/live/results checks PASS; 2x64-step CPU training/save/load/parity PASS
+Policy: policy1 trained as B against frozen policy0; no automatic promotion
+Next: durable results UI/import and battlefield art/performance regression
 Branch: dev/v1.0.0; no deployment
-Mac: inference and GPU performance unverified
+Mac: actual LLM speed/output and GPU performance unverified
 Usage: UNKNOWN
