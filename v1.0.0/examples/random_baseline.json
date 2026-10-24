@@ -1,0 +1,1102 @@
+[
+  {
+    "match_id": "9beda051901a8c52",
+    "seed": 1000,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      101
+    ],
+    "unit_losses": [
+      15,
+      5
+    ],
+    "supply_remaining": [
+      222,
+      298
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 1.872767759999988
+  },
+  {
+    "match_id": "189f4d71fa00c46c",
+    "seed": 1001,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      2,
+      101
+    ],
+    "unit_losses": [
+      16,
+      0
+    ],
+    "supply_remaining": [
+      230,
+      298
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 1.7902411919999395
+  },
+  {
+    "match_id": "1b17dd886af87314",
+    "seed": 1002,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      48,
+      101
+    ],
+    "unit_losses": [
+      16,
+      5
+    ],
+    "supply_remaining": [
+      392,
+      240
+    ],
+    "invalid_actions": 0,
+    "ticks": 6000,
+    "wall_time_s": 3.242008405999968
+  },
+  {
+    "match_id": "d794abc6dd9afc05",
+    "seed": 1003,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      16,
+      101
+    ],
+    "unit_losses": [
+      15,
+      5
+    ],
+    "supply_remaining": [
+      252,
+      316
+    ],
+    "invalid_actions": 0,
+    "ticks": 4800,
+    "wall_time_s": 1.672045227000126
+  },
+  {
+    "match_id": "c65cb868440df935",
+    "seed": 1004,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      25,
+      103
+    ],
+    "unit_losses": [
+      16,
+      4
+    ],
+    "supply_remaining": [
+      282,
+      306
+    ],
+    "invalid_actions": 0,
+    "ticks": 5400,
+    "wall_time_s": 1.6754291520001061
+  },
+  {
+    "match_id": "133a9bdf8ca37b5a",
+    "seed": 1005,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      102
+    ],
+    "unit_losses": [
+      16,
+      0
+    ],
+    "supply_remaining": [
+      222,
+      306
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 1.1959522480001397
+  },
+  {
+    "match_id": "edb9fa3ab0a68313",
+    "seed": 1006,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      10,
+      101
+    ],
+    "unit_losses": [
+      16,
+      1
+    ],
+    "supply_remaining": [
+      231,
+      311
+    ],
+    "invalid_actions": 0,
+    "ticks": 5250,
+    "wall_time_s": 1.1396004440002798
+  },
+  {
+    "match_id": "9a359dada327770b",
+    "seed": 1007,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      102
+    ],
+    "unit_losses": [
+      16,
+      4
+    ],
+    "supply_remaining": [
+      225,
+      301
+    ],
+    "invalid_actions": 0,
+    "ticks": 4650,
+    "wall_time_s": 1.4713468869999815
+  },
+  {
+    "match_id": "25dd9544bea0bc5d",
+    "seed": 1008,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      2,
+      102
+    ],
+    "unit_losses": [
+      15,
+      7
+    ],
+    "supply_remaining": [
+      225,
+      317
+    ],
+    "invalid_actions": 0,
+    "ticks": 4500,
+    "wall_time_s": 1.6135740970003098
+  },
+  {
+    "match_id": "d1029c8e099c280a",
+    "seed": 1009,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      3,
+      100
+    ],
+    "unit_losses": [
+      16,
+      3
+    ],
+    "supply_remaining": [
+      230,
+      310
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 1.1519485070002702
+  },
+  {
+    "match_id": "6af4b15367446be9",
+    "seed": 1010,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      101
+    ],
+    "unit_losses": [
+      16,
+      1
+    ],
+    "supply_remaining": [
+      222,
+      318
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 0.8740468729997701
+  },
+  {
+    "match_id": "5ea0d6ef5e8ec41b",
+    "seed": 1011,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      14,
+      103
+    ],
+    "unit_losses": [
+      16,
+      5
+    ],
+    "supply_remaining": [
+      228,
+      340
+    ],
+    "invalid_actions": 0,
+    "ticks": 4800,
+    "wall_time_s": 0.948069208999641
+  },
+  {
+    "match_id": "d1ae08d6506c4333",
+    "seed": 1012,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      101
+    ],
+    "unit_losses": [
+      16,
+      0
+    ],
+    "supply_remaining": [
+      222,
+      318
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 1.2831044220001786
+  },
+  {
+    "match_id": "a1cd1eb696f2951b",
+    "seed": 1013,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      7,
+      103
+    ],
+    "unit_losses": [
+      11,
+      5
+    ],
+    "supply_remaining": [
+      244,
+      316
+    ],
+    "invalid_actions": 0,
+    "ticks": 4800,
+    "wall_time_s": 2.0204736360001334
+  },
+  {
+    "match_id": "830f0caf5eabdf22",
+    "seed": 1014,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      5,
+      102
+    ],
+    "unit_losses": [
+      11,
+      2
+    ],
+    "supply_remaining": [
+      228,
+      312
+    ],
+    "invalid_actions": 0,
+    "ticks": 4800,
+    "wall_time_s": 1.5612235140001758
+  },
+  {
+    "match_id": "605777552667841b",
+    "seed": 1015,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      32,
+      100
+    ],
+    "unit_losses": [
+      14,
+      10
+    ],
+    "supply_remaining": [
+      237,
+      357
+    ],
+    "invalid_actions": 0,
+    "ticks": 5700,
+    "wall_time_s": 1.8375292589998935
+  },
+  {
+    "match_id": "5b03a948a161d6ef",
+    "seed": 1016,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 0,
+    "scores": [
+      100,
+      95
+    ],
+    "unit_losses": [
+      11,
+      12
+    ],
+    "supply_remaining": [
+      546,
+      282
+    ],
+    "invalid_actions": 0,
+    "ticks": 10200,
+    "wall_time_s": 2.221430235999833
+  },
+  {
+    "match_id": "0adf492d4f8345c8",
+    "seed": 1017,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      102
+    ],
+    "unit_losses": [
+      16,
+      1
+    ],
+    "supply_remaining": [
+      222,
+      306
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 1.0861437710000246
+  },
+  {
+    "match_id": "6dfbdd0a7ad1c661",
+    "seed": 1018,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      50,
+      101
+    ],
+    "unit_losses": [
+      15,
+      8
+    ],
+    "supply_remaining": [
+      392,
+      240
+    ],
+    "invalid_actions": 0,
+    "ticks": 6150,
+    "wall_time_s": 2.667326831000082
+  },
+  {
+    "match_id": "144c14e69460e24a",
+    "seed": 1019,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      101
+    ],
+    "unit_losses": [
+      16,
+      5
+    ],
+    "supply_remaining": [
+      225,
+      313
+    ],
+    "invalid_actions": 0,
+    "ticks": 4500,
+    "wall_time_s": 0.9018755639999654
+  },
+  {
+    "match_id": "1f233c66baa8a69f",
+    "seed": 1020,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      100
+    ],
+    "unit_losses": [
+      16,
+      3
+    ],
+    "supply_remaining": [
+      225,
+      313
+    ],
+    "invalid_actions": 0,
+    "ticks": 4500,
+    "wall_time_s": 0.93561162900005
+  },
+  {
+    "match_id": "79558e663f4c55fc",
+    "seed": 1021,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      3,
+      102
+    ],
+    "unit_losses": [
+      16,
+      5
+    ],
+    "supply_remaining": [
+      225,
+      317
+    ],
+    "invalid_actions": 0,
+    "ticks": 4500,
+    "wall_time_s": 0.9951886649996595
+  },
+  {
+    "match_id": "192be8a0766240af",
+    "seed": 1022,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      24,
+      100
+    ],
+    "unit_losses": [
+      12,
+      8
+    ],
+    "supply_remaining": [
+      295,
+      279
+    ],
+    "invalid_actions": 0,
+    "ticks": 5100,
+    "wall_time_s": 1.7198261759999696
+  },
+  {
+    "match_id": "7a2b9ee77e212ae5",
+    "seed": 1023,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      43,
+      102
+    ],
+    "unit_losses": [
+      16,
+      3
+    ],
+    "supply_remaining": [
+      240,
+      384
+    ],
+    "invalid_actions": 0,
+    "ticks": 6150,
+    "wall_time_s": 1.3512262680001186
+  },
+  {
+    "match_id": "3df6c11e0aaadf28",
+    "seed": 1024,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      4,
+      101
+    ],
+    "unit_losses": [
+      16,
+      1
+    ],
+    "supply_remaining": [
+      241,
+      283
+    ],
+    "invalid_actions": 0,
+    "ticks": 4650,
+    "wall_time_s": 2.308577050000167
+  },
+  {
+    "match_id": "e8c9d2991d848251",
+    "seed": 1025,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      44,
+      101
+    ],
+    "unit_losses": [
+      16,
+      7
+    ],
+    "supply_remaining": [
+      376,
+      240
+    ],
+    "invalid_actions": 0,
+    "ticks": 6000,
+    "wall_time_s": 1.61891285899992
+  },
+  {
+    "match_id": "6497f3be8b3ea5dc",
+    "seed": 1026,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      3,
+      101
+    ],
+    "unit_losses": [
+      16,
+      3
+    ],
+    "supply_remaining": [
+      230,
+      310
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 2.31339273399999
+  },
+  {
+    "match_id": "a0f7e175ff9894bf",
+    "seed": 1027,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 0,
+    "scores": [
+      100,
+      51
+    ],
+    "unit_losses": [
+      9,
+      9
+    ],
+    "supply_remaining": [
+      344,
+      268
+    ],
+    "invalid_actions": 0,
+    "ticks": 6150,
+    "wall_time_s": 1.9107341049998467
+  },
+  {
+    "match_id": "da32b5246553b14c",
+    "seed": 1028,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      9,
+      103
+    ],
+    "unit_losses": [
+      16,
+      10
+    ],
+    "supply_remaining": [
+      247,
+      303
+    ],
+    "invalid_actions": 0,
+    "ticks": 5100,
+    "wall_time_s": 2.605495201999929
+  },
+  {
+    "match_id": "4bdd0f9b6d7a1ce8",
+    "seed": 1029,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      12,
+      101
+    ],
+    "unit_losses": [
+      16,
+      7
+    ],
+    "supply_remaining": [
+      255,
+      303
+    ],
+    "invalid_actions": 0,
+    "ticks": 5100,
+    "wall_time_s": 2.043393570000262
+  },
+  {
+    "match_id": "bbb2b2d3a117f83e",
+    "seed": 1030,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 0,
+    "scores": [
+      100,
+      61
+    ],
+    "unit_losses": [
+      15,
+      7
+    ],
+    "supply_remaining": [
+      414,
+      234
+    ],
+    "invalid_actions": 0,
+    "ticks": 6750,
+    "wall_time_s": 3.86585601600018
+  },
+  {
+    "match_id": "bdcbce09d0903bef",
+    "seed": 1031,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      18,
+      103
+    ],
+    "unit_losses": [
+      16,
+      10
+    ],
+    "supply_remaining": [
+      279,
+      311
+    ],
+    "invalid_actions": 0,
+    "ticks": 5100,
+    "wall_time_s": 3.043509887000255
+  },
+  {
+    "match_id": "183d591c11e55dc0",
+    "seed": 1032,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      9,
+      103
+    ],
+    "unit_losses": [
+      16,
+      7
+    ],
+    "supply_remaining": [
+      257,
+      293
+    ],
+    "invalid_actions": 0,
+    "ticks": 4650,
+    "wall_time_s": 2.7990963289998945
+  },
+  {
+    "match_id": "097a8b28b28fce95",
+    "seed": 1033,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 0,
+    "scores": [
+      102,
+      70
+    ],
+    "unit_losses": [
+      10,
+      16
+    ],
+    "supply_remaining": [
+      410,
+      274
+    ],
+    "invalid_actions": 0,
+    "ticks": 7800,
+    "wall_time_s": 2.7780717850000656
+  },
+  {
+    "match_id": "922799d7b02e7708",
+    "seed": 1034,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      5,
+      100
+    ],
+    "unit_losses": [
+      16,
+      2
+    ],
+    "supply_remaining": [
+      238,
+      310
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 2.010763135999696
+  },
+  {
+    "match_id": "7c64aa14705a98af",
+    "seed": 1035,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      101
+    ],
+    "unit_losses": [
+      16,
+      4
+    ],
+    "supply_remaining": [
+      222,
+      310
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 2.812123012000029
+  },
+  {
+    "match_id": "5b0891b26b2838e7",
+    "seed": 1036,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 0,
+    "scores": [
+      102,
+      72
+    ],
+    "unit_losses": [
+      16,
+      6
+    ],
+    "supply_remaining": [
+      385,
+      281
+    ],
+    "invalid_actions": 0,
+    "ticks": 7050,
+    "wall_time_s": 3.3081728239999393
+  },
+  {
+    "match_id": "c083ab0863fe1438",
+    "seed": 1037,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      100
+    ],
+    "unit_losses": [
+      14,
+      4
+    ],
+    "supply_remaining": [
+      228,
+      324
+    ],
+    "invalid_actions": 0,
+    "ticks": 4800,
+    "wall_time_s": 2.8694421430000148
+  },
+  {
+    "match_id": "e37af91489a5e1e8",
+    "seed": 1038,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 0,
+    "scores": [
+      100,
+      75
+    ],
+    "unit_losses": [
+      15,
+      8
+    ],
+    "supply_remaining": [
+      420,
+      252
+    ],
+    "invalid_actions": 0,
+    "ticks": 7200,
+    "wall_time_s": 3.322946115000377
+  },
+  {
+    "match_id": "9f7534e26bda68be",
+    "seed": 1039,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      5,
+      100
+    ],
+    "unit_losses": [
+      11,
+      0
+    ],
+    "supply_remaining": [
+      230,
+      310
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 2.232054860000062
+  },
+  {
+    "match_id": "63bc6ebfc47914a1",
+    "seed": 1040,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      2,
+      100
+    ],
+    "unit_losses": [
+      16,
+      3
+    ],
+    "supply_remaining": [
+      225,
+      271
+    ],
+    "invalid_actions": 0,
+    "ticks": 4650,
+    "wall_time_s": 1.6965473049999673
+  },
+  {
+    "match_id": "8be6a47827d5e397",
+    "seed": 1041,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      6,
+      100
+    ],
+    "unit_losses": [
+      14,
+      7
+    ],
+    "supply_remaining": [
+      233,
+      305
+    ],
+    "invalid_actions": 0,
+    "ticks": 4650,
+    "wall_time_s": 1.3676369719996728
+  },
+  {
+    "match_id": "6d78ac867f4613cd",
+    "seed": 1042,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      51,
+      101
+    ],
+    "unit_losses": [
+      15,
+      8
+    ],
+    "supply_remaining": [
+      384,
+      240
+    ],
+    "invalid_actions": 0,
+    "ticks": 6150,
+    "wall_time_s": 1.6187756509998508
+  },
+  {
+    "match_id": "7de777feb1196d95",
+    "seed": 1043,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      10,
+      103
+    ],
+    "unit_losses": [
+      9,
+      7
+    ],
+    "supply_remaining": [
+      244,
+      316
+    ],
+    "invalid_actions": 0,
+    "ticks": 4950,
+    "wall_time_s": 1.443497035999826
+  },
+  {
+    "match_id": "24d8e7787c181005",
+    "seed": 1044,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      48,
+      101
+    ],
+    "unit_losses": [
+      6,
+      8
+    ],
+    "supply_remaining": [
+      240,
+      384
+    ],
+    "invalid_actions": 0,
+    "ticks": 6000,
+    "wall_time_s": 2.1944403659999807
+  },
+  {
+    "match_id": "c3ecdf4d9f4fa304",
+    "seed": 1045,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      102
+    ],
+    "unit_losses": [
+      16,
+      0
+    ],
+    "supply_remaining": [
+      222,
+      288
+    ],
+    "invalid_actions": 0,
+    "ticks": 4350,
+    "wall_time_s": 1.042521810999915
+  },
+  {
+    "match_id": "cfe8fa9a82f4e127",
+    "seed": 1046,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      0,
+      101
+    ],
+    "unit_losses": [
+      16,
+      2
+    ],
+    "supply_remaining": [
+      225,
+      313
+    ],
+    "invalid_actions": 0,
+    "ticks": 4500,
+    "wall_time_s": 2.6701442949997727
+  },
+  {
+    "match_id": "85929d4e8495d1c1",
+    "seed": 1047,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      5,
+      100
+    ],
+    "unit_losses": [
+      16,
+      0
+    ],
+    "supply_remaining": [
+      249,
+      313
+    ],
+    "invalid_actions": 0,
+    "ticks": 4500,
+    "wall_time_s": 3.1308638509999582
+  },
+  {
+    "match_id": "3bf379eca326b107",
+    "seed": 1048,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 0,
+    "scores": [
+      102,
+      77
+    ],
+    "unit_losses": [
+      12,
+      9
+    ],
+    "supply_remaining": [
+      420,
+      252
+    ],
+    "invalid_actions": 0,
+    "ticks": 7350,
+    "wall_time_s": 2.101921088000381
+  },
+  {
+    "match_id": "437125e822ea3bfe",
+    "seed": 1049,
+    "policy": "random",
+    "opponent": "rules",
+    "winner": 1,
+    "scores": [
+      14,
+      102
+    ],
+    "unit_losses": [
+      16,
+      3
+    ],
+    "supply_remaining": [
+      260,
+      308
+    ],
+    "invalid_actions": 0,
+    "ticks": 4800,
+    "wall_time_s": 1.4502508450000278
+  }
+]
