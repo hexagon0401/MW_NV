@@ -1,10 +1,10 @@
 # MW-NV v1.0.0 STATE
-Current task: D01 Swiss UI / independent battlefield palette
+Current task: D02 detailed top-down pixel battlefield
 Status: PASS
-Changed: viewer layout, presentation projection, camera, fonts, tests
-Verified: 7 JS tests; production build; Chromium desktop/mobile/fonts/tooltip PASS
-Next: D02 detailed pixel units and battlefield
-Game physics: unchanged
+Verified: 7 JS tests; build; Chromium atlas/500 units and desktop/mobile PASS
+Changed: shared pixel atlas, terrain LOD/cache, facility art, camera and tooltips
+Next: D03 local live snapshot/SSE and read-only export integration
+Game physics: unchanged; renderer uses 12 px/m
 Deployment: deferred by user
-External model/cloud requirements: RELEASE_STATUS.md
+Remaining external requirements: RELEASE_STATUS.md
 Remaining Plus quota: UNKNOWN
