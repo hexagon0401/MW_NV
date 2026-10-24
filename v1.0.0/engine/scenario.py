@@ -102,5 +102,6 @@ def create_release_match(seed=0,swap=False):
         for row in range(max(0,u.pos.y_cm//400-4),min(256,u.pos.y_cm//400+5)):
             for col in range(max(0,u.pos.x_cm//400-4),min(256,u.pos.x_cm//400+5)):
                 w.terrain.cells[row][col]=w.terrain.cells[row][255-col]=0
-    w.terrain.cache.clear()
+    from .districts import enhance
+    enhance(w)
     return w

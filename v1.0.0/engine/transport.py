@@ -83,7 +83,8 @@ def embark(w,key,c):
     if v.team!=c.team:raise OrderError('FOREIGN_UNIT')
     if v.task_state in ('MOVING','TAKEOFF','LANDING','UNLOADING'):
         raise OrderError('ILLEGAL_STATE')
-    ids=w.squads[c.unit].member_ids if c.unit in w.squads else [c.unit]
+    ids=[i for i in w.squads[c.unit].member_ids if i not in w.soldiers or w.soldiers[i].alive] if c.unit in w.squads else [c.unit]
+    if not ids:raise OrderError('ILLEGAL_STATE')
     if not hasattr(w,'transfers'):w.transfers={}
     if key not in w.transfers:
         if any(i not in w.soldiers or w.soldiers[i].team!=c.team or not w.soldiers[i].alive or w.soldiers[i].carrier_id is not None for i in ids):

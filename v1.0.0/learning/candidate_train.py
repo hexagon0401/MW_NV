@@ -37,7 +37,7 @@ def train(output,steps=64,controlled='A',opponent=None,seed=0,stats='data/result
     path.with_suffix('.json').write_text(json.dumps(dict(contract='tactics-1',rules_version='combined-arms-1',steps=steps,seed=seed,controlled=controlled,opponent=opponent,selected=False,policy_id=CandidatePolicy(path.with_suffix('.npz')).policy_id,training_run=env.run_id),indent=2)+'\n')
     if stats:
         from .results import record_training
-        record_training(stats,env.run_id,model.num_timesteps,env.opponent.policy_id if env.opponent else 'algorithm')
+        record_training(stats,CandidatePolicy(path.with_suffix('.npz')).policy_id,model.num_timesteps,env.opponent.policy_id if env.opponent else 'algorithm',training_run=env.run_id)
     return model
 
 

@@ -1,0 +1,36 @@
+[
+  {
+    "seed": 10000,
+    "ticks": 4500,
+    "sim_seconds": 900.0,
+    "scores": {
+      "0": 0,
+      "1": 100
+    },
+    "winner": 1,
+    "ended": true,
+    "checksum": "3be46b4a7495af075c122c6e43dc74e787c552840da7266346c7041436f33067",
+    "policies": {
+      "A": "c2d9bcb84fe885ee",
+      "B": "rules"
+    },
+    "swapped": false
+  },
+  {
+    "seed": 10000,
+    "ticks": 4500,
+    "sim_seconds": 900.0,
+    "scores": {
+      "0": 100,
+      "1": 0
+    },
+    "winner": 0,
+    "ended": true,
+    "checksum": "e1f2d7e2f42b41e62878a7c8f873c8db1ac318ccc674aa553b1b60f9697fb01c",
+    "policies": {
+      "A": "rules",
+      "B": "c2d9bcb84fe885ee"
+    },
+    "swapped": true
+  }
+]

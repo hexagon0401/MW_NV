@@ -23,4 +23,4 @@ host.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||e.target.clo
 host.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||touchStart?.id!==e.pointerId)return;const start=touchStart;touchStart=null;if(Math.hypot(e.clientX-start.x,e.clientY-start.y)>8)return;const r=host.getBoundingClientRect();pointer={x:e.clientX-r.left,y:e.clientY-r.top};tooltip(scene?.hit(pointer.x,pointer.y),pointer.x,pointer.y,host);});
 host.addEventListener('pointercancel',()=>{touchStart=null;pointer=null;tooltip(null);});
 
-refreshStats().then(()=>{lastHud="";});setInterval(()=>refreshStats().then(()=>{lastHud="";}),5000);
+function updateStats(){return refreshStats().then(()=>{lastHud="";if(currentFrame)renderHud(currentFrame,focus);});}updateStats();setInterval(updateStats,5000);

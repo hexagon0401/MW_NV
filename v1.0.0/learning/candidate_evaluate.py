@@ -10,12 +10,13 @@ from engine.objectives import summary
 
 def evaluate(seed=10000,policy='rules',opponent='rules',swap=False,db='data/results.sqlite'):
     if not 10000<=seed<=10099:raise ValueError('held-out seed must be 10000..10099')
-    env=CandidateEnv();env.reset(seed,options={'swap':swap});rng=np.random.default_rng(seed)
-    models={a:None if p in ('rules','random') else CandidatePolicy(p) for a,p in [('A',policy),('B',opponent)]}
-    names={a:m.policy_id if m else p for a,p in [('A',policy),('B',opponent)] for m in [models[a]]}
+    env=CandidateEnv();env.reset(seed);rng=np.random.default_rng(seed)
+    assigned={'A':opponent if swap else policy,'B':policy if swap else opponent}
+    models={a:None if p in ('rules','random') else CandidatePolicy(p) for a,p in assigned.items()}
+    names={a:m.policy_id if m else p for a,p in assigned.items() for m in [models[a]]}
     while env.agents:
         actions={}
-        for a,p in [('A',policy),('B',opponent)]:
+        for a,p in assigned.items():
             m=models[a];actions[a]=m.predict(env.vector(a),env.mask(a)) if m else int(rng.choice(np.flatnonzero(env.mask(a)))) if p=='random' else env.heuristic(a)
         env.step(actions)
     w=env.engine.world

@@ -1,6 +1,7 @@
 import json
 import pytest
 from learning.results import insert,aggregate,export_records,import_records,record_training
+pytest.importorskip('fastapi');pytest.importorskip('httpx')
 from fastapi.testclient import TestClient
 from server.app import create_app
 
@@ -44,3 +45,12 @@ def test_stats_api_empty_and_unavailable(tmp_path):
     assert client.post('/api/stats').status_code==405
     (tmp_path/'results.sqlite').write_bytes(b'broken')
     assert client.get('/api/stats').status_code==503
+
+
+def test_training_run_and_frozen_checkpoint_share_actual_steps(tmp_path):
+    db=tmp_path/'results.sqlite';training=match('episode',0,'training');training['policies']['A']='run-1';insert(db,training)
+    evaluation=match('heldout',0);evaluation['policies']['A']='weights-hash';insert(db,evaluation)
+    record_training(db,'weights-hash',64,training_run='run-1')
+    ledger=aggregate(db)
+    assert all(g['training_steps']==64 for g in ledger['policies'] if g['policy'] in ('run-1','weights-hash'))
+    assert ledger['training']==[dict(rules_version='combined-arms-1',policy='weights-hash',steps=64)]

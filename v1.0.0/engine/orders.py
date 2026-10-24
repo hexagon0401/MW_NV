@@ -69,6 +69,7 @@ def validate(world, command):
         from .combat import spec,multiplier
         from math import hypot
         weapon=spec(world,unit)['attack']
+        if unit.ammo<=0:raise OrderError('NO_AMMO')
         if not weapon or not can_see(world,unit,target) or hypot(unit.pos.x_cm-target.pos.x_cm,unit.pos.y_cm-target.pos.y_cm)>weapon['range_m']*100 or multiplier(world,unit,target)<=0:raise OrderError('OUT_OF_RANGE')
     return c
 
@@ -109,6 +110,18 @@ class CommandQueue:
             return
         self.status[key] = status
         c = self.commands[key]
+        if status in ('FAILED','CANCELLED'):
+            ids=world.squads[c.unit].member_ids if c.unit in world.squads else [c.unit]
+            for uid in ids:
+                soldier=world.soldiers.get(uid)
+                if soldier is not None and soldier.alive and soldier.task_state in ('MOVING','PATH_PENDING'):
+                    soldier.task_state='HOLD';world.emit('UNIT_TASK_CHANGED',unit=uid,task_state='HOLD')
+        actor=world.vehicles.get(c.unit)
+        if status in ('FAILED','CANCELLED') and actor is not None and actor.alive and actor.task_state in ('MOVING','TAKEOFF','LANDING','PATHING','DEPLOYING','PACKING'):
+            if actor.deployment=='DEPLOYING':actor.deployment='PACKED'
+            elif actor.deployment=='PACKING':actor.deployment='DEPLOYED'
+            actor.task_state='READY'
+            world.emit('UNIT_TASK_CHANGED',unit=actor.id,task_state='READY',deployment=actor.deployment)
         world.emit('ORDER_' + status, team=int(c.team), cmd_id=c.cmd_id, reason=reason)
 
     def ready(self, world):

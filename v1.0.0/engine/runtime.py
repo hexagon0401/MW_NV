@@ -64,15 +64,15 @@ class Engine:
         release_transfer_locks(w)
         ready=w.queue.ready(w)
         # Resolve replacement orders before moving anything during this tick.
-        winners={}
+        winners={};actors={}
         for key,c in ready:
             if c.op in (Op.WAIT,Op.CANCEL,Op.PURCHASE):continue
-            actor=(c.team,c.unit)
-            if actor not in winners or (c.priority,c.tick,c.cmd_id)>winners[actor][0]:
-                winners[actor]=((c.priority,c.tick,c.cmd_id),key)
+            occupied=[c.unit,*w.squads[c.unit].member_ids] if c.unit in w.squads else [c.unit]
+            actors[key]=[(c.team,uid) for uid in occupied]
+            for actor in actors[key]:
+                if actor not in winners or (c.priority,c.tick,c.cmd_id)>winners[actor][0]:winners[actor]=((c.priority,c.tick,c.cmd_id),key)
         for key,c in ready:
-            if c.op not in (Op.WAIT,Op.CANCEL,Op.PURCHASE) and winners[(c.team,c.unit)][1]!=key:
-                w.queue.finish(w,key,'CANCELLED')
+            if key in actors and any(winners[actor][1]!=key for actor in actors[key]):w.queue.finish(w,key,'CANCELLED')
         for key, c in ready:
             if w.queue.status[key] not in ('QUEUED', 'RUNNING'):
                 continue

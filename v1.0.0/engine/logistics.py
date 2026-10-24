@@ -36,9 +36,9 @@ def resupply(w,key,c):
         raise OrderError('INVALID_TARGET')
     if c.target in w.vehicles and (node.type_id!='TRK' or not node.alive):raise OrderError('INVALID_TARGET')
     if c.target in w.facilities and node.kind not in ('HQ','SUPPLY_NODE') and not getattr(node,'supply_per_minute',0):raise OrderError('INVALID_TARGET')
-    ids=w.squads[c.unit].member_ids if c.unit in w.squads else [c.unit]
+    ids=[i for i in w.squads[c.unit].member_ids if i not in w.soldiers or w.soldiers[i].alive] if c.unit in w.squads else [c.unit]
     units=[w.soldiers.get(i) or w.vehicles.get(i) for i in ids]
-    if any(u is None or not getattr(u,'alive',True) or u.team!=c.team or not near(u,node) or u.task_state in ('MOVING','ONBOARD') for u in units):
+    if not units or any(u is None or not getattr(u,'alive',True) or u.team!=c.team or not near(u,node) or u.task_state in ('MOVING','ONBOARD') for u in units):
         raise OrderError('ILLEGAL_STATE')
     if not hasattr(w,'supply_timers'):w.supply_timers={}
     w.supply_timers[key]=w.supply_timers.get(key,0)+200

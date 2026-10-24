@@ -63,3 +63,25 @@ def test_destroyed_carrier_evacuates_and_cannot_move():
     damage_unit(w,v,900,99)
     assert not v.alive and s.hp==65 and s.carrier_id is None and s.alive and not v.passenger_ids
     with pytest.raises(OrderError):e.submit(dict(cmd_id=5,team=1,op=7,unit=v.id,arg0=10,arg1=10))
+
+
+@pytest.mark.parametrize('distance,valid',[(99,False),(100,True),(420,True),(421,False)])
+def test_artillery_min_max_range_boundaries(distance,valid):
+    from engine.config import GameConfig
+    w=WorldState(7,GameConfig(512,512,.2));w.soldiers.clear();Engine(w)
+    gun=Vehicle(30,Team.A,WorldPos(1000,1000),'SPH');gun.deployment='DEPLOYED';w.vehicles[30]=gun
+    x=1000+distance*100;w.visible={Team.A:[],Team.B:[]};w.last_seen={Team.A:{'99':dict(id=99,x_cm=x,y_cm=1000,seen_at_tick=0)},Team.B:{}}
+    c=Command(1,Team.A,Op.FIRE_MISSION,unit=30,arg0=x//100,arg1=10)
+    if valid:assert fire_mission(w,'x',c)
+    else:
+        with pytest.raises(OrderError,match='OUT_OF_RANGE'):fire_mission(w,'x',c)
+
+
+def test_flying_armor_and_empty_artillery_ammo():
+    from engine.combat import multiplier
+    e=battle();w=e.world;heli=Vehicle(40,Team.B,WorldPos(2000,6400),'HEL');w.vehicles[40]=heli;heli.task_state='MOVING'
+    assert multiplier(w,w.soldiers[1],heli)==0
+    w.soldiers[1].type_id='INF';assert multiplier(w,w.soldiers[1],heli)==.25
+    heli.task_state='IDLE';assert multiplier(w,w.soldiers[1],heli)==.1
+    w.vehicles[30]=Vehicle(30,Team.A,WorldPos(1000,1000),'SPH',ammo=0);w.vehicles[30].deployment='DEPLOYED'
+    with pytest.raises(OrderError,match='NO_AMMO'):fire_mission(w,'x',Command(1,Team.A,Op.FIRE_MISSION,unit=30,arg0=120,arg1=100))

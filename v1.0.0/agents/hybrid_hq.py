@@ -11,7 +11,7 @@ class HybridHQ(LocalHQ):
         self.offered=shortlist(self.tactical.ranked(obs));self.observation=obs
         compact=dict(team=obs['team'],tick=obs['tick'],scores=obs['scores'],resources=obs['resources'],contract=CONTRACT,
             summary=dict(infantry=sum(u['alive'] for u in obs['units']),vehicles=sum(v['alive'] for v in obs['vehicles']),observed_enemies=len(obs['enemies'])),
-            candidates=[{k:c[k] for k in ('id','role','score','reason','command')}|({'policy_score':c['policy_score']} if 'policy_score' in c else {}) for c in self.offered])
+            candidates=[{k:c[k] for k in ('id','role','score','reason','command','analysis')}|({'policy_score':c['policy_score']} if 'policy_score' in c else {}) for c in self.offered])
         payload=dict(model=self.model,messages=[dict(role='system',content='Choose up to 4 compatible tactical candidate IDs. Return only JSON {"candidate_ids":[integers]}. Use offered IDs, no invented commands. /no_think'),dict(role='user',content=json.dumps(compact,separators=(',',':')))],temperature=0,max_tokens=256,response_format={'type':'json_object'})
         try:
             response=json.loads(self.transport(payload))

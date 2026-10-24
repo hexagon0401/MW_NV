@@ -17,6 +17,9 @@ def load_units(path=None):
                 raise ValueError(field)
         if len(spec['size_px'])!=2 or any(type(x) is not int or x<=0 for x in spec['size_px']):
             raise ValueError('size_px')
+        if spec['armor'] not in ('soft','light','medium','heavy','air') or spec['weapon'] not in (None,'rifle','cannon','ap','he'):raise ValueError('armor/weapon')
+        if not isinstance(spec['role'],str) or not spec['role']:raise ValueError('role')
+        if any(type(spec[k]) is not int or spec[k]<0 for k in ('ammo','heal_pool','repair_pool')):raise ValueError('ammunition/pools')
         attack = spec['attack']
         if name in ('MED','ENG'):
             if attack is not None or spec['ammo'] != 0:
@@ -44,6 +47,9 @@ def load_vehicles(path=None):
         if spec['weapon'] not in (None,'rifle','cannon','ap','he'):raise ValueError('weapon')
         if type(spec['ammo']) is not int or spec['ammo']<0:raise ValueError('ammo')
         if spec['attack'] and (any(spec['attack'][k]<=0 for k in ('range_m','interval_ms','damage')) or not 0<=spec['attack']['hit_probability']<=1):raise ValueError('attack')
+        if any(type(spec[k]) is not int or spec[k]<0 for k in ('capacity','cargo_capacity')):raise ValueError('capacity')
+        if bool(spec['weapon'])!=bool(spec['attack']) or bool(spec['ammo'])!=bool(spec['attack']):raise ValueError('weapon/ammo contract')
+        if len(spec['size_px'])!=2 or any(type(x) is not int or x<=0 for x in spec['size_px']):raise ValueError('size_px')
         if len(spec['footprint_cm'])!=2 or any(x<=0 for x in spec['footprint_cm']):
             raise ValueError('footprint_cm')
     return data

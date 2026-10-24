@@ -1,5 +1,7 @@
 import json
-import numpy as np
+import pytest
+np=pytest.importorskip('numpy')
+pytest.importorskip('pettingzoo')
 from engine.runtime import Engine
 from engine.scenario import create_release_match
 from engine.types import WorldPos,Team
@@ -61,3 +63,23 @@ def test_old_policy_falls_back_and_friendly_artillery_is_excluded(tmp_path):
     old=tmp_path/'old.npz';np.savez(old,w0=np.zeros((32,32)))
     h=TacticalHQ(str(old));assert h.observe_and_issue(e.observe(0))
     assert h.last_decision['policy']=='incompatible_policy_fallback'
+
+
+def test_casualty_reinforcement_and_budget_masks():
+    e=Engine(create_release_match());w=e.world
+    soldier=next(s for s in w.soldiers.values() if s.team==0 and s.type_id=='AT');soldier.alive=False
+    offered=candidates(e.observe(0));purchases=[c for c in offered if c['command']['op']==11]
+    assert purchases and all(c['credits']>0 and c['tickets']==1 for c in purchases)
+    w.teams[0].credits=0
+    assert not any(c['command']['op']==11 for c in candidates(e.observe(0)))
+
+
+def test_direct_candidates_explain_expected_armor_damage():
+    e=Engine(create_release_match());w=e.world
+    attacker=next(s for s in w.soldiers.values() if s.team==0 and s.type_id=='AT');attacker.pos=WorldPos(20000,20000)
+    tank=next(v for v in w.vehicles.values() if v.team==1 and v.type_id=='MBT');tank.pos=WorldPos(23000,20000)
+    for y in range(48,53):
+        for x in range(48,60):w.terrain.cells[y][x]=0
+    w.visible={Team.A:[tank.id],Team.B:[]};w.last_seen={Team.A:{},Team.B:{}}
+    offer=next(c for c in candidates(e.observe(0)) if c['command']['unit']==attacker.id and c['command']['op']==13)
+    assert offer['analysis']['expected_damage']==68.6 and offer['analysis']['target_armor']=='heavy'

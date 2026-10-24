@@ -1,3 +1,5 @@
+> 이 문서는 이전 28명 단계 기록입니다. 최신 실행과 규칙은 [COMBINED_ARMS.md](COMBINED_ARMS.md)를 따릅니다.
+
 # 로컬 게임 개선 / 실행
 
 ## Mac 로컬 LLM

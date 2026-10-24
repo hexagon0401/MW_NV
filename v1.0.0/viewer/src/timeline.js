@@ -16,6 +16,7 @@ export class Timeline{
   if(kind==='EMBARK_DONE'&&u){u.carrier_id=p.vehicle;u.task_state='ONBOARD';}
   if(kind==='DISEMBARK_DONE'&&u){u.carrier_id=null;u.task_state='IDLE';}
   if(kind==='ABSTRACT_ATTACK'&&u){u.attack_tick=e.sim_tick+1;u.target_id=p.target;const target=this.units.get(p.target);if(target&&target.hp!=null)target.hp=p.target_hp??Math.max(0,target.hp-p.damage);(this.state.shots??=[]).push({...p,tick:e.sim_tick+1});}
+  if(kind==='UNIT_TASK_CHANGED'&&u){u.task_state=p.task_state;if(p.deployment)u.deployment=p.deployment;}
   if(kind==='UNIT_DAMAGED'&&u)u.hp=p.hp;
   if(kind==='UNIT_REPAIRED'&&u)u.hp=p.hp;
   if(kind==='UNIT_HEALED'&&u&&u.hp!=null)u.hp+=p.amount;

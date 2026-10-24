@@ -1,13 +1,14 @@
 # MW-NV v1.0.0 STATE
-Current task: CA04 durable results, import/export and viewer counters
-Status: PASS; CA05 district map and pixel art in progress
-Completed: SQLite completed-game ledger, unique IDs and atomic/idempotent JSONL import
-UI: total games, A/B W-L-D/rate, policy/opponent/mode/version and training steps
-API: read-only /api/stats; unavailable differs from empty; no unfinished-game counts
-Verified: results/API/economy/tactics 10 PASS; prior full Python suite 105 PASS
-Learning: two 64-step rounds and paired held-out evaluation complete (0W/2L)
-Evaluation note: tiny PPO is not promoted; final enhanced map will be evaluated separately
-Next: map/vehicle art, browser 128-infantry/20-vehicle and final regression
-Branch: dev/v1.0.0; no deployment
-Mac: actual LLM and GPU unverified
+Current task: CA05 combined-arms art and final integration
+Status: PASS functional; Mac hardware/model validation pending
+Completed: CA01 catalog/64+10, CA02 combat, CA03 hybrid/PPO, CA04 ledger, CA05 art
+Verified: Python 118 PASS; JS 11 PASS; production build PASS
+Browser: desktop/mobile, 128+20 scene, live casualty/reconnect and ended-game stats PASS
+Learning: 2x64-step train/parity; continuous frozen-opponent resume PASS
+Evaluation: held-out seed10000, policy alternates A/B, 0W/2L; no promotion
+Performance: SwiftShader software GPU only; see docs/combined-arms/verification.json
+Compatibility: versioned engine replay; old display replays supported
+Run Mac: bash scripts/mac-local.sh; viewer npm run dev; see COMBINED_ARMS.md
+Next: actual Intel Mac/model validation and larger held-out balance study
+Branch: dev/v1.0.0; deployment deferred
 Usage: UNKNOWN

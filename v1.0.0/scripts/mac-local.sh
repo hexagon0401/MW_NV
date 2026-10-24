@@ -10,4 +10,6 @@ ollama pull "$MODEL_NAME"
 mkdir -p data
 ollama show "$MODEL_NAME" > data/local-model-info.txt
 ollama list > data/local-model-digests.txt
-uv run --locked --extra server --extra inference python -m server.live --hq local --endpoint http://127.0.0.1:11434/v1 --model "$MODEL_NAME" --port 8000
+set --
+if [[ -n "${MW_NV_POLICY:-}" ]]; then set -- --policy "$MW_NV_POLICY"; fi
+uv run --locked --extra server --extra inference python -m server.live --hq local --endpoint http://127.0.0.1:11434/v1 --model "$MODEL_NAME" --port 8000 "$@"
