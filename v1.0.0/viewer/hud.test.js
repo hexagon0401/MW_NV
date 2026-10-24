@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {hud} from './src/hud.js';
+test('HUD follows engine score, timer, ownership and command order',()=>{const h=hud({tick:450,scores:{0:4,1:3},facilities:[{id:201,kind:'OBJECTIVE',owner:0,progress_ms:2000}],orders:[{team:1,cmd_id:3,status:'ORDER_COMPLETED'}]});assert.equal(h.clock,'01:30');assert.equal(h.scores,'A 4 : 3 B');assert.match(h.objectives,/201 · A · 2.0s/);assert.match(h.orders,/B #3 COMPLETED/);});
