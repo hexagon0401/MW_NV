@@ -1,15 +1,15 @@
 # MW-NV v1.0.0 STATE
-Current task: D01 NIM HQ and public-viewer Cloudflare/Supabase deployment
-Status: code ready; external deployment and NIM validation BLOCKED
-NIM: --hq nim, meta/llama-3.1-8b-instruct, candidate validation/algorithm fallback
-Supabase: private mw-nv-replays bucket; initial-private-demo uploaded/checksum PASS
-Storage: manifest index read-back PASS; anon read denied; SQL table not required
-Pages: config PUBLIC_VIEWER=true; Access/password not required; no deployment URL
-Blocker: Cloudflare create403 Authentication error; token verify401 Invalid API Token
-NIM network/model list200 PASS; inference401 Unauthorized; latency/cost UNKNOWN
-Required: correct existing NIM key and Cloudflare token values; Pages Supabase secret
-Tests: Python HQ11+live/tactics12 PASS; JS13/build/Pages Functions PASS
-Next: cd viewer && npx wrangler pages deploy dist --project-name mw-nv --branch dev/v1.0.0
-Docs: cloud/NIM_DEPLOY.md; existing traffic/side bias findings remain
-Branch: dev/v1.0.0; Mac/NIM live unverified; no paid resources enabled
+Current task: D01 NIM HQ and public Cloudflare/Supabase deployment
+Status: Pages production deployed; external data/NIM checks still blocked
+Site: https://mw-nv.pages.dev (Access/password disabled by user)
+Deployment: https://3d803f6f.mw-nv.pages.dev; Cloudflare deploy stage success
+Cloudflare: token200 active; project created; static+Functions uploads successful
+Supabase: private bucket/demo/manifest checksum verified; Pages production secret absent on API
+NIM: network/list200; real inference401; former Llama8B model410 end-of-life
+Default candidate: nvidia/nemotron-3.5-lightning-30b-a3b; real speed/quality unverified
+Tests: new NIM2 PASS; viewer production/Functions build PASS; prior JS13 PASS
+Required: confirm Pages Production Supabase secret; correct NIM key delivery/value
+Required: apply saved egress draft for mw-nv.pages.dev to permit remote HTTP validation
+Next: verify public /api/matches + completed replay after secrets/domain applied
+Branch: dev/v1.0.0; no paid resources enabled; local engine/remote completed viewer
 Usage: UNKNOWN

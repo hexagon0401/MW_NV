@@ -1,75 +1,38 @@
-> 환경 적용 후 재검증: NIM 네트워크 차단은 해제됐고 모델 목록 HTTP200,
-> 그러나 실제 추론 HTTP401 Unauthorized(Invalid JWT serialization). Cloudflare 토큰 검증도
-> HTTP401 Invalid API Token이다. 실제 NIM 성공·속도·사이트 배포는 아직 미검증이다.
-> 기존 NvidiaNIM 허용 대상 integrate.api.nvidia.com은 게시된 설정에서 확인했다.
-> 이제 기존 비밀값의 실제 키/토큰 값을 교정해야 한다. `validation-status.json` 참조.
+# Cloudflare + Supabase + NIM 배포 상태
 
-> 최신 결정: 사용자가 Access를 의도적으로 비활성화했으며 공개 관전을 승인했다.
-> `PUBLIC_VIEWER=true`이면 Access·사이트 비밀번호 없이 완료 경기 관전만 허용한다.
-> MW_NV_VIEWER_PASSWORD는 필요하지 않다. Supabase 서버 키는 계속 Pages Secret에만 둔다.
-> 아래 비밀번호 설정은 비공개 모드로 되돌릴 때만 적용한다.
+## 배포 완료
 
-# NIM + 비공개 Pages 관전
+- 공개 사이트: https://mw-nv.pages.dev
+- 현재 production 배포: https://3d803f6f.mw-nv.pages.dev
+- Cloudflare API 토큰200 active, 프로젝트 생성, 정적 파일과 Functions 업로드, deploy 단계 success 확인.
+- PUBLIC_VIEWER=true로 Access/사이트 비밀번호 없이 완료 경기 관전을 제공한다. 사용자가 명시적으로 공개 접속을 승인했다.
+- Python 엔진은 로컬에서 실행하고 Pages는 완료 경기 관전만 제공한다. 원격 게임 실행 서버는 포함하지 않는다.
 
-## 현재 결과
+## 남은 검증
 
-- NIM 후보: `meta/llama-3.1-8b-instruct`. 짧은 후보 ID JSON 선택을 위한 소형 모델을 우선 선택했다. API 실호출은 네트워크 403으로 미검증이며 가장 빠르다고 실측한 것은 아니다.
-- Supabase `mw-nv-replays` 비공개 버킷 생성, `initial-private-demo` 완료 경기와 manifest 업로드, read-back SHA-256 검증 성공. anon 키 조회는 거부됐다. 데모는 이전 로컬 경기이며 NIM 생성 경기라고 주장하지 않는다.
-- Cloudflare 프로젝트 조회404, 생성403 Authentication error, 토큰 검증401 Invalid API Token. 배포 URL은 아직 없다.
-- Pages는 완료 경기 관전만 제공한다. Python 엔진은 Mac/개발 환경에서 실행한다. 이 배포는 브라우저에서 새 경기를 실행하는 호스팅 서버를 포함하지 않는다.
-- 실행 환경의 보안 프록시 참조값을 다른 서비스의 Secret으로 복사하지 않는다.
+1. **Pages 서버 키:** 사용자는 입력 완료라고 알려줬지만 재배포 후 Cloudflare API의 production env_vars에는 SUPABASE_SERVICE_ROLE_KEY가 아직 없다. Codex 환경이 아니라 Cloudflare → Workers & Pages → mw-nv → Settings → Variables and Secrets에서 Production/Secret으로 저장했는지 확인 중이다. 실제 값은 채팅/Git에 넣지 않는다. 보안 프록시 참조값을 복사하지 않는다.
+2. **실제 NIM 추론:** 네트워크와 모델 목록 조회200은 통과했으나 추론은401 Unauthorized / Invalid JWT serialization이다. 기존 NvidiaNIM 비밀값의 목적지 integrate.api.nvidia.com은 게시된 설정에서 확인했다. 실제 키 값/전달 문제를 해결해야 한다.
+3. **새 사이트 HTTP 검사:** 현재 Codex 네트워크가 mw-nv.pages.dev 접속을403으로 차단한다. 해당 production 도메인과 초기 배포 도메인의 허용 목록 초안을 저장했다. 환경 설정에서 저장/Publish 후 공개 HTML·경기 API·리플레이 실제 응답을 검사한다. Cloudflare의 deploy success와 실제 HTTP 검증은 구분한다.
 
-## 검증
+## 모델 선택
 
-Python NIM/기존 HQ 검사11개와 live/전술 회귀12개, JavaScript13개, Vite production build, Pages Functions build 통과. 실제 NIM 호출과 원격 Pages 인증은 미검증이다.
+기존 meta/llama-3.1-8b-instruct는 NVIDIA가 2026-08-26 서비스 종료했으며 실제 HTTP410으로 확인했다. 기본 후보를 현재 카탈로그에 있는 nvidia/nemotron-3.5-lightning-30b-a3b로 변경했다. 30B 전체/3B 활성 계열의 빠른 지시 모델 후보이며, 실제 속도·품질·사용 가능 크레딧은 인증 성공 전까지 UNKNOWN이다. 두 요청 모두 인증/서비스 종료 오류였으므로 오류 응답 시간을 추론 속도로 사용하지 않는다. 유료 자원/결제를 활성화하지 않았다.
 
-## 필요한 설정 (키는 채팅/Git에 넣지 않음)
-
-1. Cloudflare → My Profile → API Tokens → Create Custom Token. Account 권한 `Cloudflare Pages: Edit`, 대상 계정 `6974fa0dd5aeb87d1c8a95cd4e85e27d`. 환경 설정의 `CLOUDFLARE_API_TOKEN`을 새 실제 토큰으로 교체한다.
-2. 환경 네트워크 허용 목록에 `integrate.api.nvidia.com`을 추가하고 적용한다. NIM 키 변수는 `NVIDIA_API_KEY` 또는 기존 `NvidiaNIM`이다. NVIDIA 계정의 사용 가능 크레딧/무료 조건은 아직 확인하지 못했다. 결제 활성화나 유료 자원 생성은 하지 않았다.
-3. Pages 프로젝트 `mw-nv`를 만들고 production branch를 `dev/v1.0.0`으로 둔다. Settings → Variables and Secrets → production에 실제 `SUPABASE_SERVICE_ROLE_KEY`, 충분히 무작위인 16자 이상 `MW_NV_VIEWER_PASSWORD`를 Secret으로 입력한다. preview에도 쓸 때는 별도로 입력한다. 서버 키는 VITE_ 변수로 넣지 않는다.
-4. `viewer/wrangler.jsonc`의 일반 변수는 배포 설정에 포함된다. Access는 아직 활성화하지 않았다. 비밀번호 세션은 8시간, HttpOnly/Secure/SameSite 쿠키이며 비밀번호 변경 시 기존 세션은 무효가 된다. 강한 비밀번호가 없으면 Access 인증으로만 허용하고 둘 다 없으면 차단한다. 이 경량 로그인에는 전용 계정 관리/계정별 속도 제한은 없으므로 제한된 비공개 테스트용으로 사용한다.
-
-## 배포 명령
-
-저장소의 `dev/v1.0.0` 최신 코드를 사용한다.
+## 실행과 배포 재개
 
 ```bash
-cd v1.0.0/viewer
+# NIM 키는 환경 설정에 넣는다. 모델 파일/Ollama는 필요 없다.
+cd v1.0.0
+uv run --locked --extra server --extra inference python -m server.live --hq nim
+# 완료 경기만 단일 운영자가 업로드한다. manifest는 최근20개.
+uv run python -m cloud.publish --view data/완료경기.view.json --id 고유경기ID
+# 사이트 재배포
+cd viewer
 npm ci
-npm test
 npm run build
 XDG_CONFIG_HOME=/tmp/mw-nv-wrangler WRANGLER_SEND_METRICS=false npx wrangler pages deploy dist --project-name mw-nv --branch dev/v1.0.0
 ```
 
-성공 후 반환 URL에서 비밀번호 로그인, 경기 선택, 재생과 익명 `/api/matches` 401을 확인한다. 서버 로그/HTML/번들에 키가 없는지도 확인한다. 현재는 배포가 막혀 이 원격 검사를 하지 못했다.
+Supabase mw-nv-replays는 비공개이며 초기 데모/manifest 업로드·다운로드 체크섬과 익명 조회 거부를 확인했다. 데모는 NIM 생성 경기라고 주장하지 않는다. NIM은 팀별 관측에서 상위12개 후보를 받아 최대4개를 고르며 30초 시뮬레이션 간격에만 호출한다. 잘못된 응답/시간 초과는 알고리즘으로 복구한다. SQLite 누적 전적은 로컬에 있으며 현재 Pages에 공유 전적 서버는 없다.
 
-## NIM 경기 실행 / 완료 경기 업로드
-
-Mac에서도 Ollama나 로컬 모델 다운로드 없이 NIM에 연결할 수 있다. 환경 변수는 터미널의 안전한 입력/환경 설정으로 넣는다.
-
-```bash
-cd v1.0.0
-uv run --locked --extra server --extra inference python -m server.live --hq nim
-```
-
-양팀은 자신의 관측에서 추린 최대12개 후보만 보내며 30초 시뮬레이션 간격으로 최대4개를 고른다. 응답 중에는 엔진 시간이 멈추고 잘못된 응답/시간 초과에는 알고리즘으로 복구한다. 미시 이동에는 API를 호출하지 않는다. 이전 NumPy 정책은 새 규칙과 호환되지 않으면 사용하지 않는다.
-
-경기 종료 후 서버가 만든 `data`의 완료 `.view.json`을 다음으로 업로드한다:
-
-```bash
-uv run python -m cloud.publish --view data/완료경기.view.json --id 고유경기ID
-```
-
-현재 업로더는 단일 운영자용이며 동시에 업로드하지 않는다. manifest는 최근20개를 유지한다. SQLite 누적 전적은 엔진 로컬에 있으며 현재 Pages 배포에는 공유 전적 API를 추가하지 않았다. 공개 버킷/SQL 테이블/자동 학습 일정/유료 리소스는 만들지 않는다.
-
-## NIM 차단을 해제하는 정확한 설정
-
-Codex에서 이 작업에 연결된 MW_NV 환경의 설정을 연다. Network/인터넷 허용 도메인에
-`integrate.api.nvidia.com`을 추가한 초안은 저장했다. 기존 항목은 유지한다.
-Secrets/비밀값의 기존 **NvidiaNIM** 항목을 편집하고 Allowed destinations/허용 대상에도
-`integrate.api.nvidia.com`을 추가한다. 기존 `build.nvidia.com`은 포털 주소이고
-실제 추론 주소가 아니므로 이 항목만 있으면 API가 차단된다. 키를 다시 만들거나
-중복 비밀값을 만들 필요 없다. 기존 키 값은 유지한다. 저장하고 Publish가 표시되면
-환경을 Publish한다. 이 작업은 사이트 배포와 별개다. 적용 후 모델 목록·실제 지휘 요청을 재검증한다.
-기존 비밀값 목적지 변경은 설정 도구가 충돌로 거부하므로 사용자 설정 화면에서 해야 한다.
+이전 검사: Python HQ11+live/전술12, JS13, Vite/Pages Functions 빌드 통과. 이번 모델 기본값 변경 후 NIM2 검사 통과. 원격 HTTP·NIM 실제 성공은 미검증이다. 상세 기계 기록은 validation-status.json.

@@ -6,10 +6,17 @@
   "nim_inference_error": "Unauthorized: Invalid JWT serialization: Missing dot delimiter(s)",
   "nim_successful_decisions": 0,
   "nim_model_latency": "UNKNOWN: authentication failed, timings are error responses",
-  "cloudflare_token_verify_http": 401,
-  "cloudflare_token_error": "Invalid API Token",
-  "cloudflare_project_http": 404,
+  "cloudflare_token_verify_http": 200,
+  "cloudflare_token_error": null,
+  "cloudflare_project_http": 200,
   "supabase_manifest_http": 200,
   "supabase_matches": 1,
-  "deployed": false
+  "deployed": true,
+  "site_url": "https://mw-nv.pages.dev",
+  "deployment_url": "https://3d803f6f.mw-nv.pages.dev",
+  "deployment_stage": "success",
+  "public_site_http": "UNVERIFIED: environment egress denies newly created domain; draft additions saved",
+  "production_supabase_secret_present": false,
+  "nim_candidate_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+  "nim_previous_model_status": "Llama 3.1 8B removed by provider; HTTP410"
 }

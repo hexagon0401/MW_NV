@@ -18,7 +18,7 @@ def test_nim_requires_key_and_preserves_https_allowlist(monkeypatch):
 def test_nim_candidate_validation_and_failure_recovery(monkeypatch):
     monkeypatch.setenv('NVIDIA_API_KEY','fixture-not-a-real-key')
     obs=Engine(create_release_match()).observe(0)
-    hq=HybridHQ('https://integrate.api.nvidia.com/v1',model='meta/llama-3.1-8b-instruct',transport=lambda p:json.dumps({'candidate_ids':[]}))
+    hq=HybridHQ('https://integrate.api.nvidia.com/v1',model='nvidia/nemotron-3.5-lightning-30b-a3b',transport=lambda p:json.dumps({'candidate_ids':[]}))
     assert hq.observe_and_issue(obs)==[] and hq.last_decision['source']=='llm'
     hq.transport=lambda p:'{"candidate_ids":[999999]}'
     assert hq.observe_and_issue(obs) and hq.last_decision['source']=='algorithm'

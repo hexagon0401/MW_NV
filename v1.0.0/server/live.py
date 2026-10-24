@@ -23,7 +23,7 @@ class LiveRunner:
         self.output_dir=Path(output_dir) if output_dir else None;self.initial=frame(self.engine.world);self.saved=False
         if hq=='nim':
             endpoint='https://integrate.api.nvidia.com/v1'
-            if model=='local':model='meta/llama-3.1-8b-instruct'
+            if model=='local':model='nvidia/nemotron-3.5-lightning-30b-a3b'
         self.hq=hq;self.policies={t:HybridHQ(endpoint,model,policy=policy) if hq in ('local','nim') else (TacticalHQ(policy) if self.engine.world.config.map_width_m>=1024 else RuleHQ()) for t in Team}
         self.stream_id=uuid.uuid4().hex;self.condition=Condition();self.stop_event=Event();self.thread=None
         w=self.engine.world
