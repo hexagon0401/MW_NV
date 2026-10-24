@@ -64,6 +64,6 @@ def issue_hq_round(engine,policies):
         batches[team]=commands
     for team,commands in batches.items():
         policy=policies[team]
-        engine.world.emit('HQ_DECISION',team=int(team),metadata=policy.last_decision,commands=commands)
+        engine.record_event('HQ_DECISION',team=int(team),metadata=policy.last_decision,commands=commands)
         for c in commands:engine.submit_for(team,c)
     return batches

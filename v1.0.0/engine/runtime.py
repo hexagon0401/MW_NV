@@ -86,6 +86,9 @@ class Engine:
         update_score(w)
         regenerate(w)
 
+    def record_event(self,kind,**payload):
+        return self.world.emit(kind,**payload)
+
     def observe(self,team):
         return observation(self.world,team)
 
