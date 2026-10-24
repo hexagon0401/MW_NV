@@ -9,3 +9,6 @@ completed; train() checks saved-model and NumPy inference parity.
 One repeat-series match completed at tick 6000, 197 attacks, zero rejected commands.
 These tiny training checks establish execution, not improved strategy.
 Mac/Ollama model inference and game balance remain unverified.
+Release 900s scripted RuleHQ run observed 128 embark, 96 disembark and 284 attacks.
+It also revealed repeated transport replacement/landing failures; subsequent fixes
+keep running vehicle orders and use cleared objective approaches for landing.

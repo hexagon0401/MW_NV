@@ -1,13 +1,15 @@
 # MW-NV v1.0.0 STATE
-Current task: G01 gameplay fixes and local execution
-Status: engine checkpoint verified; final integration checks running
-Changed: range engagement, vehicle detours, RuleHQ transport, 28-unit release rosters
-Verified: prior suite 89 PASS; new combat/roster checks PASS; final suite pending
-Viewer: HP, shot lines, target/ammo/range tooltips, simple directional soldiers, darker map
-Browser: design and live SSE/casualties/reconnect smoke PASS
-Training: one 64-step PPO round/save/NumPy parity PASS; resume check running
-Mac: Ollama local script prepared; real Mac/model output unverified
-Deployment: deferred
-Next: finish checks, commit viewer/local workflows, push
+Current task: G01 gameplay, transport, local LLM launch and repeat training
+Status: functional checks PASS; Mac/model inference unverified
+Completed: ranged engagement/retreat, carrier detours, 28-person release teams
+Viewer: HP/shot lines/targets, directional soldiers, darker district map/effect labels
+Verified: Python 92 PASS; JS 9 PASS; production build PASS
+Browser: desktop/mobile/fonts/tooltips and live casualty/reconnect PASS
+Transport: release run observed embark/disembark; follow-up landing/HQ fixes tested separately
+Learning: three 64-step PPO rounds, frozen-opponent resume/save/NumPy parity PASS
+Run Mac: bash scripts/mac-local.sh; viewer npm run dev; see GAMEPLAY_UPDATE.md
+Run repeat: python -m engine.series --count 0
+Run CPU learning: python -m learning.continuous --rounds 0
+Next: Mac model validation and balance/held-out evaluation; deployment deferred
 Git branch: dev/v1.0.0
 Usage: UNKNOWN

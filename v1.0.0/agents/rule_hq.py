@@ -28,14 +28,14 @@ class RuleHQ:
             onboard=[u for u in members if u['carrier_id'] is not None]
             if onboard:
                 vehicle=next((v for v in obs['vehicles'] if v['id']==onboard[0]['carrier_id']),None)
-                if vehicle is None or vehicle['task_state'] in ('WAITING_PASSENGERS','UNLOADING'):continue
+                if vehicle is None or vehicle['task_state'] in ('WAITING_PASSENGERS','UNLOADING','MOVING','TAKEOFF','LANDING'):continue
                 target=objectives[index%len(objectives)] if objectives else None
                 if target is None:continue
                 vp=vehicle['pos'];tp=target['pos']
                 c=dict(v=1,cmd_id=tick*100+index+1,team=team,tick=tick,unit=vehicle['id'],ttl=750)
                 if hypot(vp['x_cm']-tp['x_cm'],vp['y_cm']-tp['y_cm'])<target['radius_cm']:
                     c.update(op=6,arg0=vp['x_cm']//100,arg1=vp['y_cm']//100)
-                else:c.update(op=7,arg0=tp['x_cm']//100,arg1=tp['y_cm']//100)
+                else:c.update(op=7,arg0=tp['x_cm']//100+(-16 if team==0 else 16),arg1=tp['y_cm']//100)
                 commands.append(c)
                 if len(commands)==4:break
                 continue

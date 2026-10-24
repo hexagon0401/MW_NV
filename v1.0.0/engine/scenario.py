@@ -63,7 +63,7 @@ def create_release_match(seed=0,swap=False):
       (307,152,416,'HELIPAD',Team.A),(308,872,416,'HELIPAD',Team.B)]:
         w.facilities[id]=Facility(id,WorldPos(x*100,y*100),kind,owner)
     for f in w.facilities.values():
-        if f.kind in ('HQ','HELIPAD','GARAGE'):
+        if f.kind in ('HQ','HELIPAD','GARAGE','OBJECTIVE'):
             for row in range(max(0,f.pos.y_cm//400-5),min(256,f.pos.y_cm//400+6)):
                 for col in range(max(0,f.pos.x_cm//400-5),min(256,f.pos.x_cm//400+6)):w.terrain.cells[row][col]=0
     for row in w.terrain.cells:
