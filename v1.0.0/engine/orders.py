@@ -49,13 +49,22 @@ def validate(world, command):
     unit = world.soldiers.get(c.unit) or world.squads.get(c.unit) or world.vehicles.get(c.unit)
     if unit is None:
         raise OrderError('INVALID_TARGET')
+    if not getattr(unit,'alive',True):raise OrderError('ILLEGAL_STATE')
     if unit.team != c.team:
         raise OrderError('FOREIGN_UNIT')
-    if c.op in (Op.MOVE, Op.RETREAT, Op.TRANSPORT, Op.DISEMBARK):
+    if c.op in (Op.MOVE, Op.RETREAT, Op.TRANSPORT, Op.DISEMBARK, Op.FIRE_MISSION):
         if not (0 <= c.arg0 < world.config.map_width_m and 0 <= c.arg1 < world.config.map_height_m):
             raise OrderError('OUT_OF_BOUNDS')
     if c.op in (Op.CAPTURE, Op.DEFEND, Op.RESUPPLY) and c.target not in world.facilities and not (c.op==Op.RESUPPLY and c.target in world.vehicles):
         raise OrderError('INVALID_TARGET')
+    if c.op in (Op.DEPLOY,Op.PACK_UP,Op.FIRE_MISSION) and (c.unit not in world.vehicles or unit.type_id!='SPH'):raise OrderError('INVALID_TARGET')
+    if c.op==Op.REPAIR:
+        target=world.vehicles.get(c.target)
+        if c.unit not in world.soldiers or unit.type_id!='ENG' or target is None or not target.alive or target.team!=c.team:raise OrderError('INVALID_TARGET')
+    if c.op==Op.ATTACK_TARGET:
+        target=world.soldiers.get(c.target) or world.vehicles.get(c.target)
+        if target is None or not target.alive or target.team==c.team:raise OrderError('INVALID_TARGET')
+        if c.target not in getattr(world,'visible',{}).get(c.team,[]):raise OrderError('UNOBSERVED_TARGET')
     return c
 
 

@@ -22,7 +22,7 @@ class LiveRunner:
         self.hq=hq;self.policies={t:LocalHQ(endpoint,model) if hq=='local' else RuleHQ() for t in Team}
         self.stream_id=uuid.uuid4().hex;self.condition=Condition();self.stop_event=Event();self.thread=None
         w=self.engine.world
-        self.map=dict(width_m=w.config.map_width_m,height_m=w.config.map_height_m,terrain=deepcopy(w.terrain.cells))
+        self.map=dict(catalog=dict(version=w.catalog_version,units=deepcopy(w.unit_specs),vehicles=deepcopy(w.vehicle_specs),weapons=deepcopy(w.weapon_specs)),width_m=w.config.map_width_m,height_m=w.config.map_height_m,terrain=deepcopy(w.terrain.cells))
         self.seq=-1;self.last_hq_tick=None;self._publish('ended' if getattr(w,'ended',False) else 'running')
 
     def _publish(self,status):

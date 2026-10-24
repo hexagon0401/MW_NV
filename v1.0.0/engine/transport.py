@@ -24,6 +24,11 @@ class FootprintTerrain(Terrain):
 
 def move_vehicle(w,key,v,destination):
     spec=w.vehicle_specs[v.type_id]
+    if not v.alive:raise OrderError('ILLEGAL_STATE')
+    if v.deployment!='PACKED':raise OrderError('MUST_PACK_UP')
+    if v.type_id=='MBT':
+        from .combat import engagement_target
+        if engagement_target(w,v) is not None:v.task_state='ENGAGING';return False
     if v.type_id=='HEL':
         return fly(w,key,v,destination)
     if v.fuel<=0:
@@ -34,7 +39,7 @@ def move_vehicle(w,key,v,destination):
     if not hasattr(w,'vehicle_motions'):
         w.vehicle_motions={}
     terrain=FootprintTerrain(w.terrain,spec['footprint_cm'])
-    terrain.obstacles=[(o.pos.x_cm,o.pos.y_cm,*w.vehicle_specs[o.type_id]['footprint_cm']) for o in w.vehicles.values() if o.id!=v.id and not (abs(o.pos.x_cm-v.pos.x_cm)<(w.vehicle_specs[o.type_id]['footprint_cm'][0]+spec['footprint_cm'][0])/2 and abs(o.pos.y_cm-v.pos.y_cm)<(w.vehicle_specs[o.type_id]['footprint_cm'][1]+spec['footprint_cm'][1])/2)]
+    terrain.obstacles=[(o.pos.x_cm,o.pos.y_cm,*w.vehicle_specs[o.type_id]['footprint_cm']) for o in w.vehicles.values() if o.id!=v.id and o.alive and not (abs(o.pos.x_cm-v.pos.x_cm)<(w.vehicle_specs[o.type_id]['footprint_cm'][0]+spec['footprint_cm'][0])/2 and abs(o.pos.y_cm-v.pos.y_cm)<(w.vehicle_specs[o.type_id]['footprint_cm'][1]+spec['footprint_cm'][1])/2)]
     if key not in w.vehicle_motions:
         v.task_state='PATHING'
         route=find_path(terrain,(v.pos.x_cm,v.pos.y_cm),destination,True)
@@ -54,7 +59,7 @@ def move_vehicle(w,key,v,destination):
             v.task_state='BLOCKED';raise OrderError('BLOCKED')
         for other in w.vehicles.values():
             fp=w.vehicle_specs[other.type_id]['footprint_cm']
-            if other.id!=v.id and abs(other.pos.x_cm-candidate.x_cm)<(fp[0]+spec['footprint_cm'][0])/2 and abs(other.pos.y_cm-candidate.y_cm)<(fp[1]+spec['footprint_cm'][1])/2:
+            if other.id!=v.id and other.alive and abs(other.pos.x_cm-candidate.x_cm)<(fp[0]+spec['footprint_cm'][0])/2 and abs(other.pos.y_cm-candidate.y_cm)<(fp[1]+spec['footprint_cm'][1])/2:
                 old_overlap=abs(other.pos.x_cm-v.pos.x_cm)<(fp[0]+spec['footprint_cm'][0])/2 and abs(other.pos.y_cm-v.pos.y_cm)<(fp[1]+spec['footprint_cm'][1])/2
                 if old_overlap and hypot(candidate.x_cm-other.pos.x_cm,candidate.y_cm-other.pos.y_cm)>=hypot(v.pos.x_cm-other.pos.x_cm,v.pos.y_cm-other.pos.y_cm):continue
                 v.task_state='BLOCKED';raise OrderError('BLOCKED')
@@ -74,7 +79,7 @@ def move_vehicle(w,key,v,destination):
 def embark(w,key,c):
     from .movement import move
     v=w.vehicles.get(c.target)
-    if v is None:raise OrderError('INVALID_TARGET')
+    if v is None or not v.alive:raise OrderError('INVALID_TARGET')
     if v.team!=c.team:raise OrderError('FOREIGN_UNIT')
     if v.task_state in ('MOVING','TAKEOFF','LANDING','UNLOADING'):
         raise OrderError('ILLEGAL_STATE')
@@ -123,7 +128,7 @@ def fly(w,key,v,destination):
     spec=w.vehicle_specs['HEL']
     landing=FootprintTerrain(w.terrain,[1000,1000])
     def clear_landing(point):
-        return landing.passable(*point) and not any(o.id!=v.id and abs(o.pos.x_cm-point[0])<(w.vehicle_specs[o.type_id]['footprint_cm'][0]+800)/2 and abs(o.pos.y_cm-point[1])<(w.vehicle_specs[o.type_id]['footprint_cm'][1]+800)/2 for o in w.vehicles.values())
+        return landing.passable(*point) and not any(o.id!=v.id and o.alive and abs(o.pos.x_cm-point[0])<(w.vehicle_specs[o.type_id]['footprint_cm'][0]+800)/2 and abs(o.pos.y_cm-point[1])<(w.vehicle_specs[o.type_id]['footprint_cm'][1]+800)/2 for o in w.vehicles.values())
     if key not in w.flights:
         if not clear_landing(destination) or not clear_landing((v.pos.x_cm,v.pos.y_cm)):
             raise OrderError('LANDING_INVALID')
@@ -160,7 +165,7 @@ def fly(w,key,v,destination):
 
 def unload(w,key,c):
     v=w.vehicles.get(c.unit)
-    if v is None or v.task_state in ('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS'):
+    if v is None or not v.alive or v.task_state in ('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS'):
         raise OrderError('ILLEGAL_STATE')
     if hypot(v.pos.x_cm-c.arg0*100,v.pos.y_cm-c.arg1*100)>400:
         raise OrderError('INVALID_TARGET')
@@ -176,7 +181,7 @@ def unload(w,key,c):
         for dx,dy in candidates:
             x,y=v.pos.x_cm+dx,v.pos.y_cm+dy
             if not w.terrain.passable(x,y):continue
-            if any(abs(x-o.pos.x_cm)<w.vehicle_specs[o.type_id]['footprint_cm'][0]/2+50 and abs(y-o.pos.y_cm)<w.vehicle_specs[o.type_id]['footprint_cm'][1]/2+50 for o in w.vehicles.values()):continue
+            if any(abs(x-o.pos.x_cm)<w.vehicle_specs[o.type_id]['footprint_cm'][0]/2+50 and abs(y-o.pos.y_cm)<w.vehicle_specs[o.type_id]['footprint_cm'][1]/2+50 for o in w.vehicles.values() if o.alive):continue
             if any(s.alive and s.carrier_id is None and hypot(s.pos.x_cm-x,s.pos.y_cm-y)<100 for s in w.soldiers.values()):continue
             placements.append((x,y))
             if len(placements)>=len(v.passenger_ids):break

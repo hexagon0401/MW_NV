@@ -28,4 +28,4 @@ def test_no_fuel_and_vehicle_overlap_and_narrow_route():
     assert e.world.vehicles[10].pos.x_cm>2500  # routes around parked carrier
     assert e.world.vehicles[11].pos==WorldPos(2500,6400)
     assert not hasattr(e.world.vehicles[10],'attack')
-    assert set(e.world.vehicle_specs)=={'LUV','APC','IFV','HEL','TRK'}
+    assert set(e.world.vehicle_specs)=={'LUV','APC','IFV','HEL','TRK','MBT','SPH'}

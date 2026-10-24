@@ -16,5 +16,5 @@ def test_spatial_visibility_matches_reference_scan():
     w=create_release_match(8)
     update_sensing(w)
     for team in Team:
-        expected=sorted(t.id for t in w.soldiers.values() if t.team!=team and any(can_see(w,s,t) for s in w.soldiers.values() if s.team==team))
+        expected=sorted(t.id for t in [*w.soldiers.values(),*w.vehicles.values()] if t.team!=team and any(can_see(w,s,t) for s in [*w.soldiers.values(),*w.vehicles.values()] if s.team==team))
         assert w.visible[team]==expected

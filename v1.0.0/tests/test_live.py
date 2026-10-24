@@ -17,7 +17,7 @@ def test_snapshots_are_detached_and_observation_does_not_change_determinism():
     assert engine.world.checksum()==reference.world.checksum()
     snapshot=runner.snapshot(True);snapshot['frame']['units'][0]['size_px'][0]=999
     snapshot['terrain'][0][0]=9
-    assert engine.world.unit_specs['INF']['size_px'][0]==3
+    assert engine.world.unit_specs['INF']['size_px'][0]==12
     assert engine.world.checksum()==reference.world.checksum()
     assert engine.observe(0)['enemies']==[]
     assert len(runner.snapshot()['frame']['units'])==2

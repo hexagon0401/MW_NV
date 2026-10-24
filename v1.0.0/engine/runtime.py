@@ -7,9 +7,9 @@ from .types import Op, Team, Command
 from .movement import move
 from .infantry import move_squad
 from .sensing import update_sensing, observation
-from .combat import update_combat
+from .combat import update_combat,fire_mission,deployment
 from .economy import purchase
-from .logistics import resupply, heal, regenerate
+from .logistics import resupply, heal, regenerate,repair
 from .transport import move_vehicle, embark, unload, release_transfer_locks
 from .objectives import update_capture, update_score
 
@@ -60,6 +60,7 @@ class Engine:
 
     def _tick(self):
         w = self.world
+        if w.tick%5==0:update_sensing(w)
         release_transfer_locks(w)
         ready=w.queue.ready(w)
         # Resolve replacement orders before moving anything during this tick.
@@ -80,8 +81,6 @@ class Engine:
             except OrderError as exc:
                 w.queue.finish(w, key, 'FAILED', str(exc))
 
-        if (w.tick+1) % 5 == 0:
-            update_sensing(w)
         update_combat(w)
         update_capture(w)
         update_score(w)
@@ -95,11 +94,27 @@ class Engine:
 
     def _execute(self, key, c):
         w = self.world
+        actor=w.soldiers.get(c.unit) or w.vehicles.get(c.unit)
+        if actor is not None and not actor.alive:raise OrderError('ILLEGAL_STATE')
+        if c.op==Op.ATTACK_TARGET:
+            target=w.soldiers.get(c.target) or w.vehicles.get(c.target)
+            from .sensing import can_see
+            if actor is None or target is None or target.team==c.team or not can_see(w,actor,target):raise OrderError('INVALID_TARGET')
+            actor.target_id=target.id;actor.task_state='HOLD';w.queue.finish(w,key);return
+        if c.op==Op.FIRE_MISSION:
+            w.queue.status[key]='RUNNING'
+            if fire_mission(w,key,c):w.queue.finish(w,key)
+            return
+        if c.op in (Op.DEPLOY,Op.PACK_UP):
+            if c.unit not in w.vehicles:raise OrderError('INVALID_TARGET')
+            w.queue.status[key]='RUNNING'
+            if deployment(w,w.vehicles[c.unit],c.op==Op.PACK_UP):w.queue.finish(w,key)
+            return
         if c.op==Op.PURCHASE:
             purchase(w,c);w.queue.finish(w,key);return
-        if c.op in (Op.RESUPPLY,Op.HEAL):
+        if c.op in (Op.RESUPPLY,Op.HEAL,Op.REPAIR):
             w.queue.status[key]="RUNNING"
-            if (resupply if c.op==Op.RESUPPLY else heal)(w,key,c):w.queue.finish(w,key)
+            if ({Op.RESUPPLY:resupply,Op.HEAL:heal,Op.REPAIR:repair}[c.op])(w,key,c):w.queue.finish(w,key)
             return
         if c.op==Op.DISEMBARK:
             w.queue.status[key]="RUNNING"
@@ -142,8 +157,8 @@ class Engine:
         elif c.op==Op.HOLD:
             ids=w.squads[c.unit].member_ids if c.unit in w.squads else [c.unit]
             for id in ids:
-                unit=w.soldiers.get(id)
-                if unit is not None and unit.alive and unit.carrier_id is None:unit.task_state='HOLD'
+                unit=w.soldiers.get(id) or w.vehicles.get(id)
+                if unit is not None and unit.alive and getattr(unit,'carrier_id',None) is None:unit.task_state='HOLD'
         elif c.op != Op.WAIT:
             raise OrderError('UNSUPPORTED_OP')
         w.queue.finish(w, key)
