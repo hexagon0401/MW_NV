@@ -10,13 +10,35 @@
   "cloudflare_token_error": null,
   "cloudflare_project_http": 200,
   "supabase_manifest_http": 200,
-  "supabase_matches": 1,
+  "supabase_matches": 2,
   "deployed": true,
   "site_url": "https://mw-nv.pages.dev",
-  "deployment_url": "https://3d803f6f.mw-nv.pages.dev",
+  "deployment_url": "https://f536a3f6.mw-nv.pages.dev",
   "deployment_stage": "success",
-  "public_site_http": "UNVERIFIED: environment egress denies newly created domain; draft additions saved",
-  "production_supabase_secret_present": false,
+  "public_site_http": 200,
+  "production_supabase_secret_present": true,
   "nim_candidate_model": "nvidia/nemotron-3.5-lightning-30b-a3b",
-  "nim_previous_model_status": "Llama 3.1 8B removed by provider; HTTP410"
+  "nim_previous_model_status": "Llama 3.1 8B removed by provider; HTTP410",
+  "matches_api_http": 200,
+  "completed_replay_http": 200,
+  "missing_replay_http": 404,
+  "html_secret_reference_check": "PASS",
+  "site_http_note": "Python default User-Agent received Cloudflare1010; standard browser User-Agent succeeds",
+  "full_release_replay": {
+    "id": "release-rules2-seed0-full",
+    "initial_infantry": 128,
+    "initial_vehicles": 20,
+    "http_status": 200,
+    "ended": true,
+    "hq": "algorithm, not NIM",
+    "scores": {
+      "0": 102,
+      "1": 15
+    },
+    "sim_seconds": 1170,
+    "raw_bytes": 14255831,
+    "stored_gzip_bytes": 1123550,
+    "sha256": "942430566f6138369b4d42eb4fb1095ee797eb4af5186820c108b9e080f1f89f"
+  },
+  "gzip_js_tests": 14
 }

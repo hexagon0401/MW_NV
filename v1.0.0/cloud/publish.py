@@ -1,5 +1,5 @@
 """Publish completed local views into private Storage without requiring SQL setup."""
-import argparse,json,os,re
+import argparse,json,os,re,gzip,tempfile
 from pathlib import Path
 from urllib.error import HTTPError
 from .supabase_storage import PrivateStorage
@@ -14,7 +14,12 @@ def publish(source,match_id):
     except HTTPError as e:
         if e.code not in (400,409):raise
     key=match_id+'.view.json'
-    verified=store.upload_verified(source,key)
+    if Path(source).stat().st_size>=1024*1024:
+        key+='.gz'
+        with tempfile.NamedTemporaryFile(suffix='.json.gz') as packed:
+            packed.write(gzip.compress(Path(source).read_bytes(),mtime=0));packed.flush()
+            verified=store.upload_verified(packed.name,key)
+    else:verified=store.upload_verified(source,key)
     try:entries=json.loads(store._request('object/authenticated/'+store.bucket+'/index.json'))
     except HTTPError as e:
         if e.code not in (400,404):raise

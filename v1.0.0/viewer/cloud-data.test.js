@@ -7,3 +7,11 @@ test('Storage manifest serves only completed private matches without a SQL table
  await assert.rejects(matchView(env,'missing',fetcher));
  await assert.rejects(matchView(env,'m2',async url=>Response.json(url.endsWith('/index.json')?[{id:'m2',replay_uri:'supabase://mw-nv-replays/m2.json'}]:{summary:{ended:false}})));
 });
+test('private gzip replay preserves completed summary and units',async()=>{
+ const {gzipSync}=await import('node:zlib');
+ const env={SUPABASE_URL:'https://fixture.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'fixture-key',REPLAY_MANIFEST:'storage'};
+ const doc={summary:{ended:true},units:[{id:1}]};
+ const fetcher=async url=>url.endsWith('/index.json')?Response.json([{id:'packed',replay_uri:'supabase://mw-nv-replays/packed.json.gz'}]):new Response(gzipSync(JSON.stringify(doc)));
+ assert.deepEqual(await matchView(env,'packed',fetcher),doc);
+ await assert.rejects(matchView(env,'packed',async url=>url.endsWith('/index.json')?Response.json([{id:'packed',replay_uri:'supabase://mw-nv-replays/packed.json.gz'}]):new Response('invalid gzip')));
+});
