@@ -1,0 +1,5 @@
+map:
+  width_m: 128
+  height_m: 128
+simulation:
+  tick_s: 0.2
