@@ -1,0 +1,36 @@
+{
+  "training_seed_range": [
+    0,
+    49
+  ],
+  "holdout_seed_range": [
+    10000,
+    10099
+  ],
+  "steps_per_generation": 256,
+  "policies": [
+    {
+      "id": "policy0",
+      "controlled": "A",
+      "path": "data/policies/policy0.npz"
+    },
+    {
+      "id": "policy1",
+      "controlled": "B",
+      "path": "data/policies/policy1.npz"
+    },
+    {
+      "id": "policy2",
+      "controlled": "A",
+      "path": "data/policies/policy2.npz"
+    }
+  ],
+  "best": "rules",
+  "selection": "maximum held-out mean score difference; rules wins ties",
+  "holdout_complete": true,
+  "artifact_sha256": {
+    "policy0.npz": "a2f811d0caa6eab7a1630a430c849ccb73b8530f4a88c23ea9a93bc5b3bf88d6",
+    "policy1.npz": "95f3327010eb5cffd6fdbeb78bf939a75c6b9b094973373ff5f7b3307b5d3557",
+    "policy2.npz": "8f7bc5fb5454c4114ff620b341cde9d565b844bc6cbe84cae5f469275b5f005c"
+  }
+}

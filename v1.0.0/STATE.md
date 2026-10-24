@@ -1,8 +1,8 @@
 # MW-NV v1.0.0 STATE
-Current cycle: C32
-Status: PASS
-Last checkpoint: record 50-seed random and heuristic baselines with legal action masks
-Last tests: 4 passed in 13.10s
-Open requirements: see RELEASE_STATUS.md
-Git branch: dev/v1.0.0
+Current cycle: C33-C35
+Status: PASS (CPU learning/evaluation)
+Verified: 3 policies trained; 320 held-out matches; NumPy parity; rules retained
+Training budget: 256 steps per generation, CPU only
+Open requirements: RELEASE_STATUS.md
+Next: release QA and real model/cloud/Mac validation
 Remaining Plus quota: UNKNOWN
