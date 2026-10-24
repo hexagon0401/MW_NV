@@ -6,8 +6,8 @@ Supabase: private mw-nv-replays bucket; initial-private-demo uploaded/checksum P
 Storage: manifest index read-back PASS; anon read denied; SQL table not required
 Pages: config PUBLIC_VIEWER=true; Access/password not required; no deployment URL
 Blocker: Cloudflare create403 Authentication error; token verify401 Invalid API Token
-Blocker: integrate.api.nvidia.com CONNECT403; actual NIM latency/cost UNKNOWN
-Required: Cloudflare token; edit existing NvidiaNIM secret destination + Publish; Pages Supabase secret
+NIM network/model list200 PASS; inference401 Unauthorized; latency/cost UNKNOWN
+Required: correct existing NIM key and Cloudflare token values; Pages Supabase secret
 Tests: Python HQ11+live/tactics12 PASS; JS13/build/Pages Functions PASS
 Next: cd viewer && npx wrangler pages deploy dist --project-name mw-nv --branch dev/v1.0.0
 Docs: cloud/NIM_DEPLOY.md; existing traffic/side bias findings remain

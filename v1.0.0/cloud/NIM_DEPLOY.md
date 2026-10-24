@@ -1,3 +1,9 @@
+> 환경 적용 후 재검증: NIM 네트워크 차단은 해제됐고 모델 목록 HTTP200,
+> 그러나 실제 추론 HTTP401 Unauthorized(Invalid JWT serialization). Cloudflare 토큰 검증도
+> HTTP401 Invalid API Token이다. 실제 NIM 성공·속도·사이트 배포는 아직 미검증이다.
+> 기존 NvidiaNIM 허용 대상 integrate.api.nvidia.com은 게시된 설정에서 확인했다.
+> 이제 기존 비밀값의 실제 키/토큰 값을 교정해야 한다. `validation-status.json` 참조.
+
 > 최신 결정: 사용자가 Access를 의도적으로 비활성화했으며 공개 관전을 승인했다.
 > `PUBLIC_VIEWER=true`이면 Access·사이트 비밀번호 없이 완료 경기 관전만 허용한다.
 > MW_NV_VIEWER_PASSWORD는 필요하지 않다. Supabase 서버 키는 계속 Pages Secret에만 둔다.

@@ -1,0 +1,15 @@
+{
+  "network": "NIM domain reachable after environment publication",
+  "secret_destination": "NvidiaNIM -> integrate.api.nvidia.com confirmed in published settings",
+  "nim_models_http": 200,
+  "nim_inference_http": 401,
+  "nim_inference_error": "Unauthorized: Invalid JWT serialization: Missing dot delimiter(s)",
+  "nim_successful_decisions": 0,
+  "nim_model_latency": "UNKNOWN: authentication failed, timings are error responses",
+  "cloudflare_token_verify_http": 401,
+  "cloudflare_token_error": "Invalid API Token",
+  "cloudflare_project_http": 404,
+  "supabase_manifest_http": 200,
+  "supabase_matches": 1,
+  "deployed": false
+}
