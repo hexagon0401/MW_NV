@@ -56,7 +56,7 @@ class Engine:
                     if other != key and cmd.unit == c.unit and w.queue.status[other] == 'RUNNING':
                         w.queue.finish(w, other, 'CANCELLED')
                 w.queue.status[key] = 'RUNNING'
-            if not move(w,key,unit,(c.arg0*100,c.arg1*100)):
+            if not move(w,key,unit,(c.arg0*100,c.arg1*100),w.unit_specs[unit.type_id]["speed_mps"]):
                 return
         elif c.op == Op.CANCEL:
             w.queue.cancel(w, c.team, c.target)

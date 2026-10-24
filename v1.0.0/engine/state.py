@@ -5,6 +5,7 @@ import hashlib
 import json
 import random
 from .config import GameConfig
+from .catalog import load_units
 from .map import Terrain, alpha_terrain
 from .types import Soldier, Team, TeamState, WorldPos, Facility
 
@@ -12,6 +13,7 @@ from .types import Soldier, Team, TeamState, WorldPos, Facility
 class WorldState:
     def __init__(self, seed=0, config=None):
         self.config = config or GameConfig(128, 128, 0.2)
+        self.unit_specs = load_units()
         self.seed = seed
         self.rng = random.Random(seed)
         self.map_sample = [self.rng.randrange(10) for _ in range(16)]
