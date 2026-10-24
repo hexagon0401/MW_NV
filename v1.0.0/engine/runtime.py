@@ -3,6 +3,7 @@ from decimal import Decimal
 from .orders import CommandQueue, OrderError
 from .state import WorldState
 from .types import Op
+from .movement import move
 
 
 class Engine:
@@ -46,7 +47,18 @@ class Engine:
 
     def _execute(self, key, c):
         w = self.world
-        if c.op == Op.CANCEL:
+        if c.op in (Op.MOVE, Op.RETREAT):
+            unit = w.soldiers.get(c.unit)
+            if unit is None or not unit.alive or unit.carrier_id is not None:
+                raise OrderError('ILLEGAL_STATE')
+            if w.queue.status[key] == 'QUEUED':
+                for other, cmd in w.queue.commands.items():
+                    if other != key and cmd.unit == c.unit and w.queue.status[other] == 'RUNNING':
+                        w.queue.finish(w, other, 'CANCELLED')
+                w.queue.status[key] = 'RUNNING'
+            if not move(w,key,unit,(c.arg0*100,c.arg1*100)):
+                return
+        elif c.op == Op.CANCEL:
             w.queue.cancel(w, c.team, c.target)
         elif c.op not in (Op.WAIT, Op.HOLD):
             raise OrderError('UNSUPPORTED_OP')
