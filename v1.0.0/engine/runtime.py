@@ -4,6 +4,7 @@ from .orders import CommandQueue, OrderError
 from .state import WorldState
 from .types import Op
 from .movement import move
+from .infantry import move_squad
 
 
 class Engine:
@@ -49,6 +50,12 @@ class Engine:
         w = self.world
         if c.op in (Op.MOVE, Op.RETREAT):
             unit = w.soldiers.get(c.unit)
+            if c.unit in w.squads:
+                w.queue.status[key] = 'RUNNING'
+                if not move_squad(w,key,w.squads[c.unit],(c.arg0*100,c.arg1*100)):
+                    return
+                w.queue.finish(w,key)
+                return
             if unit is None or not unit.alive or unit.carrier_id is not None:
                 raise OrderError('ILLEGAL_STATE')
             if w.queue.status[key] == 'QUEUED':

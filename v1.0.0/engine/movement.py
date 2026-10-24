@@ -5,7 +5,7 @@ from .types import WorldPos
 from .orders import OrderError
 
 
-def move(world, key, unit, destination, speed_mps=1.6):
+def move(world, key, unit, destination, speed_mps=1.6, ignore_ids=()):
     if not hasattr(world,'motions'):
         world.motions = {}
     if key not in world.motions:
@@ -26,7 +26,7 @@ def move(world, key, unit, destination, speed_mps=1.6):
         if not world.terrain.segment_clear((unit.pos.x_cm,unit.pos.y_cm),(candidate.x_cm,candidate.y_cm)):
             unit.task_state = 'BLOCKED'
             raise OrderError('BLOCKED')
-        if any(s.id != unit.id and s.alive and s.carrier_id is None and
+        if any(s.id != unit.id and s.id not in ignore_ids and s.alive and s.carrier_id is None and
                hypot(s.pos.x_cm-candidate.x_cm,s.pos.y_cm-candidate.y_cm)<84
                for s in world.soldiers.values()):
             unit.task_state = 'BLOCKED'
