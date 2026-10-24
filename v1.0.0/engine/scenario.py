@@ -6,7 +6,7 @@ from .catalog import make_soldier
 from .logistics import debit,transfer_cargo
 
 
-def create_match(seed=0,swap=False):
+def create_match(seed=0,swap=False,expanded=False):
     w=WorldState(seed,GameConfig(256,256,.2));w.soldiers.clear();w.facilities.clear()
     w.swapped=swap
     w.facilities={201:Facility(201,WorldPos(12800,5600),radius_cm=1050),
@@ -26,7 +26,8 @@ def create_match(seed=0,swap=False):
         def pos(x,y):return WorldPos(x if side==0 else 25600-x,y)
         base=1000+int(team)*100
         w.facilities[101+int(team)]=Facility(101+int(team),pos(2400,12800),'HQ',team)
-        roster=[['INF']*5,['INF']*5,['REC']*3,['INF','INF','MED']]
+        roster=([['INF']*7+['SUP'],['INF']*7+['SUP'],['REC']*6,['INF']*5+['MED']] if expanded else [['INF']*5,['INF']*5,['REC']*3,['INF','INF','MED']])
+        if expanded:w.teams[team].credits+=400
         soldier_id=base
         for group_index,roles in enumerate(roster):
             ids=[];gid=base+50+group_index
@@ -46,7 +47,7 @@ def create_match(seed=0,swap=False):
 
 def create_release_match(seed=0,swap=False):
     from .map import Terrain
-    w=create_match(seed,swap);w.config=GameConfig(1024,1024,.2)
+    w=create_match(seed,swap,expanded=True);w.config=GameConfig(1024,1024,.2)
     for collection in (w.soldiers,w.squads,w.vehicles,w.facilities):
         for unit in collection.values():unit.pos=WorldPos(unit.pos.x_cm*4,unit.pos.y_cm*4)
     for f in w.facilities.values():f.radius_cm*=4
@@ -67,4 +68,14 @@ def create_release_match(seed=0,swap=False):
                 for col in range(max(0,f.pos.x_cm//400-5),min(256,f.pos.x_cm//400+6)):w.terrain.cells[row][col]=0
     for row in w.terrain.cells:
         for col in range(128):row[col]=row[255-col]=min(row[col],row[255-col])
+    # Mirrored districts: wooded cover, side roads and courtyards; corridors stay open.
+    for row in range(12,244):
+        for col in range(12,128):
+            if row%48 in (0,1) or col in (40,41,88,89):tile=1
+            elif row%48 in range(12,23) and col%40 in range(12,23):tile=2
+            elif row%48 in range(30,34) and col%40 in range(18,22):tile=4
+            else:continue
+            if any(abs(f.pos.x_cm//400-col)<8 and abs(f.pos.y_cm//400-row)<8 for f in w.facilities.values()):continue
+            w.terrain.cells[row][col]=w.terrain.cells[row][255-col]=tile
+    w.terrain.cache.clear()
     return w

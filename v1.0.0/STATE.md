@@ -1,14 +1,13 @@
 # MW-NV v1.0.0 STATE
-Current task: D03 design and local live integration
-Status: PASS (functional); deployment deferred by user
-Completed: D01 Swiss UI/fonts, D02 pixel battlefield, D03 local snapshot/SSE
-Changed: viewer/, engine/viewer_export.py, server/live.py, server/app.py, tests/, docs/design/
-Verified: 89 Python tests, 9 JS tests, production build PASS
-Browser: desktop/mobile/fonts/hover/tap/real casualties/server restart reconnect PASS
-Physics: observed and unobserved RuleHQ game checksums match
-Performance: 500 infantry, SwiftShader 13–17 FPS; Intel Mac GPU unverified
-Visual evidence: docs/design/desktop.png, mobile.png, live.png, verification.json
-Run: python -m server.live --hq rules --port 8000; viewer npm run dev → 진행 경기
+Current task: G01 gameplay fixes and local execution
+Status: engine checkpoint verified; final integration checks running
+Changed: range engagement, vehicle detours, RuleHQ transport, 28-unit release rosters
+Verified: prior suite 89 PASS; new combat/roster checks PASS; final suite pending
+Viewer: HP, shot lines, target/ammo/range tooltips, simple directional soldiers, darker map
+Browser: design and live SSE/casualties/reconnect smoke PASS
+Training: one 64-step PPO round/save/NumPy parity PASS; resume check running
+Mac: Ollama local script prepared; real Mac/model output unverified
+Deployment: deferred
+Next: finish checks, commit viewer/local workflows, push
 Git branch: dev/v1.0.0
-Next: user review; external release requirements remain in RELEASE_STATUS.md
-Remaining Plus quota: UNKNOWN
+Usage: UNKNOWN

@@ -124,7 +124,7 @@ class Engine:
             unit = w.soldiers.get(c.unit)
             if c.unit in w.squads:
                 w.queue.status[key] = 'RUNNING'
-                if not move_squad(w,key,w.squads[c.unit],(c.arg0*100,c.arg1*100)):
+                if not move_squad(w,key,w.squads[c.unit],(c.arg0*100,c.arg1*100),engage=c.op!=Op.RETREAT):
                     return
                 w.queue.finish(w,key)
                 return

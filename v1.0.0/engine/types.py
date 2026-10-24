@@ -82,7 +82,7 @@ class Squad(Entity):
 
     def __post_init__(self):
         super().__post_init__()
-        if not 1 <= len(self.member_ids) <= 5 or len(set(self.member_ids)) != len(self.member_ids):
+        if not 1 <= len(self.member_ids) <= 12 or len(set(self.member_ids)) != len(self.member_ids):
             raise ValueError('members')
         for member in self.member_ids:
             natural(member, 'member', 1)

@@ -18,6 +18,7 @@ class FootprintTerrain(Terrain):
         top,bottom=y-half_h,y+half_h-1
         if not self.inside(left,top) or not self.inside(right,bottom):
             return False
+        if any(abs(x-ox)<(fw+self.footprint[0])/2 and abs(y-oy)<(fh+self.footprint[1])/2 for ox,oy,fw,fh in getattr(self,'obstacles',[])):return False
         return all(self.cells[row][col] in (0,1,7,8) for row in range(top//400,bottom//400+1) for col in range(left//400,right//400+1))
 
 
@@ -33,6 +34,7 @@ def move_vehicle(w,key,v,destination):
     if not hasattr(w,'vehicle_motions'):
         w.vehicle_motions={}
     terrain=FootprintTerrain(w.terrain,spec['footprint_cm'])
+    terrain.obstacles=[(o.pos.x_cm,o.pos.y_cm,*w.vehicle_specs[o.type_id]['footprint_cm']) for o in w.vehicles.values() if o.id!=v.id and not (abs(o.pos.x_cm-v.pos.x_cm)<(w.vehicle_specs[o.type_id]['footprint_cm'][0]+spec['footprint_cm'][0])/2 and abs(o.pos.y_cm-v.pos.y_cm)<(w.vehicle_specs[o.type_id]['footprint_cm'][1]+spec['footprint_cm'][1])/2)]
     if key not in w.vehicle_motions:
         v.task_state='PATHING'
         route=find_path(terrain,(v.pos.x_cm,v.pos.y_cm),destination,True)
@@ -47,10 +49,14 @@ def move_vehicle(w,key,v,destination):
         nx,ny=(tx,ty) if amount>=distance else (x+(tx-x)*amount/distance,y+(ty-y)*amount/distance)
         candidate=WorldPos(round(nx),round(ny))
         if not terrain.segment_clear((v.pos.x_cm,v.pos.y_cm),(candidate.x_cm,candidate.y_cm),True):
+            if not motion.get('rerouted'):
+                motion['rerouted']=True;motion['route']=find_path(terrain,(v.pos.x_cm,v.pos.y_cm),destination,True);return False
             v.task_state='BLOCKED';raise OrderError('BLOCKED')
         for other in w.vehicles.values():
             fp=w.vehicle_specs[other.type_id]['footprint_cm']
             if other.id!=v.id and abs(other.pos.x_cm-candidate.x_cm)<(fp[0]+spec['footprint_cm'][0])/2 and abs(other.pos.y_cm-candidate.y_cm)<(fp[1]+spec['footprint_cm'][1])/2:
+                old_overlap=abs(other.pos.x_cm-v.pos.x_cm)<(fp[0]+spec['footprint_cm'][0])/2 and abs(other.pos.y_cm-v.pos.y_cm)<(fp[1]+spec['footprint_cm'][1])/2
+                if old_overlap and hypot(candidate.x_cm-other.pos.x_cm,candidate.y_cm-other.pos.y_cm)>=hypot(v.pos.x_cm-other.pos.x_cm,v.pos.y_cm-other.pos.y_cm):continue
                 v.task_state='BLOCKED';raise OrderError('BLOCKED')
         v.pos=candidate;motion['x'],motion['y']=nx,ny
         v.fuel=max(0,v.fuel-amount/10000*spec['fuel_per_100m'])

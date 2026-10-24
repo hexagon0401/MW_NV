@@ -6,10 +6,14 @@ from .orders import OrderError
 from .types import WorldPos
 
 
-def move_squad(w,key,squad,destination):
+def move_squad(w,key,squad,destination,engage=True):
     members=[w.soldiers[i] for i in squad.member_ids if i in w.soldiers and w.soldiers[i].alive]
     if not members or any(s.team != squad.team or s.carrier_id is not None for s in members):
         raise OrderError('ILLEGAL_STATE')
+    from .combat import engagement_target
+    if engage and any(engagement_target(w,s) is not None for s in members):
+        for s in members:s.task_state='ENGAGING'
+        return False
     leader=members[0]
     old={s.id:s.pos for s in members}
     previous=deepcopy(getattr(w,'motions',{}).get(key))

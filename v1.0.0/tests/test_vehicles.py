@@ -25,6 +25,7 @@ def test_no_fuel_and_vehicle_overlap_and_narrow_route():
     assert v.pos.x_cm==1000 and e.world.queue.status['0:1']=='FAILED'
     e=vehicle_engine();e.world.vehicles[11]=Vehicle(11,Team.A,WorldPos(2500,6400))
     e.submit(dict(cmd_id=1,team=0,op=7,unit=10,arg0=100,arg1=64));e.step(10)
-    assert e.world.vehicles[10].pos.x_cm<=1800
+    assert e.world.vehicles[10].pos.x_cm>2500  # routes around parked carrier
+    assert e.world.vehicles[11].pos==WorldPos(2500,6400)
     assert not hasattr(e.world.vehicles[10],'attack')
     assert set(e.world.vehicle_specs)=={'LUV','APC','IFV','HEL','TRK'}
