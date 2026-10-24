@@ -1,5 +1,5 @@
 """Local OpenAI-compatible protocol; only engine-validated opcodes escape."""
-import json
+import json,os
 from urllib.request import Request,urlopen
 from urllib.parse import urlparse
 from .rule_hq import RuleHQ
@@ -10,13 +10,19 @@ from engine.types import Team
 class LocalHQ:
     def __init__(self,base_url='http://127.0.0.1:8080/v1',model='local',timeout=60,transport=None):
         url=urlparse(base_url)
-        if url.scheme!='http' or url.hostname not in ('localhost','127.0.0.1','::1') or url.username or url.password:
+        self.api_key=None
+        if base_url.rstrip('/')=='https://integrate.api.nvidia.com/v1':
+            self.api_key=os.environ.get('NVIDIA_API_KEY') or os.environ.get('NvidiaNIM')
+            if not self.api_key:raise ValueError('NVIDIA_API_KEY required')
+        elif url.scheme!='http' or url.hostname not in ('localhost','127.0.0.1','::1') or url.username or url.password:
             raise ValueError('local HTTP endpoint required')
         self.base_url=base_url.rstrip('/');self.model=model;self.timeout=timeout
         self.transport=transport or self._request;self.last_decision={}
 
     def _request(self,payload):
-        req=Request(self.base_url+'/chat/completions',data=json.dumps(payload).encode(),headers={'Content-Type':'application/json'})
+        headers={'Content-Type':'application/json'}
+        if self.api_key:headers['Authorization']='Bearer '+self.api_key
+        req=Request(self.base_url+'/chat/completions',data=json.dumps(payload).encode(),headers=headers)
         with urlopen(req,timeout=self.timeout) as response:
             body=response.read(65537)
         if len(body)>65536:raise ValueError('response too large')

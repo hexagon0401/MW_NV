@@ -21,7 +21,10 @@ class LiveRunner:
     def __init__(self,engine=None,seed=0,hq='rules',endpoint='http://127.0.0.1:8080/v1',model='local',output_dir=None,policy=None):
         self.engine=engine if engine is not None else RecordingEngine(create_release_match(seed))
         self.output_dir=Path(output_dir) if output_dir else None;self.initial=frame(self.engine.world);self.saved=False
-        self.hq=hq;self.policies={t:HybridHQ(endpoint,model,policy=policy) if hq=='local' else (TacticalHQ(policy) if self.engine.world.config.map_width_m>=1024 else RuleHQ()) for t in Team}
+        if hq=='nim':
+            endpoint='https://integrate.api.nvidia.com/v1'
+            if model=='local':model='meta/llama-3.1-8b-instruct'
+        self.hq=hq;self.policies={t:HybridHQ(endpoint,model,policy=policy) if hq in ('local','nim') else (TacticalHQ(policy) if self.engine.world.config.map_width_m>=1024 else RuleHQ()) for t in Team}
         self.stream_id=uuid.uuid4().hex;self.condition=Condition();self.stop_event=Event();self.thread=None
         w=self.engine.world
         self.map=dict(catalog=dict(version=w.catalog_version,units=deepcopy(w.unit_specs),vehicles=deepcopy(w.vehicle_specs),weapons=deepcopy(w.weapon_specs)),width_m=w.config.map_width_m,height_m=w.config.map_height_m,terrain=deepcopy(w.terrain.cells))
@@ -50,7 +53,7 @@ class LiveRunner:
         w=self.engine.world
         if w.tick%150==0 and self.last_hq_tick!=w.tick:
             self.last_hq_tick=w.tick
-            if self.hq=='local':
+            if self.hq in ('local','nim'):
                 self._publish('waiting_for_hq');issue_hq_round(self.engine,self.policies)
             else:
                 observations={t:self.engine.observe(t) for t in Team}
@@ -83,8 +86,8 @@ class LiveRunner:
         identifiers={}
         for t,p in self.policies.items():
             meta=getattr(p,'last_decision',{})
-            identifiers['A' if t==0 else 'B']=('llm:'+getattr(p,'model','local')+'/' if self.hq=='local' else '')+meta.get('policy','algorithm')
-        record_world(self.output_dir/'results.sqlite',self.engine.world,'hybrid' if self.hq=='local' else 'rules',identifiers,match_id='live-'+self.stream_id)
+            identifiers['A' if t==0 else 'B']=('llm:'+getattr(p,'model','local')+'/' if self.hq in ('local','nim') else '')+meta.get('policy','algorithm')
+        record_world(self.output_dir/'results.sqlite',self.engine.world,'hybrid' if self.hq in ('local','nim') else 'rules',identifiers,match_id='live-'+self.stream_id)
         self.saved=True
 
     def _run(self):
@@ -92,7 +95,7 @@ class LiveRunner:
             while not self.stop_event.is_set() and not getattr(self.engine.world,'ended',False):
                 start=time.monotonic();self.advance()
                 elapsed=time.monotonic()-start
-                self.stop_event.wait(.2 if self.hq=='local' and elapsed>.2 else max(0,.2-elapsed))
+                self.stop_event.wait(.2 if self.hq in ('local','nim') and elapsed>.2 else max(0,.2-elapsed))
         except Exception:
             logging.getLogger(__name__).exception('Local live simulation stopped')
             self._publish('error')
@@ -166,7 +169,7 @@ def serve(runner,port=8000,log_level='info'):
 
 def main():
     import uvicorn
-    parser=argparse.ArgumentParser();parser.add_argument('--seed',type=int,default=1);parser.add_argument('--hq',choices=['rules','local'],default='rules');parser.add_argument('--endpoint',default='http://127.0.0.1:8080/v1');parser.add_argument('--model',default='local');parser.add_argument('--port',type=int,default=8000);parser.add_argument('--output-dir',default='data');parser.add_argument('--policy',help='versioned candidate .npz policy');a=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--seed',type=int,default=1);parser.add_argument('--hq',choices=['rules','local','nim'],default='rules');parser.add_argument('--endpoint',default='http://127.0.0.1:8080/v1');parser.add_argument('--model',default='local');parser.add_argument('--port',type=int,default=8000);parser.add_argument('--output-dir',default='data');parser.add_argument('--policy',help='versioned candidate .npz policy');a=parser.parse_args()
     runner=LiveRunner(seed=a.seed,hq=a.hq,endpoint=a.endpoint,model=a.model,output_dir=a.output_dir,policy=a.policy)
     serve(runner,a.port)
 
