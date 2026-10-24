@@ -21,3 +21,7 @@
 
 llama.cpp 소스/빌드는 /workspace/llama-runtime의 의존성 캐시이며 별도 제품 저장소가 아니다.
 GGUF 모델의 라이선스·출처·체크섬은 아직 검증하지 않았고 모델은 Git에 포함하지 않았다.
+
+## UI fonts
+
+Geist 1.8.2 (Geist npm package, SIL OFL) and NanumSquare (typeface-nanum-square 1.1.0, OFL-1.1) are self-hosted. Font files, copyright/license text and SHA-256 provenance are in viewer/src/assets/fonts. The npm tarball SHA-512 integrity was verified before extracting font files.

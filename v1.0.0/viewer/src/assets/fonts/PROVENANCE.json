@@ -1,0 +1,26 @@
+[
+  {
+    "file": "Geist.woff2",
+    "package": "geist",
+    "version": "1.8.2",
+    "license": "SIL OPEN FONT LICENSE",
+    "sha256": "206f01ed08e05c98a51daa7472331c3c71bbb8c1f9d55ea8c70074f3c528a706",
+    "source": "https://registry.npmjs.org/geist/-/geist-1.8.2.tgz"
+  },
+  {
+    "file": "NanumSquareR.woff2",
+    "package": "typeface-nanum-square",
+    "version": "1.1.0",
+    "license": "OFL-1.1",
+    "sha256": "c892d49dae1b9664faba4289688c3c046bf610e9cf3d7cbcb3d4b2d27b25e077",
+    "source": "https://registry.npmjs.org/typeface-nanum-square/-/typeface-nanum-square-1.1.0.tgz"
+  },
+  {
+    "file": "NanumSquareB.woff2",
+    "package": "typeface-nanum-square",
+    "version": "1.1.0",
+    "license": "OFL-1.1",
+    "sha256": "9dd2e4b7cf6c8eec828dfec4ae87f64fdc361de1b86733ea4c305855bc10cb61",
+    "source": "https://registry.npmjs.org/typeface-nanum-square/-/typeface-nanum-square-1.1.0.tgz"
+  }
+]

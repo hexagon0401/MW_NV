@@ -1,30 +1,19 @@
-import {Application,Container,Graphics} from 'pixi.js';
-import './style.css';
-import {visibleChunks} from './viewport.js';
-import {Timeline} from './timeline.js';
-import {hud} from './hud.js';
-const host=document.querySelector('#field');
-const app=new Application();await app.init({resizeTo:host,background:0x172c26,antialias:false});host.appendChild(app.canvas);
-const world=new Container();app.stage.addChild(world);world.scale.set(.6);world.position.set(20,20);
-const chunks=new Map();const colors=[0x314a32,0x6b6d57,0x213d2b,0x78817c,0x616b61,0x365d67,0x243f55,0x9b9069,0x616d39,0x566455];
-let data;try{const response=await fetch(new URLSearchParams(location.search).has('match')?'/api/matches/'+encodeURIComponent(new URLSearchParams(location.search).get('match'))+'/view':'./demo.json');if(!response.ok)throw Error();data=await response.json();}catch{data={width_m:1024,height_m:1024,units:[],terrain:[]};}
-const initialZoom=Math.min(host.clientWidth/(data.width_m*3),host.clientHeight/(data.height_m*3))*.95;world.scale.set(initialZoom);world.position.set((host.clientWidth-data.width_m*3*initialZoom)/2,(host.clientHeight-data.height_m*3*initialZoom)/2);
-for(let row=0;row<Math.ceil(data.height_m/128);row++)for(let col=0;col<Math.ceil(data.width_m/128);col++){
- const g=new Graphics();g.position.set(col*384,row*384);
- for(let ty=0;ty<32;ty++)for(let tx=0;tx<32;tx++){const tile=data.terrain[row*32+ty]?.[col*32+tx]??0;g.rect(tx*12,ty*12,12,12).fill(colors[tile]);}
- chunks.set(`${col},${row}`,g);world.addChild(g);
+import './style.css';import {Timeline} from './timeline.js';import {Battlefield} from './battlefield.js';import {renderHud,tooltip} from './ui.js';
+const $=id=>document.getElementById(id),host=$('field'),live=new URLSearchParams(location.search).get('mode')==='live';
+let scene,timeline,currentFrame,elapsed=0,paused=false,last=performance.now(),lastHud='',streamId,seq=-1,pointer=null;const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function connection(text){$('connection').textContent=text;}
+function showError(message){$('map-error').textContent=message;$('map-error').hidden=false;}
+function focus(unit){scene?.focus(unit);}
+async function initialize(data,frame){scene?.destroy();scene=await Battlefield.create(host,data);$('coordinates').textContent=`${data.width_m.toLocaleString()} × ${data.height_m.toLocaleString()} M`;currentFrame=frame;lastHud='';const first=data.events?.find(e=>e.event_kind==='UNIT_MOVED'),active=frame.units.find(u=>u.id===first?.payload.unit)??frame.units.find(u=>u.alive!==false&&u.carrier_id==null);if(active)scene.focus(active);else scene.camera.fit();$('map-error').hidden=true;}
+function paint(frame,time,signature){if(!scene)return;currentFrame=frame;scene.update(frame,time);if(lastHud!==signature){renderHud(frame,focus);lastHud=signature;}if(pointer)tooltip(scene.hit(pointer.x,pointer.y),pointer.x,pointer.y,host);}
+async function replay(){try{const match=new URLSearchParams(location.search).get('match'),response=await fetch(match?`/api/matches/${encodeURIComponent(match)}/view`:'./demo.json');if(!response.ok)throw Error('경기 기록을 읽을 수 없습니다.');const data=await response.json();timeline=new Timeline(data);$('seek').max=timeline.duration;await initialize(data,timeline.at(0));connection('완료 경기 / 기록 재생');}catch(e){showError(e.message);connection('기록 연결 실패');}}
+async function connectLive(){let initialization=Promise.resolve();$('mode').textContent='LIVE';$('mode').classList.add('live');$('replay-controls').hidden=true;$('playback-label').textContent='로컬 경기 / 실시간 전황';connection('로컬 경기 연결 중');const source=new EventSource('/api/live/events');
+ const accept=async data=>{if(data.stream_id!==streamId){streamId=data.stream_id;seq=-1;}if(data.seq<seq)return;seq=data.seq;currentFrame=data.frame;connection({running:'실시간 전황 수신',waiting_for_hq:'HQ 판단 중',ended:'경기 종료',stopped:'경기 중지',error:'경기 실행 오류'}[data.status]??data.status);if(scene)paint(currentFrame,currentFrame.tick/5,`${streamId}:${seq}`);};
+ source.addEventListener('snapshot',e=>{initialization=initialization.then(async()=>{const data=JSON.parse(e.data);await initialize(data,data.frame);await accept(data);}).catch(e=>showError(e.message));});source.addEventListener('state',e=>{initialization=initialization.then(()=>accept(JSON.parse(e.data)));});source.onerror=()=>{connection('연결 끊김 / 재연결 중');if(!scene)showError('로컬 진행 경기에 연결할 수 없습니다. 실시간 관전 서버를 실행하면 자동으로 다시 연결합니다.');};window.addEventListener('pagehide',()=>source.close(),{once:true});
 }
-const sprites=new Map();
-for(const u of data.units){const g=new Graphics();const size=u.size_px??[3,5];g.rect(-size[0]/2,-size[1]/2,...size).fill(u.team===0?0x6ec1ec:0xf28275);g.position.set(u.x_cm*.03,u.y_cm*.03);world.addChild(g);sprites.set(u.id,g);}
-let drag;host.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};host.setPointerCapture(e.pointerId);});host.addEventListener('pointerup',()=>drag=null);host.addEventListener('pointermove',e=>{if(!drag)return;world.x+=e.clientX-drag.x;world.y+=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};});
-host.addEventListener('wheel',e=>{e.preventDefault();const box=host.getBoundingClientRect(),x=e.clientX-box.left,y=e.clientY-box.top;const old=world.scale.x,next=Math.min(8,Math.max(.15,old*Math.exp(-e.deltaY*.001)));world.x=x-(x-world.x)*next/old;world.y=y-(y-world.y)*next/old;world.scale.set(next);},{passive:false});
-app.ticker.add(()=>{const visible=new Set(visibleChunks(world.x,world.y,world.scale.x,host.clientWidth,host.clientHeight,data.width_m).map(p=>p.join(',')));for(const [key,g] of chunks)g.visible=visible.has(key);});
-
-const timeline=data.initial?new Timeline(data):null;let elapsed=0,paused=false;
-document.querySelector('#pause').onclick=()=>{paused=!paused;document.querySelector('#pause').textContent=paused?'재생':'일시 정지';};
-app.ticker.add(ticker=>{if(!timeline)return;if(!paused)elapsed=Math.min(timeline.duration,elapsed+ticker.deltaMS/1000*Number(document.querySelector('#speed').value));const frame=timeline.at(elapsed);for(const u of frame.units){let g=sprites.get(u.id);if(!g){g=new Graphics().rect(-u.size_px[0]/2,-u.size_px[1]/2,...u.size_px).fill(u.team===0?0x6ec1ec:0xf28275);world.addChild(g);sprites.set(u.id,g);}if(g){g.position.set(u.x_cm*.03,u.y_cm*.03);g.visible=u.alive&&u.carrier_id===null;g.scale.set(Math.max(1,.75/world.scale.x));}}});
-
-const markers=new Map();for(const f of data.initial?.facilities??[]){const g=new Graphics().circle(0,0,f.kind==='OBJECTIVE'?30:12).stroke({width:2,color:0xc7d8b6});g.position.set(f.x_cm*.03,f.y_cm*.03);world.addChild(g);markers.set(f.id,g);}
-let lastHud=-1;app.ticker.add(()=>{if(!timeline)return;const f=timeline.at(elapsed);if(f.tick===lastHud)return;lastHud=f.tick;const state=hud(f);for(const id of ['scores','clock','objectives','orders'])document.getElementById(id).textContent=state[id];for(const objective of f.facilities){const marker=markers.get(objective.id);if(marker)marker.tint=objective.owner===null?0xe3dba6:objective.owner===0?0x6ec1ec:0xf28275;}});
-
-fetch('/api/matches').then(r=>{if(!r.ok)throw Error();return r.json();}).then(matches=>{const select=document.querySelector('#matches');for(const match of matches){const option=document.createElement('option');option.value=match.id;const summary=match.summary??match;option.textContent=`${match.id} · A ${summary.scores?.[0]??0}:${summary.scores?.[1]??0} B`;select.appendChild(option);}select.value=new URLSearchParams(location.search).get('match')??'';}).catch(()=>{});document.querySelector('#matches').onchange=e=>{const params=new URLSearchParams(location.search);if(e.target.value)params.set('match',e.target.value);else params.delete('match');location.search=params.toString();};
+$('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'일시 정지';};$('seek').oninput=e=>{elapsed=Number(e.target.value);lastHud='';};$('zoom-in').onclick=()=>scene?.camera.zoomAt(scene.camera.zoom*1.35);$('zoom-out').onclick=()=>scene?.camera.zoomAt(scene.camera.zoom/1.35);$('fit').onclick=()=>scene?.camera.fit();
+host.addEventListener('pointermove',e=>{const r=host.getBoundingClientRect();pointer={x:e.clientX-r.left,y:e.clientY-r.top};});host.addEventListener('pointerleave',()=>{pointer=null;tooltip(null);});
+for(const button of document.querySelectorAll('[data-panel]'))button.onclick=()=>{const side=button.dataset.panel,opening=!$(`team-${side}`).classList.contains('open');for(const id of ['a','b']){$(`team-${id}`).classList.toggle('open',id===side&&opening);document.querySelector(`[data-panel=${id}]`).setAttribute('aria-expanded',id===side&&opening);}tooltip(null);};
+function tick(now){const dt=Math.min((now-last)/1000,.25);last=now;if(!live&&timeline&&scene){if(!paused)elapsed=Math.min(timeline.duration,elapsed+dt*Number($('speed').value));const frame=timeline.at(elapsed);paint(frame,reducedMotion?0:elapsed,`${frame.tick}`);$('seek').value=elapsed;}else if(live&&scene&&currentFrame)scene.update(currentFrame,reducedMotion?0:currentFrame.tick/5);requestAnimationFrame(tick);}requestAnimationFrame(tick);
+if(live)connectLive();else replay();
+fetch('/api/matches').then(r=>{if(!r.ok)throw Error();return r.json();}).then(matches=>{for(const match of matches){const option=document.createElement('option'),summary=match.summary??match;option.value=match.id;option.textContent=`${match.id} · ${summary.scores?.[0]??0}:${summary.scores?.[1]??0}`;$('matches').append(option);}$('matches').value=new URLSearchParams(location.search).get('match')??'';}).catch(()=>{});$('matches').onchange=e=>{const params=new URLSearchParams();if(e.target.value)params.set('match',e.target.value);location.search=params.toString();};
