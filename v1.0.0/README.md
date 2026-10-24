@@ -71,3 +71,8 @@ viewer에서 npm run dev를 실행하고 '진행 경기'를 선택한다. 배포
 이 관리자용 LIVE 모드는 제공하지 않는다. 서버의 snapshot/SSE를 읽기만 하며
 병력 수·탑승·명령·교전 상태를 한 시점으로 갱신한다. 재생 조작은 리플레이에서만 표시한다.
 완료된 경기는 data/의 view/replay 파일로 기록된다. 오늘의 디자인 작업에서는 배포하지 않았다.
+
+## 최신 플레이 개선 / Mac 로컬 LLM
+
+[GAMEPLAY_UPDATE.md](GAMEPLAY_UPDATE.md): Mac Ollama 실행, 원거리 전투와 수송,
+28명 출시 분대, 반복 경기와 재개 가능한 PPO 학습 명령.

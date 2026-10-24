@@ -11,10 +11,12 @@ from .objectives import summary
 
 def frame(w):
     """Detached presentation snapshot. Reading it cannot alter world/checksum."""
-    units=[];attacks={}
+    units=[];attacks={};shots=[]
     for event in reversed(w.events):
         if event['sim_tick']<w.tick-10:break
-        if event['event_kind']=='ABSTRACT_ATTACK':attacks.setdefault(event['payload']['unit'],event['sim_tick']+11)
+        if event['event_kind']=='ABSTRACT_ATTACK':
+            attacks.setdefault(event['payload']['unit'],event['sim_tick']+11)
+            shots.append(dict(event['payload'],tick=event['sim_tick']))
     for collection in (w.soldiers,w.vehicles):
         for u in collection.values():
             soldier=u.id in w.soldiers
@@ -22,7 +24,7 @@ def frame(w):
             units.append(dict(id=u.id,team=int(u.team),type_id=u.type_id,x_cm=u.pos.x_cm,y_cm=u.pos.y_cm,
                 size_px=list(spec['size_px']),alive=getattr(u,'alive',True),carrier_id=getattr(u,'carrier_id',None),
                 task_state=u.task_state,activity='FIRING' if u.id in attacks and getattr(u,'alive',True) and getattr(u,'carrier_id',None) is None else None,activity_until_tick=attacks.get(u.id),squad_id=getattr(u,'squad_id',None),hp=getattr(u,'hp',None),
-                ammo=getattr(u,'ammo',None),fuel=getattr(u,'fuel',None)))
+                max_hp=spec.get('hp'),target_id=getattr(u,'target_id',None),range_m=(spec.get('attack') or {}).get('range_m'),ammo=getattr(u,'ammo',None),fuel=getattr(u,'fuel',None)))
     orders=[]
     if hasattr(w,'queue'):
         for team in Team:
@@ -30,7 +32,7 @@ def frame(w):
             for c in commands:
                 orders.append(dict(team=int(team),cmd_id=c.cmd_id,op=int(c.op),unit=c.unit,arg0=c.arg0,arg1=c.arg1,
                     target=c.target,accepted_tick=c.tick,status=w.queue.status[f'{int(team)}:{c.cmd_id}']))
-    return dict(presentation_version=2,tick=w.tick,units=units,squads=[asdict(s) for s in w.squads.values()],orders=orders,
+    return dict(presentation_version=2,shots=shots,tick=w.tick,units=units,squads=[asdict(s) for s in w.squads.values()],orders=orders,
         scores={int(t):s.score for t,s in w.teams.items()},facilities=[dict(id=f.id,kind=f.kind,
         x_cm=f.pos.x_cm,y_cm=f.pos.y_cm,owner=None if f.owner is None else int(f.owner),
         radius_cm=f.radius_cm,capturing=None if f.capturing is None else int(f.capturing),progress_ms=f.progress_ms)

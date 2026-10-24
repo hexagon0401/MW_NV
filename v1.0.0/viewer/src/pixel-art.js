@@ -1,10 +1,16 @@
 import {Texture,Rectangle} from 'pixi.js';import {TYPES} from './catalog.js';
-export const FIELD={ground:0xf1f2ec,grass:0xdfe8d7,road:0xcacfd5,forest:0x76966d,water:0xa9d9e7,building:0xb4b1c4,a:0x2f6fed,b:0xe27632,neutral:0xc39a35,ink:0x334155};
+export const FIELD={ground:0xcdd3c3,grass:0xbacbaa,road:0xcacfd5,forest:0x76966d,water:0xa9d9e7,building:0xb4b1c4,a:0x2f6fed,b:0xe27632,neutral:0xc39a35,ink:0x334155};
 export const TILE_COLORS=[FIELD.ground,FIELD.road,FIELD.forest,FIELD.ink,FIELD.building,FIELD.water,0x88bbc9,0xb3a286,FIELD.grass,0x98a49b];
 const colors={ink:'#334155',shadow:'#b5bdba',paper:'#f1f2ec',glass:'#9bc8d4',steel:'#8798a0',light:'#c5d2d7'};
 function rectangle(ctx,color,x,y,w,h){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
 function dotLine(ctx,color,x,y,dx,dy,length){for(let i=0;i<length;i++)rectangle(ctx,color,x+dx*i,y+dy*i,2,2);}
-function soldier(ctx,type,team,frame,w){const x=(w-12)/2,c=team===0?'#2f6fed':'#e27632',trim=team===0?'#95b4f2':'#edb18b',r=(color,a,b,ww,hh)=>rectangle(ctx,color,x+a,b,ww,hh);r(colors.shadow,2,18,9,2);const step=frame===1?2:frame===2?-2:0;r(colors.ink,3,13,2,5+step);r(colors.ink,7,13,2,5-step);r(colors.ink,2,6,8,9);r(c,3,7,6,7);r(colors.ink,0,8,2,6);r(trim,1,8,2,4);r(colors.ink,10,8,2,6);r(trim,9,9,2,4);r('#7b8b89',4,8,4,6);r(colors.ink,1,1,10,5);r(type==='ENG'?'#c9ab53':c,2,1,8,4);r(trim,3,1,5,1);r('#d6bb9a',4,5,4,2);r(colors.ink,4,5,1,1);r(c,3,11,6,2);if(type==='MED'){r(colors.paper,3,7,6,5);r('#5e895c',5,7,2,5);r('#5e895c',3,9,6,1);}if(type==='ENG'){r(colors.light,3,8,2,6);r(colors.light,2,9,4,2);}if(type==='REC'){r(colors.ink,3,7,2,2);r(colors.ink,7,7,2,2);}if(type==='SUP'){rectangle(ctx,colors.ink,0,8,3,8);rectangle(ctx,colors.ink,w-3,8,3,8);r('#b8a67c',4,7,4,5);}}
+function soldier(ctx,type,team,frame,w){const x=(w-12)/2,c=team===0?'#2f6fed':'#e27632',r=(color,a,b,ww,hh)=>rectangle(ctx,color,x+a,b,ww,hh);const step=frame===1?1:frame===2?-1:0;
+ // Top-down helmet, shoulder silhouette and long forward rifle: nose points up.
+ r('#334155',2,6,8,10);r(c,3,7,6,7);r('#334155',2,14,3,4+step);r('#334155',7,14,3,4-step);
+ r('#334155',1,3,10,6);r(c,2,3,8,5);r('#b7c9ae',3,6,6,2);r('#334155',8,0,2,12);r('#e2ce9c',7,9,3,2);
+ if(type==='MED'){r('#eee9d9',3,9,5,4);r('#657b52',5,9,1,4);r('#657b52',3,10,5,1);}
+ if(type==='SUP')r('#334155',10,0,2,14);if(type==='REC')r('#eee9d9',3,4,6,1);
+}
 function vehicle(ctx,type,team,frame,w,h){const c=team===0?'#2f6fed':'#e27632',trim=team===0?'#7e9ece':'#c58e6b',r=(color,x,y,ww,hh)=>rectangle(ctx,color,x,y,ww,hh);
  if(type==='HEL'){r(colors.shadow,10,44,80,18);r(colors.ink,12,39,70,18);r(colors.ink,8,43,80,10);r(trim,14,40,65,14);r(c,20,42,53,10);r(colors.paper,24,45,38,3);r(colors.glass,77,43,7,9);r(colors.ink,35,40,2,15);r(colors.ink,59,40,2,15);for(const cx of [23,73]){for(let y=-23;y<=23;y++)for(let x=-23;x<=23;x++)if(Math.abs(Math.hypot(x,y)-22)<.65)r('#b7c4c4',cx+x,48+y,1,1);if(frame===2){dotLine(ctx,colors.ink,cx-17,31,1,1,35);dotLine(ctx,colors.ink,cx-17,65,1,-1,35);}else{r(colors.ink,cx-22,47,45,2);r(colors.ink,cx-1,26,2,45);}r(colors.light,cx-2,46,5,5);r(colors.ink,cx,48,1,1);}return;}
  r(colors.shadow,4,h-6,w-8,5);for(const xx of [10,w-22]){r(colors.ink,xx,2,12,7);r(colors.ink,xx,h-9,12,7);r('#64737a',xx+2,3,8,2);r('#64737a',xx+2,h-7,8,2);}r(colors.ink,7,7,w-19,h-14);r(colors.ink,4,12,w-10,h-24);r(trim,8,8,w-21,h-16);r(c,12,10,w-29,h-20);r('#c2cdd0',8,h-10,w-20,2);r(colors.ink,w-13,11,6,h-22);r(colors.glass,w-14,13,5,h-26);r(colors.paper,w-7,12,2,4);r('#d3b86e',w-7,h-16,2,4);
@@ -17,7 +23,7 @@ export class PixelAtlas{
  destroy(){for(const texture of this.textures.values())texture.destroy(false);this.base.destroy(true);}
 }
 export function tileAtlas(){const canvas=document.createElement('canvas');canvas.width=48*10;canvas.height=48*4;const ctx=canvas.getContext('2d');for(let type=0;type<10;type++)for(let variant=0;variant<4;variant++){ctx.save();ctx.translate(type*48,variant*48);const r=(color,x,y,w,h)=>rectangle(ctx,color,x,y,w,h),hex='#'+TILE_COLORS[type].toString(16).padStart(6,'0');r(type===2?'#dfe8d7':hex,0,0,48,48);
- if(type===0||type===8){for(let i=0;i<7;i++){const x=(i*17+variant*11)%47,y=(i*13+variant*7)%47;r('#e2e6db',x,y,2,1);}if(variant===2)r('#e8ebe2',8,14,19,9);}
+ if(type===0||type===8){for(let i=0;i<7;i++){const x=(i*17+variant*11)%47,y=(i*13+variant*7)%47;r('#bdc6b2',x,y,2,1);}if(variant===2)r('#c7cebc',8,14,19,9);}
  if(type===1){r('#b9c1c8',0,0,48,3);r('#dbe0e3',0,45,48,3);r('#e9e9db',variant%2?25:3,23,15,2);}
  if(type===2){for(const [x,y] of [[8+variant%2*5,7],[25,23]]){r('#9aa58c',x+5,y+20,10,4);r('#8b7f70',x+8,y+15,3,8);r('#597955',x+2,y+6,17,12);r('#76966d',x,y+5,21,9);r('#8ca77f',x+4,y,13,15);r('#9bb38c',x+6,y+2,7,3);}}
  if(type===3||type===4){r('#a6a6b2',2,2,44,44);for(let yy=3;yy<46;yy+=10){r('#d3d2d8',2,yy,44,1);for(let xx=(yy%20?3:12);xx<46;xx+=16)r('#c5c4cd',xx,yy+1,1,9);}}
