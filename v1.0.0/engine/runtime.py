@@ -8,7 +8,7 @@ from .movement import move
 from .infantry import move_squad
 from .sensing import update_sensing, observation
 from .combat import update_combat
-from .transport import move_vehicle, embark, release_transfer_locks
+from .transport import move_vehicle, embark, unload, release_transfer_locks
 from .objectives import update_capture, update_score
 
 
@@ -67,6 +67,10 @@ class Engine:
 
     def _execute(self, key, c):
         w = self.world
+        if c.op==Op.DISEMBARK:
+            w.queue.status[key]="RUNNING"
+            if unload(w,key,c):w.queue.finish(w,key)
+            return
         if c.op==Op.EMBARK:
             w.queue.status[key]="RUNNING"
             if embark(w,key,c):w.queue.finish(w,key)

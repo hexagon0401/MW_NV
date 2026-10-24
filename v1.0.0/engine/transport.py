@@ -23,6 +23,8 @@ class FootprintTerrain(Terrain):
 
 def move_vehicle(w,key,v,destination):
     spec=w.vehicle_specs[v.type_id]
+    if v.type_id=='HEL':
+        return fly(w,key,v,destination)
     if v.fuel<=0:
         v.task_state='NO_FUEL';w.emit('VEHICLE_OUT_OF_FUEL',unit=v.id)
         raise OrderError('NO_FUEL')
@@ -106,3 +108,76 @@ def release_transfer_locks(w):
     for v in w.vehicles.values():
         if v.task_state=='WAITING_PASSENGERS' and not any(t['vehicle']==v.id and t['remaining'] and w.queue.status.get(k) in ('QUEUED','RUNNING') for k,t in getattr(w,'transfers',{}).items()):
             v.task_state='READY'
+
+
+def fly(w,key,v,destination):
+    if not hasattr(w,'flights'):w.flights={}
+    spec=w.vehicle_specs['HEL']
+    landing=FootprintTerrain(w.terrain,[1000,1000])
+    if key not in w.flights:
+        if not landing.passable(*destination) or not landing.passable(v.pos.x_cm,v.pos.y_cm):
+            raise OrderError('LANDING_INVALID')
+        if v.task_state in ('WAITING_PASSENGERS','UNLOADING'):
+            raise OrderError('ILLEGAL_STATE')
+        w.flights[key]=dict(stage='TAKEOFF',elapsed=0,x=float(v.pos.x_cm),y=float(v.pos.y_cm))
+    f=w.flights[key];v.task_state=f['stage']
+    if f['stage'] in ('TAKEOFF','LANDING'):
+        f['elapsed']+=200
+        if f['elapsed']>=4000:
+            if f['stage']=='LANDING':
+                if not landing.passable(v.pos.x_cm,v.pos.y_cm):raise OrderError('LANDING_INVALID')
+                v.task_state='ARRIVED';w.emit('UNIT_ARRIVED',unit=v.id)
+                return True
+            f['stage']='MOVING';f['elapsed']=0
+        return False
+    if v.fuel<=0:
+        w.emit('VEHICLE_OUT_OF_FUEL',unit=v.id);raise OrderError('NO_FUEL')
+    x,y=f['x'],f['y'];tx,ty=destination
+    distance=hypot(tx-x,ty-y)
+    amount=min(distance,spec['speed_mps']*20,v.fuel/spec['fuel_per_100m']*10000)
+    nx,ny=(tx,ty) if amount>=distance else (x+(tx-x)*amount/distance,y+(ty-y)*amount/distance)
+    if not w.terrain.inside(round(nx),round(ny)) or [round(nx)//400,round(ny)//400] in getattr(w.terrain,'no_fly',[]):
+        raise OrderError('NO_FLY')
+    v.pos=WorldPos(round(nx),round(ny));f['x'],f['y']=nx,ny
+    v.fuel=max(0,v.fuel-amount/10000*spec['fuel_per_100m'])
+    for id in v.passenger_ids:w.soldiers[id].pos=v.pos
+    w.emit('UNIT_MOVED',unit=v.id,x_cm=v.pos.x_cm,y_cm=v.pos.y_cm)
+    if amount>=distance:f['stage']='LANDING';f['elapsed']=0
+    return False
+
+
+def unload(w,key,c):
+    v=w.vehicles.get(c.unit)
+    if v is None or v.task_state in ('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS'):
+        raise OrderError('ILLEGAL_STATE')
+    if hypot(v.pos.x_cm-c.arg0*100,v.pos.y_cm-c.arg1*100)>400:
+        raise OrderError('INVALID_TARGET')
+    if not hasattr(w,'unloads'):w.unloads={}
+    if key not in w.unloads:
+        candidates=[]
+        for dx in range(-800,801,100):
+            for dy in range(-800,801,100):
+                if hypot(dx,dy)<=800:
+                    candidates.append((dx,dy))
+        candidates.sort(key=lambda p:(hypot(*p),p))
+        placements=[]
+        for dx,dy in candidates:
+            x,y=v.pos.x_cm+dx,v.pos.y_cm+dy
+            if not w.terrain.passable(x,y):continue
+            if any(abs(x-o.pos.x_cm)<w.vehicle_specs[o.type_id]['footprint_cm'][0]/2+50 and abs(y-o.pos.y_cm)<w.vehicle_specs[o.type_id]['footprint_cm'][1]/2+50 for o in w.vehicles.values()):continue
+            if any(s.alive and s.carrier_id is None and hypot(s.pos.x_cm-x,s.pos.y_cm-y)<100 for s in w.soldiers.values()):continue
+            placements.append((x,y))
+            if len(placements)>=len(v.passenger_ids):break
+        if len(placements)<len(v.passenger_ids):raise OrderError('NO_DISEMBARK_SPACE')
+        w.unloads[key]=dict(ids=list(v.passenger_ids),positions=placements,elapsed=0)
+    t=w.unloads[key];v.task_state='UNLOADING';t['elapsed']+=200
+    while t['ids'] and t['elapsed']>=500:
+        x,y=t['positions'][0]
+        if not w.terrain.passable(x,y) or any(s.alive and s.carrier_id is None and hypot(s.pos.x_cm-x,s.pos.y_cm-y)<84 for s in w.soldiers.values()):
+            raise OrderError('NO_DISEMBARK_SPACE')
+        t['elapsed']-=500;id=t['ids'].pop(0);t['positions'].pop(0)
+        s=w.soldiers[id];s.pos=WorldPos(x,y);s.carrier_id=None;s.task_state='IDLE'
+        v.passenger_ids.remove(id);w.emit('DISEMBARK_DONE',unit=id,vehicle=v.id)
+    if not t['ids']:
+        v.task_state='IDLE';return True
+    return False
