@@ -6,6 +6,7 @@ from .types import Op
 from .movement import move
 from .infantry import move_squad
 from .sensing import update_sensing, observation
+from .combat import update_combat
 
 
 class Engine:
@@ -49,6 +50,7 @@ class Engine:
 
         if (w.tick+1) % 5 == 0:
             update_sensing(w)
+        update_combat(w)
 
     def observe(self,team):
         return observation(self.world,team)
