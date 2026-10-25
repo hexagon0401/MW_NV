@@ -1,5 +1,5 @@
 /** Native pixel clusters, a fixed five-tone ramp and ordered dithering. No gradients. */
-const INK='#2f4038',DARK='#50634d',MID='#7d9267',LIGHT='#aab58a',SUN='#d1cf9f';
+const INK='#2f4038',DARK='#506559',MID='#7d9075',LIGHT='#a9b69a',SUN='#d1d0ad';
 function rect(c,color,x,y,w,h){c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
 function poly(c,points,color){ // rasterize scanlines: no anti-aliased Canvas paths
  const min=Math.floor(Math.min(...points.map(p=>p[1]))),max=Math.ceil(Math.max(...points.map(p=>p[1])));c.fillStyle=color;
@@ -16,6 +16,10 @@ export function pixelUnit(c,type,team,frame,w,h){const r=(color,x,y,ww,hh)=>rect
  if(truck){r(INK,front-5,5,9,h-10);r(MID,front-4,6,7,h-12);r('#83a6aa',front,7,3,h-14);r('#bbd0be',front,7,1,h-14);r(INK,6,6,w-23,h-12);r('#a49b72',7,7,w-25,h-14);dither(c,8,h-12,w-27,3,'#a49b72','#7c805d');for(let x=10;x<w-20;x+=7)r('#ccc199',x,7,1,h-14);if(type==='TRK')for(let x=9;x<w-20;x+=7){r(DARK,x,9,5,h-18);r(LIGHT,x,9,5,1);}}
  else if(type==='LUV'){r(INK,10,5,12,h-10);r('#809f9f',12,6,3,h-12);r(DARK,16,6,5,h-12);r(LIGHT,17,7,3,h-14);r(DARK,w-12,6,5,h-12);}
  else {r(DARK,9,7,11,h-14);r(LIGHT,10,7,9,1);for(let x=w-19;x<w-9;x+=3)r(INK,x,7,1,h-14);if(type==='SPH'&&frame===2)for(const x of [5,w-10]){r(INK,x,0,5,3);r(INK,x,h-3,5,3);}}
+ if(type==='MBT'){for(let xx=7;xx<18;xx+=3){r(INK,xx,8,1,h-16);r(LIGHT,xx+1,8,1,h-16);}r(LIGHT,w-13,6,6,1);r(DARK,w-8,9,2,h-18);}
+ if(type==='IFV'){r(INK,8,8,6,6);r(LIGHT,9,8,4,1);r(DARK,w-14,h/2-3,5,6);}
+ if(type==='SPH'){r(INK,7,8,8,8);r(LIGHT,8,8,5,1);}
+ if(type==='TRK')for(let xx=9;xx<w-23;xx+=8){r('#647868',xx,9,6,h-18);r('#bbb99a',xx,9,6,1);}
  r(stripe,w-17,h/2-2,6,4);r(SUN,w-5,6,1,2);
 }
 export function pixelTurret(c,type,team,w,h){const r=(color,x,y,ww,hh)=>rect(c,color,x,y,ww,hh),x=type==='SPH'?11:type==='IFV'?20:16,y=type==='SPH'?5:8,ww=type==='SPH'?18:type==='IFV'?12:20,hh=type==='SPH'?20:14;

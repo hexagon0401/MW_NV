@@ -16,9 +16,10 @@ export function combatRegions(frame){
  for(const s of [...(frame.shots??[]),...(frame.impacts??[])]){if(frame.tick-s.tick>15||frame.tick<s.tick)continue;const p=s.destination??s;if(p.x_cm==null)continue;const key=`${Math.floor(p.x_cm/8000)}:${Math.floor(p.y_cm/8000)}`;const prev=cells.get(key);if(!prev||prev.tick<s.tick)cells.set(key,{...p,tick:s.tick,id:key});}
  return [...cells.values()].sort((a,b)=>b.tick-a.tick||a.id.localeCompare(b.id)).slice(0,6);
 }
+const shortMaps=new WeakMap();
 export function shortId(frame,u){
  if(u.is_group)return String(u.name??'').replace(' 분대','');
  const codes={HEL:'H',MBT:'T',SPH:'G',IFV:'I',APC:'P',TRK:'S',LUV:'L'};
- const n=frame.units.filter(v=>v.team===u.team&&v.type_id===u.type_id).sort((a,b)=>a.id-b.id).findIndex(v=>v.id===u.id)+1;
+ if(!shortMaps.has(frame)){const map=new Map(),counts=new Map();for(const v of [...frame.units].sort((a,b)=>a.id-b.id)){const key=v.team+':'+v.type_id,n=(counts.get(key)??0)+1;counts.set(key,n);map.set(v.id,n);}shortMaps.set(frame,map);}const n=shortMaps.get(frame).get(u.id)??1;
  return `${u.team===0?'A':'B'}-${codes[u.type_id]??'F'}${n}`;
 }

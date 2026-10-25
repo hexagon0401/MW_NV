@@ -19,7 +19,7 @@ export class TacticalOverlay{
  const grouped=groupedSquads(frame,z,this.far);this.far=grouped.far;this.groups=grouped.groups;this.hidden=new Set(this.groups.flatMap(g=>g.members));
  for(const u of frame.units){const a=s.sprites.get(u.id);if(!a)continue;const infantry=typeOf(u).kind==='infantry';a.health.clear();
  if(infantry){a.sprite.visible=false;a.shadow.visible=false;a.marker.visible=false;a.badge.visible=false;}
- if(u.alive===false||u.carrier_id!=null||this.hidden.has(u.id))continue;
+ if(u.alive===false||u.carrier_id!=null||this.hidden.has(u.id)||z<.65)continue;
  const x=u.x_cm*.12,y=u.y_cm*.12,team=TEAM[u.team],g=this.node(u.id);g.position.set(x,y);g.scale.set(1/z);
  if(infantry){const r=Math.max(6,Math.min(12,6*z));g.circle(0,0,r).fill(team).stroke({width:1,color:0x243447});if(u.team===1)g.moveTo(-r,0).lineTo(r,0).stroke({width:1,color:0xf1f2ec,alpha:.5});const h=a.heading;g.moveTo(Math.cos(h)*r,Math.sin(h)*r).lineTo(Math.cos(h+.55)*(r-3),Math.sin(h+.55)*(r-3)).lineTo(Math.cos(h-.55)*(r-3),Math.sin(h-.55)*(r-3)).closePath().fill(0xfff4c1);g.circle(-Math.cos(h)*3,-Math.sin(h)*3,2).fill(0x243447);
  if(z>=1.2||s.hovered?.id===u.id)this.label(`role:${u.id}`,u.type_id,x,y+18/z,z);
@@ -31,7 +31,7 @@ export class TacticalOverlay{
  const semantic=[...this.groups.map(g=>({...g,type_id:'INF',name:entityName(frame,Number(g.id.split(':')[1])),priority:1})),...frame.units.filter(u=>u.alive!==false&&u.carrier_id==null&&(typeOf(u).kind==='vehicle'||z<.3&&!this.hidden.has(u.id))).map(u=>({...u,priority:u.type_id==='HEL'?3:2}))].map(u=>({...u,short:shortId(frame,u),selected:s.selected===u.id||s.selected===Number(String(u.id).split(':')[1]),priority:(s.selected===u.id?20:u.priority)}));
  this.badges=z<.65?placeBadges(semantic,s.camera,s.host.clientWidth,s.host.clientHeight):[];
  for(const b of this.badges){const x=(b.ax-s.camera.x)/z,y=(b.ay-s.camera.y)/z,g=this.node(`badge:${b.id}`);g.position.set(x,y);g.scale.set(1/z);const color=TEAM[b.team];g.roundRect(-11,-11,22,22,3).fill({color:0x22342e,alpha:.94}).stroke({width:b.selected?2:1.5,color:b.selected?0xfff2bc:color});drawSymbol(g,b.type_id,color);if(b.is_cluster)g.circle(8,-8,4).fill(0xe8dfc9);
- if(b.showLabel){const t=this.label(`badge-title:${b.id}`,b.label,x+(17+b.label.length*3)/z,y,z);t.style.fontSize=10;t.style.fill=0xf2efdf;t.style.stroke={color:0x25372e,width:3};}
+ if(b.showLabel){const t=this.label(`badge-title:${b.id}`,b.label,x+(17+b.label.length*3)/z,y,z);if(!t.iconLabel){t.style.fontSize=10;t.style.fill=0xf2efdf;t.style.stroke={color:0x25372e,width:3};t.iconLabel=true;}}
  }
  this.combats=combatRegions(frame);
  for(const p of this.combats){const x=p.x_cm*.12,y=p.y_cm*.12,g=this.node(`combat:${p.id}`);g.position.set(x,y);g.scale.set(1/z);g.poly([0,-7,6,5,-6,5]).fill(0xb5483d).stroke({width:1,color:0xffe5c2});}

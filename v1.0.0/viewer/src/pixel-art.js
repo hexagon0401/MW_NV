@@ -1,6 +1,6 @@
 import {illustratedFacility} from './illustrated-units.js';import {pixelUnit,pixelTurret} from './tactical-pixels.js';
 import {Texture,Rectangle} from 'pixi.js';import {TYPES} from './catalog.js';
-export const FIELD={ground:0xaeb99a,grass:0x96aa82,road:0x9ca8a5,forest:0x657f57,water:0x82afb4,building:0xa6b2a6,a:0x2f6fed,b:0xe27632,neutral:0xc39a35,ink:0x334155};
+export const FIELD={ground:0xb9c4a3,grass:0xaebb9a,road:0x8d9791,forest:0x708c5d,water:0x739f9f,building:0x93968a,a:0x2f6fed,b:0xe27632,neutral:0xc39a35,ink:0x334155};
 export const TILE_COLORS=[FIELD.ground,FIELD.road,FIELD.forest,FIELD.ink,FIELD.building,FIELD.water,0x88bbc9,0xb3a286,FIELD.grass,0x98a49b];
 const colors={ink:'#334155',shadow:'#b5bdba',paper:'#f1f2ec',glass:'#9bc8d4',steel:'#8798a0',light:'#c5d2d7'};
 function rectangle(ctx,color,x,y,w,h){ctx.fillStyle=color;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
