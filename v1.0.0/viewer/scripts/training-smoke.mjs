@@ -9,9 +9,9 @@ try{
  await page.waitForFunction(()=>document.querySelector('#training-text')?.textContent.includes('PPO'),{timeout:30000});
  assert.equal(await page.locator('#speed').inputValue(),'1');
  assert.ok((await page.locator('#field').boundingBox()).height>100);
- await page.screenshot({path:'../docs/training-enhancement/desktop.png'});
+ await page.screenshot({path:(process.env.ARTIFACT_DIR??'../docs/training-enhancement/')+'desktop.png'});
  await page.setViewportSize({width:390,height:844});
  assert.ok((await page.locator('#field').boundingBox()).height>100);
- await page.screenshot({path:'../docs/training-enhancement/mobile.png'});
+ await page.screenshot({path:(process.env.ARTIFACT_DIR??'../docs/training-enhancement/')+'mobile.png'});
  console.log('Training banner, default1x and responsive viewport PASS');
 }finally{await browser.close();}

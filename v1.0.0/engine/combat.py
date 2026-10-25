@@ -105,7 +105,7 @@ def update_combat(w):
         damage=min(target.hp,amount);u.ammo-=1;u.cooldown_ms=attack['interval_ms']
         if u.id in w.vehicles:u.turret_heading=atan2(target.pos.y_cm-u.pos.y_cm,target.pos.x_cm-u.pos.x_cm)
         damage_unit(w,target,damage,u.id)
-        w.emit('ABSTRACT_ATTACK',unit=u.id,target=target.id,damage=damage,hit=hit,weapon=spec(w,u)['weapon'],range_m=attack['range_m'],distance_m=round(hypot(target.pos.x_cm-u.pos.x_cm,target.pos.y_cm-u.pos.y_cm)/100,2),hit_probability=chance,target_hp=target.hp)
+        w.emit('ABSTRACT_ATTACK',unit=u.id,target=target.id,damage=damage,hit=hit,weapon=spec(w,u)['weapon'],origin=dict(x_cm=u.pos.x_cm,y_cm=u.pos.y_cm),destination=dict(x_cm=target.pos.x_cm,y_cm=target.pos.y_cm),range_m=attack['range_m'],distance_m=round(hypot(target.pos.x_cm-u.pos.x_cm,target.pos.y_cm-u.pos.y_cm)/100,2),hit_probability=chance,target_hp=target.hp)
     remaining=[]
     for shot in w.projectiles:
         if w.tick<shot['impact_tick']:remaining.append(shot);continue
