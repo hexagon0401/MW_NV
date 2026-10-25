@@ -29,7 +29,7 @@
 
 ## 검증
 
-- 전체 Python136개 통과(경고1개). 마지막 변경 뒤 관련19개 재검사 통과. JavaScript17개 및 production/Functions build 통과.
+- 전체 Python136개 통과(경고1개). 마지막 변경 뒤 관련21개 및 복구8개 재검사 통과. JavaScript18개 및 production/Functions build 통과.
 - NIM 양팀 실제 요청으로8개 교사 선택 표본 수집, actor 모방 업데이트 발생을 확인했다. 실패/429 양쪽 폐기, 관측 격리, 마스크, value head 미갱신, cooldown 저장을 검사한다.
 - 실제 checkpoint를 다른 프로세스에서 이어 학습하여6208→6272 정책 스텝 증가를 확인했다. Gym Monitor 상태도 복구해 env reset 없이 재개한다. 파일 손상/잘못된 SHA/백업 실패 보존을 검사했다.
 - 원형 보병·hover 해제·본진 버튼·분대 축약을 Chromium으로 검사했다. circles-hover.png/headquarters.png/squad-overview.png 및 READABILITY.md 참조.
@@ -47,3 +47,5 @@ MPLCONFIGDIR=/workspace/.cache/mpl XDG_CACHE_HOME=/workspace/.cache \
 ```
 
 로그 data/self-play-v2/runner.log. 환경 종료 시 프로세스가 멈출 수 있다. Publish 후에도 자동으로 실행이 유지된다고 가정하지 않고 재개 지침을 따른다. 환경 시작 지침도 이 경로로 저장했다. 사용량/전략 개선은 확인하지 못했으면 UNKNOWN이다.
+
+최종 검증에서 Supabase 비공개 A.json/B.json의200 응답, 공개 학습 상태200, 배포 HTML과 로컬 빌드 일치를 확인했다. 재시작 후 배속은 복구 전 누적 시간을 제외한 현재 프로세스 시뮬레이션 증가량으로 계산한다. 신규 스폰 차량의 탑승 게이지도 별도 검사했다.

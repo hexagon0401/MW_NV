@@ -9,7 +9,7 @@ Teacher: paired everyHQ; anonymized IDs/SELF coords; 10k buffer; PPO64 + imitati
 Resume: atomic current.json generations2; environment/Monitor/RNG/optimizer/ledger restored
 Backup: 10 completed games -> Release latest; 2 local bundles +8 opponents; metadata branch
 BLOCKER: uploads.github.com POST Forbidden; domain/startup draft saved, user Save/Publish needed
-Verified: Python136; targeted19; JS17; builds; Chromium circle/hover/HQ/overview/mobile
-Actual: 4 completed,189 paired labels,12 imitation updates; resume6208->6272 verified
+Verified: Python136; targeted21+recovery8; JS18; builds; Chromium circle/hover/HQ/overview/mobile
+Actual: paired teacher + actor updates; A/B private200; resume6208->6272 verified
 Next: continue learning; apply egress draft and verify actual Release upload/download SHA
 Limits: no strategy improvement claim; 50-game evaluations pending; environment may stop; usage UNKNOWN

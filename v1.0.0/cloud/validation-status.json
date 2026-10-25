@@ -13,7 +13,7 @@
   "supabase_matches": 2,
   "deployed": true,
   "site_url": "https://mw-nv.pages.dev",
-  "deployment_url": "https://22caad51.mw-nv.pages.dev",
+  "deployment_url": "https://1eccc744.mw-nv.pages.dev",
   "deployment_stage": "success",
   "public_site_http": 200,
   "production_supabase_secret_present": true,
@@ -70,5 +70,18 @@
     "baseline_transfer_wins": 0,
     "baseline_transfer_games": 2,
     "promotion": false
+  },
+  "self_play_v2": {
+    "root": "data/self-play-v2",
+    "public_training_http": 200,
+    "private_role_metadata_http": 200,
+    "teacher": "paired each HQ",
+    "imitation": "actor only, .05, 32 samples,64 PPO steps",
+    "backup": "uploads.github.com Forbidden; draft saved",
+    "python_full": 136,
+    "python_targeted": 21,
+    "js_tests": 18,
+    "rollout_resume": "6208 -> 6272",
+    "strategy_improvement": "UNKNOWN"
   }
 }

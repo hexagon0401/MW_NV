@@ -49,6 +49,9 @@ def test_environment_checkpoint_and_role_side_balance(tmp_path):
     snapshot=env.snapshot();other=SelfPlayEnv(tmp_path,b);other.restore(snapshot)
     assert other.parallel.engine.world.checksum()==env.parallel.engine.world.checksum()
     assert np.array_equal(other.parallel.vector(other.controlled),env.parallel.vector(env.controlled))
+    from engine.replay import encode,decode
+    wrong=decode(env.snapshot());wrong['world'].rules_version='incompatible'
+    with pytest.raises(ValueError):other.restore(encode(wrong))
     checkpoint(tmp_path,model,env,b,dict(generation=1,completed_games=0));assert (current(tmp_path)/'latest.zip').is_file()
     from learning.backup import pack,restore
     archive,digest=pack(tmp_path,1);dest=tmp_path/'restore';restore(archive,dest,digest);assert (dest/'environment.json').is_file()
@@ -81,3 +84,15 @@ def test_retry_after_skips_both_teams():
     def limited(p):raise HTTPError('https://fixture',429,'rate limited',{'Retry-After':'120'},None)
     c=LocalHQ(transport=limited);e=CandidateEnv();e.reset(0);b=TeacherBuffer();b.collect(e,[c,c]);assert not b.rows
     requests=b.stats['requests'];b.collect(e,[c,c]);assert b.stats['requests']==requests and b.stats['skipped']==2
+
+def test_backup_pack_marks_remote_progress_without_marking_local_success(tmp_path):
+    from learning.backup import pack,restore
+    (tmp_path/'state.json').write_text('{"completed_games":10,"last_backup_games":0}')
+    archive,digest=pack(tmp_path,1);restore(archive,tmp_path/'restored',digest)
+    assert json.loads((tmp_path/'state.json').read_text())['last_backup_games']==0
+    assert json.loads((tmp_path/'restored'/'state.json').read_text())['last_backup_games']==10
+    assert not list((tmp_path/'backups').glob('*.partial'))
+
+def test_terminal_round_does_not_request_teacher_labels():
+    e=CandidateEnv();e.reset(0);calls=[];e.teacher_hook=lambda env:calls.append(True)
+    e.engine.world.ended=True;e._round();assert not calls

@@ -23,7 +23,7 @@ class CandidateEnv(ParallelEnv):
     def raw(self,a):return self.engine.observe(self.possible_agents.index(a))
     def _round(self):
         self.items={a:candidates(self.raw(a)) for a in self.possible_agents};self.selected={a:[] for a in self.possible_agents};self.finished={a:False for a in self.possible_agents};self.reserved_supply={a:0 for a in self.possible_agents}
-        if hasattr(self,'teacher_hook'):self.teacher_hook(self)
+        if hasattr(self,'teacher_hook') and not getattr(self.engine.world,'ended',False):self.teacher_hook(self)
     def vector(self,a):
         values=vector(self.raw(a),compatible(self.items[a],self.selected[a]));values[16]=len(self.selected[a])/4;values[17]=sum(c.get('supply_cost',0) for c in self.selected[a])/2000;return values
     def observations(self):return {a:self.vector(a) for a in self.agents}

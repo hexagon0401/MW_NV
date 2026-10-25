@@ -9,3 +9,7 @@ test('group LOD hysteresis excludes mounted troops',()=>{
  const frame={squads:[{id:1,team:0,member_ids:[1,2,3]}],units:[{id:1,alive:true,x_cm:0,y_cm:0},{id:2,alive:true,x_cm:10000,y_cm:10000},{id:3,alive:true,carrier_id:99,x_cm:0,y_cm:0}]};
  assert.equal(groupedSquads(frame,.3).groups[0].count,2);assert.equal(groupedSquads(frame,.33,true).far,true);assert.equal(groupedSquads(frame,.36,true).far,false);
 });
+test('newly spawned carrier gains a working passenger gauge',()=>{
+ const t=new Timeline({initial:{tick:0,units:[{id:1,alive:true,carrier_id:null,x_cm:0,y_cm:0}],facilities:[]},final:{tick:10},events:[{event_kind:'UNIT_SPAWNED',sim_tick:0,payload:{unit:2,entity:{id:2,alive:true,passenger_ids:[],x_cm:0,y_cm:0}}},{event_kind:'EMBARK_DONE',sim_tick:1,payload:{unit:1,vehicle:2}}]});
+ assert.equal(t.at(.4).units.find(u=>u.id===2).passenger_count,1);assert.equal(t.at(.2).units.find(u=>u.id===2).passenger_count,0);
+});

@@ -29,7 +29,10 @@ class SelfPlayEnv(TrainingEnv):
         p=self.parallel
         return encode(dict(world=p.engine.world,agents=p.agents,items=p.items,selected=p.selected,finished=p.finished,reserved_supply=p.reserved_supply,initial_costs=p.initial_costs,controlled=self.controlled,other=self.other,episode=self.episode,completed_games=self.completed_games,games=self.games,sim_seconds=self.sim_seconds,run_id=self.run_id,initial_frame=self.initial_frame,match_id=self.match_id,opponent_weights=None if self.opponent is None else {k:v.tolist() for k,v in self.opponent.weights.items()},opponent_id=None if self.opponent is None else self.opponent.policy_id))
     def restore(self,document):
-        d=decode(document);p=self.parallel;p.engine=Engine(d.pop('world'))
+        d=decode(document);world=d.pop('world')
+        from engine.version import RULES_VERSION,CATALOG_VERSION
+        if world.rules_version!=RULES_VERSION or world.catalog_version!=CATALOG_VERSION:raise ValueError('incompatible recovery rules/catalog')
+        p=self.parallel;p.engine=Engine(world)
         for k in ('agents','items','selected','finished','reserved_supply','initial_costs'):setattr(p,k,d.pop(k))
         weights=d.pop('opponent_weights');identity=d.pop('opponent_id');self.opponent=None
         if weights:
@@ -101,17 +104,24 @@ def run(root,seed_policy,updates=0,teacher_enabled=True,publish=True):
         with sqlite3.connect('data/results.sqlite') as conn:
             try:env.completed_games=max(env.completed_games,conn.execute("SELECT count(*) FROM records WHERE kind='match' AND id LIKE ?",(env.run_id+'-%',)).fetchone()[0])
             except sqlite3.OperationalError:pass
-    model.teacher_buffer=teacher;report=Reporter(root,state['generation'],model.num_timesteps);start_steps=model.num_timesteps;finished=0
+    import subprocess
+    from engine.version import RULES_VERSION,CATALOG_VERSION
+    state.update(rules_version=RULES_VERSION,catalog_version=CATALOG_VERSION,policy_contract='tactics-1',code_commit=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip())
+    model.teacher_buffer=teacher;report=Reporter(root,state['generation'],model.num_timesteps);start_steps=model.num_timesteps;started_sim=env.sim_seconds;finished=0
     class Progress(BaseCallback):
         def _on_step(self):
-            report(dict(phase='learning',policy_steps=self.num_timesteps,sim_seconds=env.sim_seconds,games=env.completed_games,nim_in_training=teacher_enabled,teacher=dict(teacher.stats),backup=state.get('backup','pending'),map_family=getattr(env.parallel.engine.world,'training_map_family','custom')))
+            report(dict(phase='learning',policy_steps=self.num_timesteps,sim_seconds=env.sim_seconds-started_sim,games=env.completed_games,nim_in_training=teacher_enabled,teacher=dict(teacher.stats),backup=state.get('backup','pending'),map_family=getattr(env.parallel.engine.world,'training_map_family','custom')))
             return True
     try:
         while updates==0 or finished<updates:
-            report.round=state['generation'];report(dict(phase='learning',nim_in_training=teacher_enabled),force=True)
+            report.round=state['generation'];report(dict(phase='learning',nim_in_training=teacher_enabled,policy_steps=model.num_timesteps,sim_seconds=env.sim_seconds-started_sim,games=env.completed_games,teacher=dict(teacher.stats),backup=state.get('backup','pending')),force=True)
+            before_steps=model.num_timesteps
             model.learn(total_timesteps=64,reset_num_timesteps=False,callback=Progress())
             state.update(generation=state['generation']+1,completed_games=env.completed_games,policy_steps=model.num_timesteps)
             report.base_steps=model.num_timesteps
+            from .results import record_training
+            identity=root/'identity.npz';export(model,identity);policy_id=CandidatePolicy(identity).policy_id;identity.unlink()
+            record_training('data/results.sqlite',policy_id,model.num_timesteps-before_steps,env.opponent.policy_id if env.opponent else 'algorithm',run_id=f'{env.run_id}-update-{state["generation"]}-{policy_id}',training_run=env.run_id)
             checkpoint(root,model,env,teacher,state)
             # Frozen opponent snapshots are bounded and never modified during an episode.
             if state['generation']%4==0:
@@ -121,7 +131,7 @@ def run(root,seed_policy,updates=0,teacher_enabled=True,publish=True):
             if publish and backup_due(env.completed_games,state['last_backup_games']):
                 try:
                     from .backup import publish as backup
-                    previous_backup=state['last_backup_games'];state['last_backup_games']=env.completed_games;checkpoint(root,model,env,teacher,state);backup(root,state['generation']);state['backup']='verified'
+                    previous_backup=state['last_backup_games'];backup(root,state['generation']);state['last_backup_games']=env.completed_games;state['backup']='verified';checkpoint(root,model,env,teacher,state)
                 except Exception as exc:
                     state['last_backup_games']=previous_backup;state['backup']='deferred:'+type(exc).__name__;checkpoint(root,model,env,teacher,state)
             if env.completed_games-state['last_evaluation_games']>=50:

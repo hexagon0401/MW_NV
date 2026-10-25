@@ -1,5 +1,5 @@
 """Verified replaceable Release backup, separate metadata branch, no binary Git history."""
-import hashlib,json,subprocess,tarfile,tempfile,shutil
+import hashlib,json,subprocess,tarfile,tempfile,shutil,io
 from pathlib import Path
 REPO='hexagon0401/MW_NV'
 
@@ -14,11 +14,16 @@ def pack(root,generation):
     if archive.exists():return archive,hashlib.sha256(archive.read_bytes()).hexdigest()
     saved=root/json.loads((root/'current.json').read_text())['path'] if (root/'current.json').exists() else root
     files=['latest.zip','latest.npz','teacher.npz','environment.json','monitor.json','results.sqlite','rng.json','state.json','A.json','B.json','champion.npz','opponents.json']
-    with tarfile.open(archive,'w:gz') as tar:
+    temporary=archive.with_suffix('.partial')
+    with tarfile.open(temporary,'w:gz') as tar:
         for name in files:
             path=(saved/name) if (saved/name).is_file() else root/name
-            if path.is_file():tar.add(path,arcname=name)
+            if path.is_file():
+                if name=='state.json':
+                    data=json.loads(path.read_text());data['last_backup_games']=data['completed_games'];body=json.dumps(data).encode();info=tarfile.TarInfo(name);info.size=len(body);tar.addfile(info,io.BytesIO(body))
+                else:tar.add(path,arcname=name)
         for path in sorted((root/'opponents').glob('*.npz')):tar.add(path,arcname='opponents/'+path.name)
+    temporary.replace(archive)
     verified=None
     if (root/'backup-status.json').exists():
         try:verified=json.loads((root/'backup-status.json').read_text()).get('asset')
