@@ -46,11 +46,11 @@ def record_training(db,policy,steps,opponent='algorithm',run_id=None,training_ru
     return insert(db,dict(kind='training',id=run_id or uuid.uuid4().hex,rules_version=RULES_VERSION,policies={'A':policy,'B':opponent},steps=int(steps),training_run=training_run))
 
 
-def records(db):
+def records(db,kind=None):
     path=Path(db)
     if not path.exists():return []
     with sqlite3.connect(path.resolve().as_uri()+'?mode=ro',uri=True) as conn:
-        return [json.loads(row[0]) for row in conn.execute('SELECT payload FROM records ORDER BY id')]
+        return [json.loads(row[0]) for row in conn.execute('SELECT payload FROM records WHERE (? IS NULL OR kind=?) ORDER BY id',(kind,kind))]
 
 
 def aggregate(db):

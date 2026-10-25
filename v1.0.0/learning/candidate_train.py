@@ -26,6 +26,7 @@ class TrainingEnv(gym.Env):
     def step(self,action):
         e=self.parallel;other=self.opponent.predict(e.vector(self.other),e.mask(self.other)) if self.opponent else e.heuristic(self.other)
         before=e.engine.world.tick
+        e.decision_sources={self.controlled:'PPO 지휘',self.other:'과거 정책' if self.opponent else '규칙 지휘'}
         obs,rewards,done,trunc,infos=e.step({self.controlled:int(action),self.other:other})
         self.sim_seconds+=(e.engine.world.tick-before)*.2
         if done[self.controlled]:self.games+=1

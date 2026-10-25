@@ -27,12 +27,12 @@ class SelfPlayEnv(TrainingEnv):
         return result
     def snapshot(self):
         p=self.parallel
-        return encode(dict(world=p.engine.world,agents=p.agents,items=p.items,selected=p.selected,finished=p.finished,reserved_supply=p.reserved_supply,initial_costs=p.initial_costs,controlled=self.controlled,other=self.other,episode=self.episode,completed_games=self.completed_games,games=self.games,sim_seconds=self.sim_seconds,run_id=self.run_id,initial_frame=self.initial_frame,match_id=self.match_id,opponent_weights=None if self.opponent is None else {k:v.tolist() for k,v in self.opponent.weights.items()},opponent_id=None if self.opponent is None else self.opponent.policy_id))
+        return encode(dict(world=p.engine.world,presentation_events=p.engine.presentation_events,agents=p.agents,items=p.items,selected=p.selected,finished=p.finished,reserved_supply=p.reserved_supply,initial_costs=p.initial_costs,controlled=self.controlled,other=self.other,episode=self.episode,completed_games=self.completed_games,games=self.games,sim_seconds=self.sim_seconds,run_id=self.run_id,initial_frame=self.initial_frame,match_id=self.match_id,opponent_weights=None if self.opponent is None else {k:v.tolist() for k,v in self.opponent.weights.items()},opponent_id=None if self.opponent is None else self.opponent.policy_id))
     def restore(self,document):
         d=decode(document);world=d.pop('world')
         from engine.version import RULES_VERSION,CATALOG_VERSION
         if world.rules_version!=RULES_VERSION or world.catalog_version!=CATALOG_VERSION:raise ValueError('incompatible recovery rules/catalog')
-        p=self.parallel;p.engine=Engine(world)
+        p=self.parallel;p.engine=Engine(world);p.engine.presentation_events=d.pop('presentation_events',[])
         for k in ('agents','items','selected','finished','reserved_supply','initial_costs'):setattr(p,k,d.pop(k))
         weights=d.pop('opponent_weights');identity=d.pop('opponent_id');self.opponent=None
         if weights:

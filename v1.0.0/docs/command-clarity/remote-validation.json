@@ -1,0 +1,38 @@
+{
+  "/api/stats": {
+    "http": 200,
+    "total": 72,
+    "items": 0,
+    "teams": {
+      "A": {
+        "wins": 34,
+        "losses": 38,
+        "draws": 0,
+        "games": 72,
+        "win_rate": 0.4722222222222222
+      },
+      "B": {
+        "wins": 38,
+        "losses": 34,
+        "draws": 0,
+        "games": 72,
+        "win_rate": 0.5277777777777778
+      }
+    }
+  },
+  "/api/history?offset=0": {
+    "http": 200,
+    "total": 72,
+    "items": 50
+  },
+  "/api/history?offset=50": {
+    "http": 200,
+    "total": 72,
+    "items": 22
+  },
+  "/api/training": {
+    "http": 200,
+    "total": null,
+    "items": 0
+  }
+}

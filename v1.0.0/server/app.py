@@ -15,6 +15,11 @@ def create_app(store=None,live_runner=None,lifespan=None):
         data=json.loads(path.read_text())
         if not data.get('summary',{}).get('ended'):raise HTTPException(404)
         return data
+    @app.get('/api/history')
+    @app.get('/history')
+    def history(offset:int=Query(0,ge=0)):
+        from learning.public_results import document
+        d=document(root/'results.sqlite');rows=d['matches'];return dict(total=len(rows),items=rows[offset:offset+50],next=offset+50 if offset+50<len(rows) else None,updated_at=d['updated_at'])
     @app.get('/api/training')
     @app.get('/training')
     def training():

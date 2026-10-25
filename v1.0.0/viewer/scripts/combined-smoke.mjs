@@ -7,7 +7,7 @@ try{
  let ready=false;for(let i=0;i<80;i++){try{if((await fetch(endpoint+'/api/live/snapshot')).ok){ready=true;break;}}catch{}await new Promise(r=>setTimeout(r,100));}assert.ok(ready,stderr);
  browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH??'/usr/bin/chromium',headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const page=await browser.newPage({viewport:{width:1500,height:980},hasTouch:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));
- await page.goto(endpoint+'/viewer/?mode=live');await page.waitForFunction(()=>document.querySelector('#count-a').textContent==='64');assert.equal(await page.locator('#count-b').textContent(),'64');assert.match(await page.locator('#vehicles-a').textContent(),/차량 10/);await page.getByRole('button',{name:/^전차 .*↗/,exact:false}).first().click();
+ await page.goto(endpoint+'/viewer/?mode=live');await page.waitForFunction(()=>document.querySelector('#count-a').textContent==='64');assert.equal(await page.locator('#count-b').textContent(),'64');assert.match(await page.locator('#vehicles-a').textContent(),/차량 10/);await page.getByRole('button',{name:/전차 .*↗/,exact:false}).first().click();
  const field=await page.locator('#field').boundingBox();await page.mouse.move(field.x+field.width/2,field.y+field.height/2);await page.waitForSelector('#tooltip:not([hidden])');assert.match(await page.locator('#tooltip').textContent(),/900/);
  await page.screenshot({path:output+'armor-detail.png'});await page.click('#fit');await page.screenshot({path:output+'district-overview.png'});
  const snapshot=await(await fetch(endpoint+'/api/live/snapshot')).json();assert.equal(snapshot.frame.units.length,148);

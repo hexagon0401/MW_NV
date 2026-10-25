@@ -50,7 +50,10 @@ def frame(w):
 def export_view(engine,initial):
     w=engine.world
     if not getattr(w,'ended',False):raise ValueError('only completed matches may be published')
-    events=deepcopy(w.events)
+    ordered=[(e['sim_tick'],i,deepcopy(e)) for i,e in enumerate(w.events)]
+    ordered.extend((e['sim_tick'],e['after_event_count']-.5,{k:deepcopy(v) for k,v in e.items() if k!='after_event_count'}) for e in getattr(engine,'presentation_events',[]))
+    events=[e for _,_,e in sorted(ordered,key=lambda row:(row[0],row[1]))]
+    for i,event in enumerate(events):event['event_id']=i
     for event in events:
         p=event['payload']
         if event['event_kind']=='ORDER_ACCEPTED' and hasattr(w,'queue'):

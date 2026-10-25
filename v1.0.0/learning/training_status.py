@@ -1,5 +1,5 @@
 """Small public progress report; never exports host paths or credentials."""
-import json,os,time
+import json,os,time,sqlite3
 from pathlib import Path
 from datetime import datetime,timezone
 
@@ -20,4 +20,6 @@ class Reporter:
                 from cloud.supabase_storage import PrivateStorage
                 store=PrivateStorage(os.environ['SUPABASE_URL'],os.environ['SUPABASE_SERVICE_ROLE_KEY'])
                 store._request('object/'+store.bucket+'/training-status.json','PUT',json.dumps(doc).encode())
-            except (OSError,ValueError,KeyError) as exc:print('Training status upload deferred: '+type(exc).__name__,flush=True)
+                from .public_results import publish
+                publish()
+            except (OSError,ValueError,KeyError,sqlite3.Error) as exc:print('Training status upload deferred: '+type(exc).__name__,flush=True)

@@ -17,6 +17,7 @@ from .objectives import update_capture, update_score
 class Engine:
     def __init__(self, world=None):
         self.world = world if world is not None else WorldState()
+        self.presentation_events=[]
         if self.world.config.tick_s != 0.2:
             raise ValueError('engine tick must be 0.2 seconds')
         if not hasattr(self.world, 'queue'):
@@ -77,7 +78,9 @@ class Engine:
             if w.queue.status[key] not in ('QUEUED', 'RUNNING'):
                 continue
             try:
+                previous=w.queue.status[key]
                 self._execute(key, c)
+                if previous!='RUNNING' and w.queue.status[key]=='RUNNING':self.record_presentation('ORDER_RUNNING',team=int(c.team),cmd_id=c.cmd_id)
             except OrderError as exc:
                 w.queue.finish(w, key, 'FAILED', str(exc))
 
@@ -85,6 +88,9 @@ class Engine:
         update_capture(w)
         update_score(w)
         regenerate(w)
+
+    def record_presentation(self,kind,**payload):
+        self.presentation_events.append(dict(sim_tick=self.world.tick,event_kind=kind,payload=payload,after_event_count=len(self.world.events)))
 
     def record_event(self,kind,**payload):
         return self.world.emit(kind,**payload)

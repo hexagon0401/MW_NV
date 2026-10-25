@@ -49,7 +49,9 @@ class CandidateEnv(ParallelEnv):
         if all(self.finished.values()):
             before=[w.teams[t].score for t in (0,1)];loss_before=self.losses()
             for a in self.possible_agents:
-                for c in commands(self.raw(a),self.selected[a]):
+                batch=commands(self.raw(a),self.selected[a])
+                self.engine.record_presentation('HQ_DECISION',team=self.possible_agents.index(a),commands=batch,metadata=dict(source=getattr(self,'decision_sources',{}).get(a,'정책 선택'),reasons=[dict(unit=c['command']['unit'],reason=c['reason'],score=c['score']) for c in self.selected[a]]))
+                for c in batch:
                     try:self.engine.submit_for(self.possible_agents.index(a),c)
                     except OrderError:infos[a]['invalid_action']=True
             self.engine.step(30);loss_after=self.losses();delta=(w.teams[0].score-before[0])-(w.teams[1].score-before[1])
