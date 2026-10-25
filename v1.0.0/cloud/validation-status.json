@@ -2,10 +2,10 @@
   "network": "NIM domain reachable after environment publication",
   "secret_destination": "NvidiaNIM -> integrate.api.nvidia.com confirmed in published settings",
   "nim_models_http": 200,
-  "nim_inference_http": 401,
-  "nim_inference_error": "Unauthorized: Invalid JWT serialization: Missing dot delimiter(s)",
-  "nim_successful_decisions": 0,
-  "nim_model_latency": "UNKNOWN: authentication failed, timings are error responses",
+  "nim_inference_http": 200,
+  "nim_inference_error": null,
+  "nim_successful_decisions": 1,
+  "nim_model_latency": "Not benchmarked; actual four-candidate JSON selection verified",
   "cloudflare_token_verify_http": 200,
   "cloudflare_token_error": null,
   "cloudflare_project_http": 200,
@@ -42,10 +42,18 @@
   },
   "gzip_js_tests": 14,
   "nim_last_retry": {
-    "http": 401,
-    "error": "Unauthorized: Invalid JWT serialization: Missing dot delimiter(s)",
-    "decision_source": "algorithm fallback",
-    "user_instruction": "stop on failure",
-    "continuous_training_started": false
+    "http": 200,
+    "decision_source": "llm",
+    "commands": 4,
+    "thinking_enabled": false,
+    "continuous_training_started": true
+  },
+  "training": {
+    "root": "data/nim-approved-training",
+    "rounds": 0,
+    "steps_per_round": 256,
+    "device": "CPU",
+    "nim_calls_during_training": false,
+    "auto_promote": false
   }
 }

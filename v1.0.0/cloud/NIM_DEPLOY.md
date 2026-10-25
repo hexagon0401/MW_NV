@@ -1,3 +1,11 @@
+> 최신 결과: 키 Value 수정 후 NIM HTTP200 및 후보4개 지휘 변환 성공.
+> 빈 응답은 NIM chat_template_kwargs.enable_thinking=false로 해결했다.
+> 아래 과거401 기록은 해결됐다. CPU 학습을 사용자 요청에 따라 시작했다.
+> 루트 data/nim-approved-training, --rounds 0 --steps 256. 로그 runner.log, PID runner.pid.
+> 재개는 .venv/bin/python -u -m learning.continuous --root data/nim-approved-training --rounds 0 --steps 256.
+> 라운드별 .zip/.npz/.json과 state.json을 저장한다. 기존 프로세스 종료/중복 여부를 확인한 뒤 재개한다.
+> 환경 종료 시 프로세스 지속은 보장하지 않는다. 학습은 NIM 미호출/정책 자동 승격 없음.
+
 # Cloudflare + Supabase + NIM 배포 상태
 
 ## 배포 완료

@@ -21,7 +21,9 @@ class LocalHQ:
 
     def _request(self,payload):
         headers={'Content-Type':'application/json'}
-        if self.api_key:headers['Authorization']='Bearer '+self.api_key
+        if self.api_key:
+            headers['Authorization']='Bearer '+self.api_key
+            payload=dict(payload,chat_template_kwargs={'enable_thinking':False})
         req=Request(self.base_url+'/chat/completions',data=json.dumps(payload).encode(),headers=headers)
         with urlopen(req,timeout=self.timeout) as response:
             body=response.read(65537)

@@ -123,3 +123,5 @@ SQL 테이블 없이 비공개 Storage manifest를 지원하고, Access 미설�
 실제 외부 배포/모델 성공과 코드·mock 검사 성공을 구분해 기록한다.
 
 사용자가 Access 비활성화는 의도적이라고 명시했다. PUBLIC_VIEWER=true로 완료 경기 공개 관전을 허용하고 사이트 비밀번호를 요구하지 않는다. Supabase 객체/키는 비공개로 유지한다.
+
+NIM 키 Value 수정 후 실제 지휘 JSON 성공. NIM 요청에는 enable_thinking=false를 사용한다. 사용자가 성공 시 무한 반복 CPU PPO 학습을 명시적으로 승인했다. --rounds 0 --steps 256으로 시작하며 학습에는 NIM을 호출하지 않고 정책 자동 승격도 하지 않는다.
