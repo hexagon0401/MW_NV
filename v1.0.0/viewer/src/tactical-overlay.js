@@ -7,7 +7,7 @@ export function groupedSquads(frame,zoom,previous=false){
  const far=zoom<=.30?true:zoom>=.36?false:previous,groups=[];
  for(const s of frame.squads??[]){const members=frame.units.filter(u=>s.member_ids.includes(u.id)&&u.alive!==false&&u.carrier_id==null);if(members.length<2)continue;
  const xs=members.map(u=>u.x_cm*.12*zoom),ys=members.map(u=>u.y_cm*.12*zoom);
- const dense=(Math.max(...xs)-Math.min(...xs)+12)*(Math.max(...ys)-Math.min(...ys)+12)<members.length*220;
+ const dense=(Math.max(...xs)-Math.min(...xs)+24)*(Math.max(...ys)-Math.min(...ys)+24)<members.length*480;
  if(far||dense)groups.push({id:`squad:${s.id}`,is_group:true,team:s.team,members:members.map(u=>u.id),x_cm:members.reduce((n,u)=>n+u.x_cm,0)/members.length,y_cm:members.reduce((n,u)=>n+u.y_cm,0)/members.length,hp:members.reduce((n,u)=>n+(u.hp??0),0),max_hp:members.every(u=>u.max_hp!=null)?members.reduce((n,u)=>n+u.max_hp,0):null,name:entityName(frame,s.id),count:members.length});}
  return {far,groups};
 }

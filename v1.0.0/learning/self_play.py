@@ -1,5 +1,5 @@
 """Long-lived shared PPO, frozen opponents, paired NIM labels and resumable environment."""
-import argparse,json,os,random,shutil,time,uuid
+import argparse,json,os,random,shutil,time,uuid,signal
 from pathlib import Path
 import numpy as np
 import torch
@@ -32,6 +32,7 @@ class SelfPlayEnv(TrainingEnv):
         d=decode(document);world=d.pop('world')
         from engine.version import RULES_VERSION,CATALOG_VERSION
         if world.rules_version!=RULES_VERSION or world.catalog_version!=CATALOG_VERSION:raise ValueError('incompatible recovery rules/catalog')
+        if getattr(world,'map_id',None)=='river-districts' and getattr(world,'map_version',None)!='2':raise ValueError('incompatible recovery map version')
         p=self.parallel;p.engine=Engine(world);p.engine.presentation_events=d.pop('presentation_events',[])
         for k in ('agents','items','selected','finished','reserved_supply','initial_costs'):setattr(p,k,d.pop(k))
         weights=d.pop('opponent_weights');identity=d.pop('opponent_id');self.opponent=None
@@ -106,14 +107,17 @@ def run(root,seed_policy,updates=0,teacher_enabled=True,publish=True):
             except sqlite3.OperationalError:pass
     import subprocess
     from engine.version import RULES_VERSION,CATALOG_VERSION
-    state.update(rules_version=RULES_VERSION,catalog_version=CATALOG_VERSION,policy_contract='tactics-1',code_commit=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip())
+    state.update(rules_version=RULES_VERSION,catalog_version=CATALOG_VERSION,policy_contract='tactics-1',map_id='river-districts',map_version='2',code_commit=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip())
     model.teacher_buffer=teacher;report=Reporter(root,state['generation'],model.num_timesteps);start_steps=model.num_timesteps;started_sim=env.sim_seconds;finished=0
     class Progress(BaseCallback):
         def _on_step(self):
-            report(dict(phase='learning',policy_steps=self.num_timesteps,sim_seconds=env.sim_seconds-started_sim,games=env.completed_games,nim_in_training=teacher_enabled,teacher=dict(teacher.stats),backup=state.get('backup','pending'),map_family=getattr(env.parallel.engine.world,'training_map_family','custom')))
+            report(dict(phase='learning',policy_steps=self.num_timesteps,sim_seconds=env.sim_seconds-started_sim,games=env.completed_games,nim_in_training=teacher_enabled,teacher=dict(teacher.stats),backup=state.get('backup','pending'),map_family=getattr(env.parallel.engine.world,'training_map_family','custom'),map_id=getattr(env.parallel.engine.world,'map_id',None),map_version=getattr(env.parallel.engine.world,'map_version',None)))
             return True
+    stop_requested={'value':False}
+    def request_stop(signum,frame):stop_requested['value']=True
+    previous_handlers={s:signal.signal(s,request_stop) for s in (signal.SIGINT,signal.SIGTERM)}
     try:
-        while updates==0 or finished<updates:
+        while (updates==0 or finished<updates) and not stop_requested['value'] and not (root/'STOP').exists():
             report.round=state['generation'];report(dict(phase='learning',nim_in_training=teacher_enabled,policy_steps=model.num_timesteps,sim_seconds=env.sim_seconds-started_sim,games=env.completed_games,teacher=dict(teacher.stats),backup=state.get('backup','pending')),force=True)
             before_steps=model.num_timesteps
             model.learn(total_timesteps=64,reset_num_timesteps=False,callback=Progress())
@@ -138,10 +142,13 @@ def run(root,seed_policy,updates=0,teacher_enabled=True,publish=True):
                 report(dict(phase='evaluation'),force=True)
                 from .self_play_evaluate import evaluate
                 evaluate(root,state['generation']);state['last_evaluation_games']=env.completed_games
-            atomic_json(root/'state.json',state);report(dict(phase='checkpoint_saved',nim_in_training=teacher_enabled),force=True);finished+=1
-    except KeyboardInterrupt:
-        # A consumed-rollout checkpoint already exists; interrupted rollout is intentionally not saved.
-        report(dict(status='stopped',phase='stopped'),force=True)
+            atomic_json(root/'state.json',state);report(dict(phase='checkpoint_saved',nim_in_training=teacher_enabled,policy_steps=model.num_timesteps,games=env.completed_games),force=True);finished+=1
+    finally:
+        for signum,handler in previous_handlers.items():signal.signal(signum,handler)
+        report(dict(status='stopped',phase='stopped',nim_in_training=teacher_enabled),force=True)
+
+    # Any interruption before a consumed checkpoint restores the last safe generation.
+    return state
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--root',default='data/self-play-v2');p.add_argument('--seed-policy',required=True);p.add_argument('--updates',type=int,default=0);p.add_argument('--no-teacher',action='store_true');p.add_argument('--no-publish',action='store_true');a=p.parse_args();run(a.root,a.seed_policy,a.updates,not a.no_teacher,not a.no_publish)
+    p=argparse.ArgumentParser();p.add_argument('--root',default='data/self-play-v3');p.add_argument('--seed-policy',required=True);p.add_argument('--updates',type=int,default=0);p.add_argument('--no-teacher',action='store_true');p.add_argument('--no-publish',action='store_true');a=p.parse_args();run(a.root,a.seed_policy,a.updates,not a.no_teacher,not a.no_publish)

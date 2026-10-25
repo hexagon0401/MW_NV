@@ -61,7 +61,7 @@ def create_release_match(seed=0,swap=False):
       (303,304,320,'TOWER',Team.A),(304,720,320,'TOWER',Team.B),
       (305,176,512,'GARAGE',Team.A),(306,848,512,'GARAGE',Team.B),
       (307,152,416,'HELIPAD',Team.A),(308,872,416,'HELIPAD',Team.B)]:
-        w.facilities[id]=Facility(id,WorldPos(x*100,y*100),kind,owner)
+        w.facilities[id]=Facility(id,WorldPos((1024-x if swap else x)*100,y*100),kind,owner)
     for f in w.facilities.values():
         if f.kind in ('HQ','HELIPAD','GARAGE','OBJECTIVE'):
             for row in range(max(0,f.pos.y_cm//400-5),min(256,f.pos.y_cm//400+6)):

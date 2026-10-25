@@ -14,7 +14,7 @@ def frame(w):
     units=[];attacks={};shots=[];impacts=[];damage=[]
     for event in reversed(w.events):
         if event['sim_tick']<w.tick-10:break
-        if event['event_kind']=='ARTILLERY_IMPACT':impacts.append(dict(event['payload'],tick=event['sim_tick']))
+        if event['event_kind'] in ('ARTILLERY_IMPACT','TANK_IMPACT'):impacts.append(dict(event['payload'],tick=event['sim_tick']))
         if event['event_kind']=='UNIT_DAMAGED' and event['payload']['damage']:damage.append(dict(event['payload'],tick=event['sim_tick']))
         if event['event_kind']=='ABSTRACT_ATTACK':
             attacks.setdefault(event['payload']['unit'],event['sim_tick']+11)
@@ -60,7 +60,7 @@ def export_view(engine,initial):
             c=w.queue.commands.get(f"{p['team']}:{p['cmd_id']}")
             if c is not None:p.update(op=int(c.op),unit=c.unit,arg0=c.arg0,arg1=c.arg1,target=c.target)
     initial=deepcopy(initial)
-    return dict(version=1,presentation_version=3,rules_version=w.rules_version,catalog=dict(version=w.catalog_version,units=deepcopy(w.unit_specs),vehicles=deepcopy(w.vehicle_specs),weapons=deepcopy(w.weapon_specs)),width_m=w.config.map_width_m,height_m=w.config.map_height_m,
+    return dict(version=1,presentation_version=4,map_id=getattr(w,'map_id',None),map_version=getattr(w,'map_version',None),rules_version=w.rules_version,catalog=dict(version=w.catalog_version,units=deepcopy(w.unit_specs),vehicles=deepcopy(w.vehicle_specs),weapons=deepcopy(w.weapon_specs)),width_m=w.config.map_width_m,height_m=w.config.map_height_m,
         terrain=deepcopy(w.terrain.cells),units=initial['units'],initial=initial,final=frame(w),events=events,summary=summary(w))
 
 

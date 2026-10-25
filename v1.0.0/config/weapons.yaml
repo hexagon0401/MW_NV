@@ -1,4 +1,4 @@
-version: combined-arms-1
+version: combined-arms-2
 multipliers:
   rifle:
     soft: 1
@@ -32,3 +32,7 @@ artillery:
   scatter_m: 8
   blast_m: 12
   observation_ticks: 50
+
+tank_splash:
+  blast_m: 4
+  damage: 40

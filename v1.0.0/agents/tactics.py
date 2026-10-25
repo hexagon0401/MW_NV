@@ -24,6 +24,7 @@ def candidates(obs):
 
     def direct(actor,target,s):
         if actor.get('ammo',0)<=0 or not s['attack']:return False
+        if actor['type_id']=='MBT' and any(distance(friend,target)<catalog['weapons']['tank_splash']['blast_m'] for friend in [*own,*vehicles] if friend.get('carrier_id') is None and not (friend['type_id']=='HEL' and friend['task_state'] in ('TAKEOFF','MOVING','LANDING'))):return False
         enemy_spec=(catalog['units'] if target['type_id'] in catalog['units'] else catalog['vehicles'])[target['type_id']]
         defense='light' if target['type_id']=='HEL' and target['task_state'] not in ('MOVING','TAKEOFF','LANDING') else enemy_spec['armor']
         if catalog['weapons']['multipliers'][s['weapon']][defense]<=0:return False
@@ -154,7 +155,7 @@ def candidates(obs):
                 else:add(v,'fire',130,'관측 표적 대응·포병 설치',15)
             elif v['deployment']!='PACKED':add(v,'fire',75,'표적 없음·포병 철수',16)
             elif objectives:
-                f=min(objectives,key=lambda f:distance(v,f));x=f['pos']['x_cm']//100+(-220 if obs['team']==0 else 220)
+                f=min(objectives,key=lambda f:distance(v,f));base=next((b for b in obs['facilities'] if b['kind']=='HQ' and b['owner']==obs['team']),v);x=f['pos']['x_cm']//100+(-220 if base['pos']['x_cm']<obs['map_width_m']*50 else 220)
                 if abs(v['pos']['x_cm']//100-x)>30:add(v,'fire',65,'포병 사거리 확보',7,x=max(12,min(obs['map_width_m']-12,x)),y=f['pos']['y_cm']//100)
         elif vs['attack']:
             targets=[e for e in enemies if direct(v,e,vs)]

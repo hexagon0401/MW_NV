@@ -60,8 +60,10 @@ def load_weapons():
     for weapon,table in data['multipliers'].items():
         if set(table)!={'soft','light','medium','heavy','air'} or any(not isinstance(v,(int,float)) or not isfinite(v) or v<0 for v in table.values()):raise ValueError('damage multipliers')
     if any(type(v) is not int or v<=0 for v in data['artillery'].values()):raise ValueError('artillery settings')
+    if set(data['tank_splash'])!={'blast_m','damage'} or any(type(v) not in (int,float) or not isfinite(v) or v<=0 for v in data['tank_splash'].values()):raise ValueError('tank splash settings')
     return data
 
 
 def catalog_document():
-    return dict(version='combined-arms-1',units=load_units(),vehicles=load_vehicles(),weapons=load_weapons())
+    from .version import CATALOG_VERSION
+    return dict(version=CATALOG_VERSION,units=load_units(),vehicles=load_vehicles(),weapons=load_weapons())

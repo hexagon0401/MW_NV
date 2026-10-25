@@ -13,7 +13,7 @@ GitHub Actions/Pages를 상시 학습 서버처럼 우회 사용하지 않는다
 ## 서버가 준비되면
 
 1. 호환되는 Linux CPU/Python3.12에서 잠금 의존성 설치와 짧은 학습/NumPy 일치 검사를 먼저 실행한다. ARM VM이면 현재 잠금 패키지의 ARM wheel 지원을 별도 확인한다.
-2. 기존 worker를 마지막 안전 checkpoint에서 중단한 뒤 data/self-play-v2 전체와 data/results.sqlite를 안전하게 이전한다. 키는 Git/채팅에 넣지 않고 대상 서버 /etc/mw-nv/training.env에 전용 사용자만 읽도록 저장한다.
+2. 기존 worker를 마지막 안전 checkpoint에서 중단한 뒤 data/self-play-v3 전체와 data/results.sqlite를 안전하게 이전한다. 키는 Git/채팅에 넣지 않고 대상 서버 /etc/mw-nv/training.env에 전용 사용자만 읽도록 저장한다.
 3. 전용 사용자 mwnv, 저장소 /opt/MW_NV, 쓰기 가능한 /var/lib/mw-nv 경로를 준비한다. training.service는 이 경로를 기준으로 한 배포 템플릿이다. 현재 서버에 설치·활성화한 것은 아니다.
 4. 서비스 환경에는 기존 NIM/Supabase/GitHub 인증과 MW_NV_PUBLISH_TRAINING=1을 설정한다. Codex 프록시 참조값은 외부 서버에서 동작하는 실제 키가 아니므로 복사하지 않는다.
 5. systemd 서비스 등록 후 재부팅·비정상 종료 복구·중복 프로세스·진행 보고·백업 업로드를 검증한다. 브라우저는 기존 Pages 주소를 계속 사용한다.

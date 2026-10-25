@@ -23,7 +23,7 @@ export class Timeline{
   if(kind==='UNIT_HEALED'&&u&&u.hp!=null)u.hp+=p.amount;
   if(kind==='DEPLOYMENT_CHANGED'&&u)u.deployment=p.deployment;
   if(kind==='ARTILLERY_FIRED'){(this.state.projectiles??=[]).push({...p});if(u&&u.ammo!=null)u.ammo--;}
-  if(kind==='ARTILLERY_IMPACT')(this.state.impacts??=[]).push({...p,tick:e.sim_tick+1});
+  if(['ARTILLERY_IMPACT','TANK_IMPACT'].includes(kind))(this.state.impacts??=[]).push({...p,tick:e.sim_tick+1});
   if(kind==='UNIT_DAMAGED'&&p.damage)(this.state.damage??=[]).push({...p,tick:e.sim_tick+1});
   if(kind==='HQ_DECISION')(this.state.decisions??={})[p.team]=structuredClone(p.metadata);
   if(kind==='SCORE_TICK')this.state.scores={...p.scores};
@@ -35,6 +35,6 @@ export class Timeline{
   const units=[...this.units.values()].map(unit=>{const u={...unit},track=this.tracks.get(u.id);if(track?.length){let lo=0,hi=track.length;while(lo+1<hi){const m=(lo+hi)>>1;if(track[m].t<=t)lo=m;else hi=m;}const a=track[lo],b=track[lo+1],f=b?Math.max(0,Math.min(1,(t-a.t)/(b.t-a.t||1))):0;u.x_cm=a.x+(b?b.x-a.x:0)*f;u.y_cm=a.y+(b?b.y-a.y:0)*f;}if(u.activity_until_tick!==undefined&&t*5>=u.activity_until_tick)u.activity=null;if(u.alive!==false&&u.carrier_id==null&&u.attack_tick!==undefined&&t*5-u.attack_tick<10)u.activity='FIRING';return u;});
   const byId=new Map(units.map(u=>[u.id,u]));
   for(const carrier of units)if(carrier.passenger_count!=null)carrier.passenger_count=carrier.alive===false?0:(this.unknownPassengers.get(carrier.id)??0)+units.filter(u=>u.carrier_id===carrier.id&&u.alive!==false).length;for(const u of units)if(u.carrier_id!=null){const carrier=byId.get(u.carrier_id);if(carrier){u.x_cm=carrier.x_cm;u.y_cm=carrier.y_cm;}}
-  return {...this.state,projectiles:(this.state.projectiles??[]).filter(s=>s.impact_tick>=t*5),impacts:(this.state.impacts??[]).filter(s=>t*5-s.tick<=10),damage:(this.state.damage??[]).filter(s=>t*5-s.tick<=10),shots:(this.state.shots??[]).filter(s=>t*5-s.tick<=10),tick:Math.round(t*5),units,scores:{...this.state.scores},facilities:[...this.facilities.values()].map(f=>({...f})),orders:[...this.commands.values()].map(c=>({...c}))};
+  return {...this.state,projectiles:(this.state.projectiles??[]).filter(s=>s.impact_tick>=t*5),impacts:(this.state.impacts??[]).filter(s=>t*5-s.tick<=10),damage:(this.state.damage??[]).filter(s=>t*5-s.tick<=10),shots:(this.state.shots??[]).filter(s=>t*5-s.tick<=10),tick:Math.round(t*5),render_time:t,units,scores:{...this.state.scores},facilities:[...this.facilities.values()].map(f=>({...f})),orders:[...this.commands.values()].map(c=>({...c}))};
  }
 }

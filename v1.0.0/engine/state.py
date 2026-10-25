@@ -18,7 +18,8 @@ class WorldState:
         self.vehicle_specs = load_vehicles()
         self.weapon_specs=load_weapons()
         self.rules_version=RULES_VERSION
-        self.catalog_version='combined-arms-1'
+        from .version import CATALOG_VERSION
+        self.catalog_version=CATALOG_VERSION
         self.artillery_rng=random.Random(seed ^ 0xA47111)
         self.projectiles=[]
         self.seed = seed

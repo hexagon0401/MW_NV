@@ -15,7 +15,7 @@ Environment=MKL_NUM_THREADS=2
 Environment=OPENBLAS_NUM_THREADS=2
 Environment=MPLCONFIGDIR=/var/lib/mw-nv/mpl
 Environment=XDG_CACHE_HOME=/var/lib/mw-nv/cache
-ExecStart=/opt/MW_NV/v1.0.0/.venv/bin/python -u -m learning.self_play --root data/self-play-v2 --seed-policy data/self-play-v2/seed.zip
+ExecStart=/opt/MW_NV/v1.0.0/.venv/bin/python -u -m learning.self_play --root data/self-play-v3 --seed-policy data/self-play-v3/seed.zip
 Restart=on-failure
 RestartSec=15
 KillSignal=SIGINT

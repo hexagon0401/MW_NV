@@ -28,3 +28,13 @@ def test_spawn_roster_fits_and_distinct_districts():
         assert FootprintTerrain(w.terrain,w.vehicle_specs[v.type_id]['footprint_cm']).passable(v.pos.x_cm,v.pos.y_cm)
     assert sum(t==4 for row in w.terrain.cells for t in row)>400
     assert sum(t==2 for row in w.terrain.cells for t in row)>3000
+
+
+def test_side_swap_reflects_every_owned_support_facility():
+    normal=create_release_match(8);swapped=create_release_match(8,swap=True)
+    for uid,f in normal.facilities.items():
+        if f.owner is not None:
+            other=swapped.facilities[uid]
+            assert other.owner==f.owner
+            assert other.pos.x_cm==102400-f.pos.x_cm
+            assert other.pos.y_cm==f.pos.y_cm
