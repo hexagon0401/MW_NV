@@ -5,6 +5,6 @@ export function describeTraining(data,now=Date.now()){
 }
 export function startTrainingStatus(){
  const label=document.getElementById('training-text');if(!label)return;
- async function refresh(){try{const r=await fetch('/api/training',{cache:'no-store'});if(!r.ok)throw Error();label.textContent=describeTraining(await r.json());}catch{label.textContent='학습 현황 — 연결 확인 불가';}}
+ async function refresh(){try{const r=await fetch('/api/training',{cache:'no-store'});if(!r.ok)throw Error();const data=await r.json();const full=describeTraining(data);const old=Date.now()-Date.parse(data.updated_at)>180000;label.textContent=`${old?'마지막 보고':data.phase==='stopped'?'학습 중지':data.phase==='evaluation'?'평가 중':'PPO 학습'} · 완료 ${data.games??0}경기 · ${data.sim_speed??'—'}×`;document.getElementById('training-full').textContent=full;}catch{label.textContent='학습 현황 — 연결 확인 불가';}}
  refresh();const timer=setInterval(refresh,30000);window.addEventListener('pagehide',()=>clearInterval(timer),{once:true});
 }

@@ -3,9 +3,9 @@ test('semantic names and command phases use actual state',()=>{
  const frame={units:[{id:10,team:0,type_id:'HEL',task_state:'MOVING'}],squads:[],facilities:[{id:202,x_cm:51200,y_cm:51200}]};
  assert.equal(entityName(frame,10),'A 헬기 1');assert.equal(orderState(frame,{unit:10,status:'RUNNING'}).text,'이동 중');assert.equal(orderState(frame,{unit:10,status:'COMPLETED'}).text,'완료');assert.equal(orderTarget(frame,{target:202}),'중앙 광장');assert.equal(resultLabel({winner:1}),'B 승리');assert.equal(resultLabel({winner:null}),'무승부');
 });
-test('screen labels displace overlapping labels without changing source positions',()=>{
+test('symbols remain anchored and cluster rather than covering terrain',()=>{
  const input=[{id:1,x_cm:1000,y_cm:1000},{id:2,x_cm:1000,y_cm:1000}],copy=JSON.stringify(input);
- const boxes=placeBadges(input,{zoom:.1,x:100,y:100},800,600);assert.notEqual(boxes[0].y,boxes[1].y);assert.equal(JSON.stringify(input),copy);
+ const boxes=placeBadges(input,{zoom:.1,x:100,y:100},800,600);assert.equal(boxes.length,1);assert.equal(boxes[0].ax,112);assert.equal(boxes[0].cluster_ids.length,2);assert.equal(JSON.stringify(input),copy);
 });
 test('history endpoint paginates immutable compressed pages newest first',async()=>{
  const {onRequestGet}=await import('./functions/api/history.js'),{gzipSync}=await import('node:zlib');

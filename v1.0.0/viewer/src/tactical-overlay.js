@@ -1,4 +1,4 @@
-import {placeBadges} from './badge-layout.js';
+import {placeBadges,combatRegions,shortId} from './badge-layout.js';
 import {entityName,shortState,currentOrder,orderState} from './command-view.js';
 import {Container,Graphics,Text} from 'pixi.js';
 import {typeOf} from './catalog.js';
@@ -28,15 +28,24 @@ export class TacticalOverlay{
  if(ratio!=null)g.rect(-width/2-1,top-1,width+2,height+2).fill(0x182632).rect(-width/2,top,width*ratio,height).fill(ratio<=.25?0xd4483f:ratio<=.6?0xe3bc42:0x63c28a);
  }
  for(const u of this.groups){if(z<.65)continue;const x=u.x_cm*.12,y=u.y_cm*.12,g=this.node(u.id);g.position.set(x,y);g.scale.set(1/z);g.roundRect(-32,-12,64,25,4).fill(TEAM[u.team]).stroke({width:2,color:0x243447});g.rect(-32,16,64,5).fill(0x182632).rect(-32,16,64*(u.max_hp==null?0:Math.max(0,Math.min(1,u.hp/u.max_hp))),5).fill(0x63c28a);this.label(u.id,`${u.name.replace(' 분대','')} · ${u.count}`,x,y,z);}
- const semantic=[...this.groups.map(g=>({...g,name:entityName(frame,Number(g.id.split(':')[1])).replace('분대','보병')+' '+g.count,priority:1})),...frame.units.filter(u=>u.alive!==false&&u.carrier_id==null&&(typeOf(u).kind==='vehicle'||z<.3&&!this.hidden.has(u.id))).map(u=>({...u,name:entityName(frame,u.id).replace('분대','보병'),priority:u.type_id==='HEL'?3:2}))];
+ const semantic=[...this.groups.map(g=>({...g,type_id:'INF',name:entityName(frame,Number(g.id.split(':')[1])),priority:1})),...frame.units.filter(u=>u.alive!==false&&u.carrier_id==null&&(typeOf(u).kind==='vehicle'||z<.3&&!this.hidden.has(u.id))).map(u=>({...u,priority:u.type_id==='HEL'?3:2}))].map(u=>({...u,short:shortId(frame,u),selected:s.selected===u.id||s.selected===Number(String(u.id).split(':')[1]),priority:(s.selected===u.id?20:u.priority)}));
  this.badges=z<.65?placeBadges(semantic,s.camera,s.host.clientWidth,s.host.clientHeight):[];
- for(const b of this.badges){const g=this.node(`badge:${b.id}`),wx=(b.x-s.camera.x)/z,wy=(b.y-s.camera.y)/z;g.position.set(wx,wy);g.scale.set(1/z);g.moveTo(b.ax-b.x,b.ay-b.y).lineTo(46,18).stroke({width:1,color:TEAM[b.team],alpha:.6});g.roundRect(0,0,92,36,3).fill(0xfef5ef).stroke({width:1.5,color:TEAM[b.team]});g.rect(0,0,4,36).fill(TEAM[b.team]);const title=this.label(`badge-title:${b.id}`,b.name,wx+47/z,wy+10/z,z);if(!title.semantic){title.style.fontSize=11;title.style.fill=0x07004d;title.style.stroke={width:0};title.semantic=true;}const caption=this.label(`badge-state:${b.id}`,shortState(frame,b),wx+47/z,wy+25/z,z);if(!caption.semantic){caption.style.fontSize=10;caption.style.stroke={width:0};caption.semantic=true;}const order=currentOrder(frame,b),status=order?orderState(frame,order).kind:null;caption.style.fill=status==='combat'?0xb72e2b:status==='running'?0x2f6fed:status==='waiting'?0x9c7217:0x26413c;}
- const fighting=new Map();
- for(const shot of frame.shots??[]){if(frame.tick-shot.tick>10)continue;const target=shot.destination??frame.units.find(u=>u.id===shot.target);if(target){const key=`${Math.floor(target.x_cm/6000)},${Math.floor(target.y_cm/6000)}`;fighting.set(key,{x_cm:target.x_cm,y_cm:target.y_cm});}}
- for(const impact of frame.impacts??[])if(frame.tick-impact.tick<=10)fighting.set(`impact:${impact.unit}`,impact);
- for(const [key,p] of fighting){const x=p.x_cm*.12,y=p.y_cm*.12,g=this.node(`combat:${key}`);g.position.set(x,y);g.scale.set(1/z);g.circle(0,0,22).stroke({color:0xc33735,width:2,alpha:.6});const t=this.label(`combat:${key}`,'교전 중',x,y-28/z,z);t.style.fill=0xb72e2b;}
- for(const f of frame.facilities)if(f.kind==='OBJECTIVE'){const x=f.x_cm*.12,y=f.y_cm*.12,g=this.node(`objective:${f.id}`);g.position.set(x,y);g.scale.set(1/z);g.roundRect(-40,-23,80,22,3).fill(0xfef5ef).stroke({width:2,color:f.owner==null?0xc39a35:TEAM[f.owner]});const t=this.label(`objective:${f.id}`,entityName(frame,f.id),x,y-12/z,z);if(!t.semantic){t.style.fill=0x07004d;t.style.stroke={width:0};t.semantic=true;}}
+ for(const b of this.badges){const x=(b.ax-s.camera.x)/z,y=(b.ay-s.camera.y)/z,g=this.node(`badge:${b.id}`);g.position.set(x,y);g.scale.set(1/z);const color=TEAM[b.team];g.roundRect(-11,-11,22,22,3).fill({color:0x22342e,alpha:.94}).stroke({width:b.selected?2:1.5,color:b.selected?0xfff2bc:color});drawSymbol(g,b.type_id,color);if(b.is_cluster)g.circle(8,-8,4).fill(0xe8dfc9);
+ if(b.showLabel){const t=this.label(`badge-title:${b.id}`,b.label,x+(17+b.label.length*3)/z,y,z);t.style.fontSize=10;t.style.fill=0xf2efdf;t.style.stroke={color:0x25372e,width:3};}
+ }
+ this.combats=combatRegions(frame);
+ for(const p of this.combats){const x=p.x_cm*.12,y=p.y_cm*.12,g=this.node(`combat:${p.id}`);g.position.set(x,y);g.scale.set(1/z);g.poly([0,-7,6,5,-6,5]).fill(0xb5483d).stroke({width:1,color:0xffe5c2});}
+ const selected=frame.units.find(u=>u.id===s.selected)??this.groups.find(u=>Number(String(u.id).split(':')[1])===s.selected||u.id===s.selected);
+ if(selected){const x=selected.x_cm*.12,y=selected.y_cm*.12,g=this.node('selection');g.position.set(x,y);g.circle(0,0,16/z).stroke({width:2/z,color:0xffedb0});const order=currentOrder(frame,selected),target=order&&(frame.facilities.find(f=>f.id===order.target)??frame.units.find(u=>u.id===order.target));const p=target??(order?.arg0!=null&&[2,7,10,14].includes(order.op)?{x_cm:order.arg0*100,y_cm:order.arg1*100}:null);if(p)g.moveTo(0,0).lineTo(p.x_cm*.12-x,p.y_cm*.12-y).stroke({width:1/z,color:TEAM[selected.team],alpha:.7});}
+ for(const f of frame.facilities)if(f.kind==='OBJECTIVE'){const x=f.x_cm*.12,y=f.y_cm*.12,g=this.node(`objective:${f.id}`);g.position.set(x,y);g.scale.set(1/z);g.roundRect(-30,-20,60,16,2).fill(0xfef5ef).stroke({width:2,color:f.owner==null?0xc39a35:TEAM[f.owner]});const t=this.label(`objective:${f.id}`,entityName(frame,f.id),x,y-12/z,z);if(!t.semantic){t.style.fill=0x07004d;t.style.stroke={width:0};t.semantic=true;}}
  for(const f of frame.facilities)if(f.kind==='HQ'&&f.owner!=null){const x=f.x_cm*.12,y=f.y_cm*.12,g=this.node(`HQ:${f.id}`);g.position.set(x,y);g.scale.set(1/z);g.roundRect(-30,-17,60,22,3).fill(TEAM[f.owner]).stroke({width:2,color:0x243447});this.label(`HQ:${f.id}`,`${f.owner===0?'A':'B'} 본진`,x,y-6/z,z);}
  }
- hit(x,y){const c=this.scene.camera;for(const b of this.badges??[])if(x>=b.x&&x<=b.x+92&&y>=b.y&&y<=b.y+36)return b;for(const u of this.groups??[])if(Math.abs(x-u.x_cm*.12*c.zoom-c.x)<34&&Math.abs(y-u.y_cm*.12*c.zoom-c.y)<23)return u;return null;}
+ hit(x,y){const c=this.scene.camera;for(const b of this.badges??[])if(Math.abs(x-b.ax)<=13&&Math.abs(y-b.ay)<=13)return b;for(const u of this.groups??[])if(c.zoom>=.65&&Math.abs(x-u.x_cm*.12*c.zoom-c.x)<34&&Math.abs(y-u.y_cm*.12*c.zoom-c.y)<23)return u;return null;}
+}
+function drawSymbol(g,type,color){
+ const r=(x,y,w,h)=>g.rect(x,y,w,h).fill(color);
+ if(type==='HEL'){r(-7,-2,14,4);r(-5,-8,1,16);r(5,-8,1,16);r(-8,-6,7,1);r(2,5,7,1);}
+ else if(['MBT','SPH','IFV'].includes(type)){r(-7,-5,13,2);r(-7,4,13,2);r(-5,-3,9,6);r(0,-1,type==='SPH'?10:9,2);}
+ else if(['TRK','APC','LUV'].includes(type)){r(-7,-4,9,8);r(3,-3,4,6);r(-5,-6,3,2);r(3,-5,3,2);r(-5,4,3,2);r(3,3,3,2);}
+ else{g.circle(-2,-2,3).fill(color);r(-5,2,7,3);r(2,-3,6,2);}
 }
