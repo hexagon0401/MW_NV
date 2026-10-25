@@ -54,6 +54,11 @@
     "steps_per_round": 256,
     "device": "CPU",
     "nim_calls_during_training": false,
-    "auto_promote": false
+    "auto_promote": false,
+    "first_completed_round": 0,
+    "first_round_steps": 256,
+    "checkpoint": "data/nim-approved-training/round-000000.npz",
+    "numpy_parity": "PASS inside train_round",
+    "process_alive": true
   }
 }
