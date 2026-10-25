@@ -13,7 +13,7 @@
   "supabase_matches": 2,
   "deployed": true,
   "site_url": "https://mw-nv.pages.dev",
-  "deployment_url": "https://f536a3f6.mw-nv.pages.dev",
+  "deployment_url": "https://22caad51.mw-nv.pages.dev",
   "deployment_stage": "success",
   "public_site_http": 200,
   "production_supabase_secret_present": true,
@@ -60,5 +60,15 @@
     "checkpoint": "data/nim-approved-training/round-000000.npz",
     "numpy_parity": "PASS inside train_round",
     "process_alive": true
+  },
+  "training_enhancement": {
+    "status_api": 200,
+    "latest_replay": "training-latest",
+    "resume_optimizer": true,
+    "map_variants": 4,
+    "replay_speed": 1,
+    "baseline_transfer_wins": 0,
+    "baseline_transfer_games": 2,
+    "promotion": false
   }
 }

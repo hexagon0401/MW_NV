@@ -12,12 +12,13 @@ from .candidate_policy import vector,OBS_SIZE,ACTIONS
 class CandidateEnv(ParallelEnv):
     metadata={'name':'mw_nv_tactics_v1','render_modes':[],'is_parallelizable':True}
     possible_agents=['A','B']
-    def __init__(self):
+    def __init__(self,scenario_factory=create_release_match):
+        self.scenario_factory=scenario_factory
         self.agents=[];self.observation_spaces={a:Box(-1,1,(OBS_SIZE,),np.float32) for a in self.possible_agents};self.action_spaces={a:Discrete(ACTIONS) for a in self.possible_agents}
     def observation_space(self,agent):return self.observation_spaces[agent]
     def action_space(self,agent):return self.action_spaces[agent]
     def reset(self,seed=None,options=None):
-        self.engine=Engine(create_release_match(seed or 0,swap=bool((options or {}).get('swap',False))))
+        self.engine=Engine(self.scenario_factory(seed or 0,swap=bool((options or {}).get('swap',False))))
         self.agents=self.possible_agents.copy();self.initial_costs=[self.initial_value(t) for t in (0,1)];self._round();return self.observations(),{a:{} for a in self.agents}
     def raw(self,a):return self.engine.observe(self.possible_agents.index(a))
     def _round(self):

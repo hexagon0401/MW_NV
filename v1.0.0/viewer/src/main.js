@@ -1,3 +1,4 @@
+import {startTrainingStatus} from './training.js';
 import './style.css';import {refreshStats} from './stats.js';import {configureCatalog} from './catalog.js';import {Timeline} from './timeline.js';import {Battlefield} from './battlefield.js';import {renderHud,tooltip} from './ui.js';
 const $=id=>document.getElementById(id),host=$('field'),live=new URLSearchParams(location.search).get('mode')==='live';
 let scene,timeline,currentFrame,elapsed=0,paused=false,last=performance.now(),lastHud='',streamId,seq=-1,pointer=null,touchStart=null;const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -24,3 +25,5 @@ host.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||touchStart?.id
 host.addEventListener('pointercancel',()=>{touchStart=null;pointer=null;tooltip(null);});
 
 function updateStats(){return refreshStats().then(()=>{lastHud="";if(currentFrame)renderHud(currentFrame,focus);});}updateStats();setInterval(updateStats,5000);
+
+startTrainingStatus();

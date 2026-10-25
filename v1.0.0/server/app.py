@@ -15,6 +15,12 @@ def create_app(store=None,live_runner=None,lifespan=None):
         data=json.loads(path.read_text())
         if not data.get('summary',{}).get('ended'):raise HTTPException(404)
         return data
+    @app.get('/api/training')
+    @app.get('/training')
+    def training():
+        path=root/'nim-approved-training'/'training-status.json'
+        if not path.is_file():raise HTTPException(503,'training status unavailable')
+        return json.loads(path.read_text())
     @app.get('/api/stats')
     @app.get('/stats')
     def stats():
