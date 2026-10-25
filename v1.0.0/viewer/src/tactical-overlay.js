@@ -14,7 +14,7 @@ export function groupedSquads(frame,zoom,previous=false){
 export class TacticalOverlay{
  constructor(scene){this.scene=scene;this.layer=new Container();scene.world.addChild(this.layer);this.nodes=new Map();this.labels=new Map();this.far=false;}
  node(id){if(!this.nodes.has(id)){const g=new Graphics();this.layer.addChild(g);this.nodes.set(id,g);}const g=this.nodes.get(id);g.visible=true;g.clear();return g;}
- label(id,text,x,y,z){if(!this.labels.has(id)){const t=new Text({text:'',style:{fontFamily:'Geist',fontSize:11,fontWeight:'bold',fill:0x334155,stroke:{color:0xf1f2ec,width:3}}});t.anchor.set(.5);this.layer.addChild(t);this.labels.set(id,t);}const t=this.labels.get(id);t.text=text;t.position.set(x,y);t.scale.set(1/z);t.visible=true;return t;}
+ label(id,text,x,y,z){if(!this.labels.has(id)){const t=new Text({text:'',style:{fontFamily:'Geist, NanumSquare',fontSize:11,fontWeight:'bold',fill:0x334155,stroke:{color:0xf1f2ec,width:3}}});t.anchor.set(.5);this.layer.addChild(t);this.labels.set(id,t);}const t=this.labels.get(id);t.text=text;t.position.set(x,y);t.scale.set(1/z);t.visible=true;return t;}
  update(frame){const s=this.scene,z=s.camera.zoom;for(const n of [...this.nodes.values(),...this.labels.values()])n.visible=false;
  const grouped=groupedSquads(frame,z,this.far);this.far=grouped.far;this.groups=grouped.groups;this.hidden=new Set(this.groups.flatMap(g=>g.members));
  for(const u of frame.units){const a=s.sprites.get(u.id);if(!a)continue;const infantry=typeOf(u).kind==='infantry';a.health.clear();
@@ -34,7 +34,7 @@ export class TacticalOverlay{
  if(b.showLabel){const t=this.label(`badge-title:${b.id}`,b.label,x+(17+b.label.length*3)/z,y,z);if(!t.iconLabel){t.style.fontSize=10;t.style.fill=0xf2efdf;t.style.stroke={color:0x25372e,width:3};t.iconLabel=true;}}
  }
  this.combats=combatRegions(frame);
- for(const p of this.combats){const x=p.x_cm*.12,y=p.y_cm*.12,g=this.node(`combat:${p.id}`);g.position.set(x,y);g.scale.set(1/z);g.poly([0,-7,6,5,-6,5]).fill(0xb5483d).stroke({width:1,color:0xffe5c2});}
+ for(const p of this.combats){const x=p.x_cm*.12,y=p.y_cm*.12,g=this.node(`combat:${p.id}`);g.position.set(x+18/z,y-16/z);g.scale.set(1/z);g.poly([0,-7,6,5,-6,5]).fill(0xb5483d).stroke({width:1,color:0xffe5c2});}
  const selected=frame.units.find(u=>u.id===s.selected)??this.groups.find(u=>Number(String(u.id).split(':')[1])===s.selected||u.id===s.selected);
  if(selected){const x=selected.x_cm*.12,y=selected.y_cm*.12,g=this.node('selection');g.position.set(x,y);g.circle(0,0,16/z).stroke({width:2/z,color:0xffedb0});const order=currentOrder(frame,selected),target=order&&(frame.facilities.find(f=>f.id===order.target)??frame.units.find(u=>u.id===order.target));const p=target??(order?.arg0!=null&&[2,7,10,14].includes(order.op)?{x_cm:order.arg0*100,y_cm:order.arg1*100}:null);if(p)g.moveTo(0,0).lineTo(p.x_cm*.12-x,p.y_cm*.12-y).stroke({width:1/z,color:TEAM[selected.team],alpha:.7});}
  for(const f of frame.facilities)if(f.kind==='OBJECTIVE'){const x=f.x_cm*.12,y=f.y_cm*.12,g=this.node(`objective:${f.id}`);g.position.set(x,y);g.scale.set(1/z);g.roundRect(-30,-20,60,16,2).fill(0xfef5ef).stroke({width:2,color:f.owner==null?0xc39a35:TEAM[f.owner]});const t=this.label(`objective:${f.id}`,entityName(frame,f.id),x,y-12/z,z);if(!t.semantic){t.style.fill=0x07004d;t.style.stroke={width:0};t.semantic=true;}}

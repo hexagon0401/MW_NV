@@ -2,7 +2,7 @@
   "infantry": 128,
   "vehicles": 20,
   "stressUnits": 500,
-  "fps": 23,
+  "fps": 20,
   "renderer": "Chromium SwiftShader (cloud CPU); not Intel Mac",
   "errors": []
 }

@@ -16,4 +16,5 @@ export function orderState(frame,c){
  return {text:u&&['MOVING','PATHING','PATH_PENDING','TAKEOFF'].includes(u.task_state)?'이동 중':u&&['WAITING_TRAFFIC','BOARDING_QUEUE','WAITING_PASSENGERS'].includes(u.task_state)?'대기 중':'수행 중',kind:u?.task_state==='WAITING_TRAFFIC'?'waiting':'running'};
 }
 export function orderTarget(frame,c){if(c.target)return entityName(frame,c.target);if([2,7,10,14].includes(c.op)&&c.arg0!=null&&c.arg1!=null){const f=(frame.facilities??[]).find(f=>Math.hypot(f.x_cm/100-c.arg0,f.y_cm/100-c.arg1)<60);return f?entityName(frame,f.id)+' 부근':`${c.arg0}, ${c.arg1}m`;}return '';}
-export function shortState(frame,u){const c=currentOrder(frame,u);return c?`${OPS[c.op]??'명령'} · ${orderState(frame,c).text}`:u.is_group?'도보 병력':stateOf(u);}
+export function orderVerb(frame,c){if(c.op===7){const u=frame.units.find(u=>u.id===c.unit);return u&&((u.passenger_count??0)>0||u.task_state==='WAITING_PASSENGERS')?'수송':'차량 이동';}return OPS[c.op]??'명령';}
+export function shortState(frame,u){const c=currentOrder(frame,u);return c?`${orderVerb(frame,c)} · ${orderState(frame,c).text}`:u.is_group?'도보 병력':stateOf(u);}

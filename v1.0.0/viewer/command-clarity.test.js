@@ -1,7 +1,7 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {entityName,orderState,orderTarget} from './src/command-view.js';import {placeBadges} from './src/badge-layout.js';import {resultLabel} from './src/history.js';
+import {test} from 'node:test';import assert from 'node:assert/strict';import {entityName,orderState,orderTarget,orderVerb} from './src/command-view.js';import {placeBadges} from './src/badge-layout.js';import {resultLabel} from './src/history.js';
 test('semantic names and command phases use actual state',()=>{
  const frame={units:[{id:10,team:0,type_id:'HEL',task_state:'MOVING'}],squads:[],facilities:[{id:202,x_cm:51200,y_cm:51200}]};
- assert.equal(entityName(frame,10),'A 헬기 1');assert.equal(orderState(frame,{unit:10,status:'RUNNING'}).text,'이동 중');assert.equal(orderState(frame,{unit:10,status:'COMPLETED'}).text,'완료');assert.equal(orderTarget(frame,{target:202}),'중앙 광장');assert.equal(resultLabel({winner:1}),'B 승리');assert.equal(resultLabel({winner:null}),'무승부');
+ assert.equal(entityName(frame,10),'A 헬기 1');assert.equal(orderVerb(frame,{op:7,unit:10}),'차량 이동');frame.units[0].passenger_count=8;assert.equal(orderVerb(frame,{op:7,unit:10}),'수송');assert.equal(orderState(frame,{unit:10,status:'RUNNING'}).text,'이동 중');assert.equal(orderState(frame,{unit:10,status:'COMPLETED'}).text,'완료');assert.equal(orderTarget(frame,{target:202}),'중앙 광장');assert.equal(resultLabel({winner:1}),'B 승리');assert.equal(resultLabel({winner:null}),'무승부');
 });
 test('symbols remain anchored and cluster rather than covering terrain',()=>{
  const input=[{id:1,x_cm:1000,y_cm:1000},{id:2,x_cm:1000,y_cm:1000}],copy=JSON.stringify(input);

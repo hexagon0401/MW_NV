@@ -147,3 +147,11 @@ NIM 키 Value 수정 후 실제 지휘 JSON 성공. NIM 요청에는 enable_thin
 축소 시 분대/차량 이름·명령 상태 배지와 실제 사격 기반 교전 표식을 제공한다. 화면용 명령 telemetry는 World 밖에 보존한다.
 사용자에게 상시 서버가 없어 무료 클라우드를 조사한다. Pages는 PPO 실행 서버가 아니며 Oracle Always Free는 조건 미검증 후보일 뿐이다.
 공식 문서 CONNECT403으로 허용 초안만 저장했다. 별도 서버 생성·유료 자원·결제는 실행하지 않았다.
+
+## T05 전장·관전 전면 개선 / 중간 저장
+
+사용자 승인: 차분한 전술 픽셀, 아이콘+짧은 ID, 실제 맵 재설계, 전차 범위 피해, 수동+교전 이동.
+규칙 combined-arms-3 / catalog combined-arms-2 / river-districts v2. 전차 명중 시4m/최대40 HE 범위 피해, 직접 표적 중복·탑승/공중 제외, 아군 피해 유지.
+새 학습은 actor만 이전한 data/self-play-v3; critic/optimizer/buffer/counter 새로 시작. v2 복구본 보존. 지원시설/포병 방향의 진영 반전 오류를 수정했다.
+최종10경기 A5/B5이나 서쪽8/동쪽2. BLOCKED/TRAFFIC_TIMEOUT 잔존; 개선·균형 확보를 주장하지 않는다.
+사용자가 시간상 중단·GitHub 임시 저장을 요청했다. 추가 개발/배포를 멈추며 기존 승인된 반복 학습은 유지한다. 재개는 STATE와 docs/tactical-redesign/REPORT.md·GAMES.md 참조.
