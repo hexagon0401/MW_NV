@@ -76,7 +76,7 @@ def checkpoint(root,model,env,teacher,state):
     for old in sorted(parent.glob('checkpoint-*'),key=lambda p:p.stat().st_mtime)[:-2]:shutil.rmtree(old)
     return directory
 
-def backup_due(completed,last):return completed-last>=10
+def backup_due(completed,last,retry_at=0,now=None):return completed-last>=10 and (time.time() if now is None else now)>=retry_at
 
 def run(root,seed_policy,updates=0,teacher_enabled=True,publish=True):
     root=Path(root);root.mkdir(parents=True,exist_ok=True);(root/'opponents').mkdir(exist_ok=True)
@@ -128,12 +128,12 @@ def run(root,seed_policy,updates=0,teacher_enabled=True,publish=True):
                 shutil.copyfile(current(root)/'latest.npz',root/'opponents'/f'policy-{state["generation"]:08d}.npz')
                 for path in sorted((root/'opponents').glob('*.npz'))[:-8]:path.unlink()
             atomic_json(root/'opponents.json',dict(files=[p.name for p in sorted((root/'opponents').glob('*.npz'))]))
-            if publish and backup_due(env.completed_games,state['last_backup_games']):
+            if publish and backup_due(env.completed_games,state['last_backup_games'],state.get('backup_retry_at',0)):
                 try:
                     from .backup import publish as backup
-                    previous_backup=state['last_backup_games'];backup(root,state['generation']);state['last_backup_games']=env.completed_games;state['backup']='verified';checkpoint(root,model,env,teacher,state)
+                    previous_backup=state['last_backup_games'];backup(root,state['generation']);state['last_backup_games']=env.completed_games;state['backup']='verified';state['backup_retry_at']=0;checkpoint(root,model,env,teacher,state)
                 except Exception as exc:
-                    state['last_backup_games']=previous_backup;state['backup']='deferred:'+type(exc).__name__;checkpoint(root,model,env,teacher,state)
+                    state['last_backup_games']=previous_backup;state['backup']='deferred:'+type(exc).__name__;state['backup_retry_at']=time.time()+300;checkpoint(root,model,env,teacher,state)
             if env.completed_games-state['last_evaluation_games']>=50:
                 report(dict(phase='evaluation'),force=True)
                 from .self_play_evaluate import evaluate

@@ -10,6 +10,6 @@ Resume: atomic current.json generations2; environment/Monitor/RNG/optimizer/ledg
 Backup: 10 completed games -> Release latest; 2 local bundles +8 opponents; metadata branch
 BLOCKER: uploads.github.com POST Forbidden; domain/startup draft saved, user Save/Publish needed
 Verified: Python136; targeted21+recovery8; JS18; builds; Chromium circle/hover/HQ/overview/mobile
-Actual: paired teacher + actor updates; A/B private200; resume6208->6272 verified
+Actual: 10 games/28 updates/442 teacher pairs; local backup triggered; remote deferred
 Next: continue learning; apply egress draft and verify actual Release upload/download SHA
 Limits: no strategy improvement claim; 50-game evaluations pending; environment may stop; usage UNKNOWN

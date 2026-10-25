@@ -24,7 +24,7 @@
 - 세대 폴더를 완성한 뒤 current.json 포인터를 원자적으로 바꾼다. 최근2세대를 유지한다. 레거시 루트는 삭제하지 않는다. 소비 전 rollout 도중 중단된 경험은 마지막 안전 checkpoint부터 다시 수집한다. NIM 미래 응답 자체의 결정론은 보장하지 않는다.
 - 완료 학습 경기10개마다 다음 PPO 업데이트 경계에서 GitHub Release `training-latest`에 세대별 tar.gz를 올린다. 다운로드 SHA256이 맞아야 최신 참조를 바꾸고 이전 Release 자산을 삭제한다. 바이너리를 Git에 커밋하지 않는다.
 - `training/checkpoints` 브랜치에는 작은 manifest만 GitHub API로 기록한다. 현재 코드 작업 트리는 건드리지 않는다. 모델은 ignored data/에만 존재한다.
-- 실패 시 기존 원격 자산/확인된 로컬 복구본과 최신 pending 묶음을 보존한다. 네트워크 오류가 반복돼도 pending 묶음이 무한히 쌓이지 않도록 최대2개로 제한한다.
+- 실패 후5분 backoff를 적용하고 기존 원격 자산/확인된 로컬 복구본과 최신 pending 묶음을 보존한다. 네트워크 오류가 반복돼도 pending 묶음이 무한히 쌓이지 않도록 최대2개로 제한한다.
 - **외부 차단:** Release 생성은 성공했으나 `uploads.github.com` POST가 네트워크 Forbidden이었다. 허용 도메인 초안을 저장했다. 환경 설정에서 검토·저장·Publish해야 실제 업로드와 원격 다운로드 검증을 마칠 수 있다. 현재 원격 모델 백업 완료로 보고하지 않는다. 로컬 pack/restore/체크섬/오류 보존 검사는 통과했다.
 
 ## 검증
@@ -33,7 +33,7 @@
 - NIM 양팀 실제 요청으로8개 교사 선택 표본 수집, actor 모방 업데이트 발생을 확인했다. 실패/429 양쪽 폐기, 관측 격리, 마스크, value head 미갱신, cooldown 저장을 검사한다.
 - 실제 checkpoint를 다른 프로세스에서 이어 학습하여6208→6272 정책 스텝 증가를 확인했다. Gym Monitor 상태도 복구해 env reset 없이 재개한다. 파일 손상/잘못된 SHA/백업 실패 보존을 검사했다.
 - 원형 보병·hover 해제·본진 버튼·분대 축약을 Chromium으로 검사했다. circles-hover.png/headquarters.png/squad-overview.png 및 READABILITY.md 참조.
-- 50경기 정기 평가와10경기 원격 업로드는 아직 해당 횟수/네트워크 조건을 충족하지 않아 전체 실전 완료로 보고하지 않는다.
+- 실제10경기 완료 후 백업 트리거·로컬 묶음 생성을 확인했지만 원격 업로드는 네트워크 Forbidden으로 보류됐다.50경기 정기 평가는 아직 실행 전이다.
 
 ## 재개
 

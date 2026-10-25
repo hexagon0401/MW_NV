@@ -71,6 +71,7 @@ def test_backup_threshold_and_failure_preserves_prior(tmp_path,monkeypatch):
     from learning import backup
     assert not backup_due(9,0) and backup_due(10,0) and not backup_due(10,10)
     assert backup_due(20,10)
+    assert not backup_due(10,0,retry_at=100,now=99) and backup_due(10,0,retry_at=100,now=100)
     (tmp_path/'latest.zip').write_bytes(b'fixture');(tmp_path/'state.json').write_text('{"completed_games":10}')
     (tmp_path/'backup-status.json').write_text('verified-old')
     def fail(*args,**kwargs):raise RuntimeError('network unavailable')
