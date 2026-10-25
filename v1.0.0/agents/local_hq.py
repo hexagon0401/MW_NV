@@ -1,5 +1,6 @@
 """Local OpenAI-compatible protocol; only engine-validated opcodes escape."""
 import json,os
+from concurrent.futures import ThreadPoolExecutor
 from urllib.request import Request,urlopen
 from urllib.parse import urlparse
 from .rule_hq import RuleHQ
@@ -8,11 +9,11 @@ from engine.types import Team
 
 
 class LocalHQ:
-    def __init__(self,base_url='http://127.0.0.1:8080/v1',model='local',timeout=60,transport=None):
+    def __init__(self,base_url='http://127.0.0.1:8080/v1',model='local',timeout=60,transport=None,api_key=None):
         url=urlparse(base_url)
         self.api_key=None
         if base_url.rstrip('/')=='https://integrate.api.nvidia.com/v1':
-            self.api_key=os.environ.get('NVIDIA_API_KEY') or os.environ.get('NvidiaNIM')
+            self.api_key=api_key or os.environ.get('NVIDIA_API_KEY') or os.environ.get('NvidiaNIM')
             if not self.api_key:raise ValueError('NVIDIA_API_KEY required')
         elif url.scheme!='http' or url.hostname not in ('localhost','127.0.0.1','::1') or url.username or url.password:
             raise ValueError('local HTTP endpoint required')
@@ -60,8 +61,13 @@ class LocalHQ:
 def issue_hq_round(engine,policies):
     """Decision barrier: no simulation step until both snapshots have decisions."""
     snapshots={t:engine.observe(t) for t in Team};batches={}
+    order=list(Team)
+    if (engine.world.tick//150)%2:order.reverse()
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        pending={t:pool.submit(policies[t].observe_and_issue,snapshots[t]) for t in order}
+        responses={t:pending[t].result() for t in Team}
     for team in Team:
-        policy=policies[team];commands=policy.observe_and_issue(snapshots[team])
+        policy=policies[team];commands=responses[team]
         try:
             if len(commands)>4:raise OrderError('TOO_MANY_COMMANDS')
             for command in commands:

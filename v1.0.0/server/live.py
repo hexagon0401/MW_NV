@@ -24,7 +24,7 @@ class LiveRunner:
         if hq=='nim':
             endpoint='https://integrate.api.nvidia.com/v1'
             if model=='local':model='nvidia/nemotron-3.5-lightning-30b-a3b'
-        self.hq=hq;self.policies={t:HybridHQ(endpoint,model,policy=policy) if hq in ('local','nim') else (TacticalHQ(policy) if self.engine.world.config.map_width_m>=1024 else RuleHQ()) for t in Team}
+        self.hq=hq;self.policies={t:HybridHQ(endpoint,model,policy=policy,timeout=30 if hq=='nim' else 60,api_key=os.environ.get('NVIDIA_API_KEY_A' if t==0 else 'NVIDIA_API_KEY_B') if hq=='nim' else None) if hq in ('local','nim') else (TacticalHQ(policy) if self.engine.world.config.map_width_m>=1024 else RuleHQ()) for t in Team}
         self.stream_id=uuid.uuid4().hex;self.condition=Condition();self.stop_event=Event();self.thread=None
         w=self.engine.world
         self.map=dict(catalog=dict(version=w.catalog_version,units=deepcopy(w.unit_specs),vehicles=deepcopy(w.vehicle_specs),weapons=deepcopy(w.weapon_specs)),width_m=w.config.map_width_m,height_m=w.config.map_height_m,terrain=deepcopy(w.terrain.cells))

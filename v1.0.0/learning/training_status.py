@@ -12,8 +12,9 @@ class Reporter:
         if not force and now-self.last<30:return
         self.last=now;elapsed=now-self.start
         doc=dict(schema=1,status='running',updated_at=datetime.now(timezone.utc).isoformat(),round=self.round+1,completed_steps=self.base_steps,**self.state)
-        doc.update(sim_speed=round(doc.get('sim_seconds',0)/max(.001,elapsed),1),device='CPU',algorithm='MaskablePPO',maps='4 terrain variants',replay_speed=1,nim_in_training=False)
+        doc.update(sim_speed=round(doc.get('sim_seconds',0)/max(.001,elapsed),1),device='CPU',algorithm='MaskablePPO',maps='4 terrain variants',replay_speed=1,nim_in_training=doc.get('nim_in_training',False))
         tmp=self.root/'training-status.partial';tmp.write_text(json.dumps(doc));tmp.replace(self.root/'training-status.json')
+        Path('data/training-status.json').write_text(json.dumps(doc))
         if os.environ.get('MW_NV_PUBLISH_TRAINING')=='1':
             try:
                 from cloud.supabase_storage import PrivateStorage

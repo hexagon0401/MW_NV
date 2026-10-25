@@ -53,16 +53,17 @@ def test_sse_bootstrap_update_reconnect_and_stop():
 
 def test_llm_barrier_freezes_clock_and_publishes_waiting_state():
     entered,release=Event(),Event();runner=LiveRunner(Engine(),hq='local');calls=[]
-    def answer(payload):
-        calls.append(json.loads(payload['messages'][1]['content'])['team'])
-        entered.set();release.wait(2);return '{"commands":[]}'
-    for policy in runner.policies.values():policy.transport=answer
+    def answer(team,payload):
+        assert 'team' not in json.loads(payload['messages'][1]['content'])
+        calls.append(int(team))
+        entered.set();release.wait(2);return '{"candidate_ids":[]}'
+    for team,policy in runner.policies.items():policy.transport=lambda payload,team=team:answer(team,payload)
     try:
         runner.start();assert entered.wait(1)
         waiting=runner.snapshot();assert waiting['status']=='waiting_for_hq' and waiting['frame']['tick']==0
         release.set();running=runner.wait_after(waiting['seq'],2)
         assert running['status']=='running' and running['frame']['tick']>=1
-        assert calls==[0,1]
+        assert sorted(calls)==[0,1]
     finally:release.set();runner.stop()
 
 

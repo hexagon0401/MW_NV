@@ -1,15 +1,15 @@
 # MW-NV v1.0.0 STATE
-Current: T03 readability + NIM teacher/self-play/recovery upgrade
-Status: readability built/tested; teacher/self-play/backup implementation in progress
-Site: https://mw-nv.pages.dev; latest training replay ?match=training-latest
-Deploy: https://22caad51.mw-nv.pages.dev; public viewer; Supabase private objects
-UI: /api/training every30s; steps/round/sim-speed/CPU/time; stale report marked
-Training: rounds0/steps256; data/nim-approved-training; runner.pid / runner-v2.log
-Resume: .zip weights/optimizer; mixed opponents; retain latest8 +100-round milestones
-Maps: four geometry/cover variants, injected scenario factory; train0–49/eval10000–10099
-Replay: latest completed only, gzip/checksum/one object; original ticks/default1x
-Verified: readability JS17/build/desktop+mobile; teacher/HQ8; new pipeline checks pending
-Verified: round9 policy_steps512 resumed round8; remote training200/list contains training-latest
-Baseline transfer: old policy0/2 wins on held-out mirrored seed; no improvement claim
-Next: continue training; paired held-out evaluations before promoting any policy
-Limits: Codex environment may stop; NIM unused in PPO; arbitrary new maps unproven; usage UNKNOWN
+Current: T03 readability + paired NIM teacher/shared Self-Play + verified Release backup
+Status: visual deployed; NIM teacher/actor imitation running; remote backup egress BLOCKED
+Site: https://mw-nv.pages.dev; latest completed training ?match=training-latest
+Visual: circular infantry, screen-size HP, squad LOD, HQ/team markers, hover range/shots
+Replay: passenger counts include embark/disembark/rewind; original rules/physics preserved
+Training: data/self-play-v2; runner.pid / runner.log; shared policy from legacy round33
+Teacher: paired everyHQ; anonymized IDs/SELF coords; 10k buffer; PPO64 + imitation.05
+Resume: atomic current.json generations2; environment/Monitor/RNG/optimizer/ledger restored
+Backup: 10 completed games -> Release latest; 2 local bundles +8 opponents; metadata branch
+BLOCKER: uploads.github.com POST Forbidden; domain/startup draft saved, user Save/Publish needed
+Verified: Python136; targeted19; JS17; builds; Chromium circle/hover/HQ/overview/mobile
+Actual: 4 completed,189 paired labels,12 imitation updates; resume6208->6272 verified
+Next: continue learning; apply egress draft and verify actual Release upload/download SHA
+Limits: no strategy improvement claim; 50-game evaluations pending; environment may stop; usage UNKNOWN

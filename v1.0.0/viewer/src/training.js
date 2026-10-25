@@ -1,7 +1,7 @@
 export function describeTraining(data,now=Date.now()){
  if(!data||!Number.isFinite(Date.parse(data.updated_at)))return '학습 현황 — 연결 확인 불가';
  const stale=now-Date.parse(data.updated_at)>180000;
- return `${stale?'마지막 보고 · ':''}${data.phase==='checkpoint_saved'?'체크포인트 저장':'PPO 학습 중'} · ${data.round}회차 · 누적 완료 ${Number(data.completed_steps??0).toLocaleString()}스텝 · 정책 ${Number(data.policy_steps??0).toLocaleString()}스텝 · 시뮬레이션 ${data.sim_speed??'—'}× · ${data.maps??'—'} · CPU · NIM 미사용 · ${new Date(data.updated_at).toLocaleTimeString('ko-KR')}`;
+ return `${stale?'마지막 보고 · ':''}${data.phase==='checkpoint_saved'?'체크포인트 저장':'PPO 학습 중'} · 업데이트 ${data.round} · 완료 ${data.games??0}경기 · 누적 완료 ${Number(data.completed_steps??0).toLocaleString()}스텝 · 정책 ${Number(data.policy_steps??0).toLocaleString()}스텝 · 시뮬레이션 ${data.sim_speed??'—'}× · ${data.maps??'—'} · CPU · ${data.nim_in_training?`NIM 교사 · ${data.teacher?.paired??0}회 수집`:'NIM 미사용'} · ${data.backup==='verified'?'백업 검증됨':data.backup?.startsWith('deferred')?'백업 재시도 대기':'10경기 백업 대기'} · ${new Date(data.updated_at).toLocaleTimeString('ko-KR')}`;
 }
 export function startTrainingStatus(){
  const label=document.getElementById('training-text');if(!label)return;

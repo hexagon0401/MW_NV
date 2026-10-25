@@ -18,7 +18,7 @@ class TrainingEnv(gym.Env):
         self.observation_space=self.parallel.observation_space(controlled);self.action_space=self.parallel.action_space(controlled)
     def reset(self,seed=None,options=None):
         super().reset(seed=seed);chosen=(self.episode+self.seed_offset)%50 if seed is None else seed%50;self.episode+=1
-        obs,_=self.parallel.reset(chosen,options=dict(swap=bool(self.episode%2)))
+        obs,_=self.parallel.reset(chosen,options=dict(swap=(options or {}).get('swap',bool(self.episode%2))))
         from engine.viewer_export import frame
         self.initial_frame=frame(self.parallel.engine.world)
         return obs[self.controlled],{}
@@ -31,7 +31,7 @@ class TrainingEnv(gym.Env):
         if done[self.controlled]:self.games+=1
         if done[self.controlled] and self.stats:
             from .results import record_world
-            record_world(self.stats,e.engine.world,'training',{self.controlled:self.run_id,self.other:self.opponent.policy_id if self.opponent else 'algorithm'},steps=0)
+            self.last_match_inserted=record_world(self.stats,e.engine.world,'training',{self.controlled:self.run_id,self.other:self.opponent.policy_id if self.opponent else 'algorithm'},steps=0,match_id=getattr(self,'match_id',None))
         if done[self.controlled] and os.environ.get('MW_NV_PUBLISH_TRAINING')=='1':
             try:
                 from .replay_sink import publish_latest
