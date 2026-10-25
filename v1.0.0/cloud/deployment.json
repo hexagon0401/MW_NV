@@ -8,6 +8,6 @@
   "visibility": "public-completed-matches",
   "storage_provider": "supabase-private",
   "site_url": "https://mw-nv.pages.dev",
-  "deployment_url": "https://6af5b1f9.mw-nv.pages.dev",
-  "cloudflare_deploy_status": "success; final polish and public verification pending"
+  "deployment_url": "https://aac65376.mw-nv.pages.dev",
+  "cloudflare_deploy_status": "success; public HTML/assets/APIs/replay and Chromium verified"
 }

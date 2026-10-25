@@ -155,3 +155,5 @@ NIM 키 Value 수정 후 실제 지휘 JSON 성공. NIM 요청에는 enable_thin
 새 학습은 actor만 이전한 data/self-play-v3; critic/optimizer/buffer/counter 새로 시작. v2 복구본 보존. 지원시설/포병 방향의 진영 반전 오류를 수정했다.
 최종10경기 A5/B5이나 서쪽8/동쪽2. BLOCKED/TRAFFIC_TIMEOUT 잔존; 개선·균형 확보를 주장하지 않는다.
 사용자가 시간상 중단·GitHub 임시 저장을 요청했다. 추가 개발/배포를 멈추며 기존 승인된 반복 학습은 유지한다. 재개는 STATE와 docs/tactical-redesign/REPORT.md·GAMES.md 참조.
+
+2026-10-26 재개 완료: 최종 UI 배포 aac65376 및 공개 HTML/JS·전적·학습·rules3 최신 리플레이·Chromium 검증을 마쳤다. 기존 학습 worker는 중복 시작하지 않고 유지했다. 경로/교통/진영 효과 개선은 별도 후속 작업이다.

@@ -13,7 +13,7 @@
   "supabase_matches": 2,
   "deployed": true,
   "site_url": "https://mw-nv.pages.dev",
-  "deployment_url": "https://9ee26e3a.mw-nv.pages.dev",
+  "deployment_url": "https://aac65376.mw-nv.pages.dev",
   "deployment_stage": "success",
   "public_site_http": 200,
   "production_supabase_secret_present": true,
@@ -92,5 +92,19 @@
     "history_http": 200,
     "observed_completed_matches": 72,
     "hosting": "external CPU not provisioned; Oracle official docs CONNECT403"
+  },
+  "tactical_redesign": {
+    "javascript_tests": 22,
+    "python_previous_full": 150,
+    "python_followup_safety": 1,
+    "public_html_asset_hash": "PASS",
+    "public_stats_history_training_replay_http": 200,
+    "replay_rules": "combined-arms-3",
+    "replay_catalog": "combined-arms-2",
+    "map": "river-districts v2",
+    "initial_units": 148,
+    "chromium": "public site/fonts/history PASS; no page errors",
+    "verified_at_kst": "2026-10-26T08:48:52+09:00",
+    "traffic_and_start_side_effects": "remain; see docs/tactical-redesign/GAMES.md"
   }
 }

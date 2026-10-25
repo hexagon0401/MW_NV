@@ -31,7 +31,7 @@ rules combined-arms-3, catalog combined-arms-2, map river-districts v2. 명중 �
 
 ## 배포와 한계
 
-Pages preview 배포의 success는 Cloudflare API에서 확인했다. preview 서브도메인 HTTP 요청은 환경 네트워크 CONNECT403으로 막혀 실제 원격 화면 검사는 못 했다(preview.json). 같은 빌드의 로컬 Chromium 검사 후 정식 배포의 HTML/정적 자산/전적/새 규칙 리플레이를 따로 확인한다. Production Secret을 복사하거나 공개하지 않는다. 이전 production 배포는 rollback용으로 보존한다.
+Pages preview 배포의 success는 Cloudflare API에서 확인했다. preview 서브도메인 HTTP 요청은 환경 네트워크 CONNECT403으로 막혀 실제 원격 화면 검사는 못 했다(preview.json). 같은 빌드의 로컬 Chromium 검사에 이어 2026-10-26 정식 사이트의 HTML/JavaScript 해시, 전적/학습 API와 새 규칙 리플레이, 실제 원격 Chromium 화면을 검증했다. Production Secret을 복사하거나 공개하지 않는다. 이전 production 배포는 rollback용으로 보존한다.
 
 PPO는 현재 Codex CPU 환경에서 동작한다. Pages에는 학습 프로세스를 올리지 않았으며 환경 종료 후 상시 실행을 보장하지 않는다. 새 유료 서비스나 외부 CPU 서버를 만들지 않았다. 사용량 UNKNOWN.
 
@@ -46,3 +46,13 @@ PPO는 현재 Codex CPU 환경에서 동작한다. Pages에는 학습 프로세�
 ## 사용자 요청으로 중간 저장
 
 2026-10-25 개발 중단. 핵심 배포6af5b1f9는 성공했지만 공개 주소 API 검증과 최종 UI polish 재배포는 아직 하지 않았다. 최종 로컬 build/JS22/이동 부대 추적 포함 Chromium 검사는 통과했다. 최종500유닛 결과20FPS는 클라우드 SwiftShader이며 Intel Mac 결과가 아니다. 개발 중단 시 학습 worker는 계속 실행 중이었다(gen36, 새13경기,2304스텝, paired teacher34). 새 학습 모델은 ignored data/self-play-v3에 보존하며 원격 Release 백업은 여전히 차단돼 있다. 모델이 Git에 올라갔다고 간주하지 않는다.
+
+## 재개 후 완료 — 2026-10-26 (한국 시간)
+
+최종 UI를 https://aac65376.mw-nv.pages.dev 에 배포하고 https://mw-nv.pages.dev 에서 확인했다. JavaScript22개와 production/Functions build를 다시 통과했다. 엔진/게임 규칙 소스는 이번 재개에서 변경하지 않았으며 이전 Python150개+관측 격리/위험 후보1개 결과를 유지한다.
+
+공개 HTML과 JavaScript가 로컬 최종 빌드와 바이트/해시 일치한다. stats/history/training/최신 리플레이 모두HTTP200. 최신 리플레이는 combined-arms-3 / catalog2 / river-districts v2 / 초기148기물 / 완료 경기다. 원격 Chromium에서 실제 관전 로딩, 폰트와 전적 팝업50건, pageerror0개를 확인했다. 검증 시각과 수치는 production.json, 화면은 deployed.png에 보존했다.
+
+기존 worker를 재시작하지 않았다. 649경기/114624스텝 진행을 확인했고, 공개 보고에서650경기/114752스텝의 보류 평가 단계도 확인했다. 이전 진행량과 이번 검증 결과를 전략 향상으로 해석하지 않는다. Release 백업 미검증·영구 외부CPU 부재·Intel Mac 미검증과 GAMES.md의 교통/진영 효과는 남아 있다.
+
+![정식 배포 관전 화면](deployed.png)

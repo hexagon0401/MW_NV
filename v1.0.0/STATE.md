@@ -1,15 +1,15 @@
 # MW-NV v1.0.0 STATE
-Current: T05 WIP saved at user request; development paused
-Done: compact icons/selection/follow, district map/art, rules3 tank splash/VFX, actor migration
-Verified: Python150 + safety1; JS22; Vite/Functions; Chromium mobile/500 units20FPS SW
-Games: final10 complete A5/B5; deterministic reexecution PASS; west8/east2; traffic failures remain
-Evidence: docs/tactical-redesign/REPORT.md, GAMES.md, screenshots and games.json
-Production: https://mw-nv.pages.dev deployment6af5b1f9 (earlier build); remote verification PENDING
-Pending: final tested UI polish NOT deployed; preview CF success but preview GET CONNECT403
-Training: self-play-v3 worker20442 kept running per continuous-training authorization
-Observed: generation36,13 completed new games,2304steps; paired teacher34; no improvement claim
-Legacy: self-play-v2 checkpointgen256/games93/steps23040 preserved; rules2 cannot resume on rules3
-Recovery: .venv/bin/python -m learning.self_play --root data/self-play-v3 --seed-policy data/self-play-v3/seed.zip
-Next: inspect PID/state first; deploy final viewer/dist, verify public APIs/new replay, update PR1
-Blocker: Release uploads forbidden; local models kept; startup draft v3 saved needs Save/Publish
-Limits: no permanent CPU server; Intel Mac unverified; usage UNKNOWN
+Current: T05 COMPLETE; final tactical UI deployed and public site verified 2026-10-26 KST
+Site: https://mw-nv.pages.dev; production https://aac65376.mw-nv.pages.dev
+Verified: prior Python150+safety1; today JS22, production/Functions build
+Remote: HTML/JS hash match; stats/history/training/latest replay HTTP200; Chromium fonts/history PASS
+Replay: rules3/catalog2/river-districts v2;148 initial units; completed latest training match
+Games: final10 A5/B5; deterministic rerun PASS; west8/east2; BLOCKED/TRAFFIC_TIMEOUT remain
+Evidence: docs/tactical-redesign/REPORT.md, GAMES.md, production.json, deployed.png
+Training: existing self-play-v3 worker20442 retained; observed650 games/114752steps; evaluation phase
+Recovery: inspect PID first; .venv/bin/python -m learning.self_play --root data/self-play-v3 --seed-policy data/self-play-v3/seed.zip
+Legacy: self-play-v2 rules2 checkpointgen256/games93/steps23040 preserved; never resume as rules3
+Blocker: Release uploads deferred; local recovery kept; no verified remote model backup
+Startup: v3 environment draft saved but needs user Save/Publish; no permanent external CPU
+Next: separate traffic/formation arrival diagnosis and larger paired-side evaluation; PR1 updated
+Limits: Intel Mac/performance improvement unverified; usage UNKNOWN
