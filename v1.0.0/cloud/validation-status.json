@@ -13,7 +13,7 @@
   "supabase_matches": 2,
   "deployed": true,
   "site_url": "https://mw-nv.pages.dev",
-  "deployment_url": "https://aac65376.mw-nv.pages.dev",
+  "deployment_url": "https://aea6b716.mw-nv.pages.dev",
   "deployment_stage": "success",
   "public_site_http": 200,
   "production_supabase_secret_present": true,
@@ -106,5 +106,14 @@
     "chromium": "public site/fonts/history PASS; no page errors",
     "verified_at_kst": "2026-10-26T08:48:52+09:00",
     "traffic_and_start_side_effects": "remain; see docs/tactical-redesign/GAMES.md"
+  },
+  "objective_statistics": {
+    "python_targeted": 14,
+    "javascript": 24,
+    "public_api_http": 200,
+    "chromium": "fixtures desktop/mobile plus real public modal PASS",
+    "new_completed_game_collection": "PASS",
+    "legacy": "unknown, not backfilled",
+    "causality": "not established"
   }
 }

@@ -1,4 +1,4 @@
-# 先점령·승패 통계
+# 선점령·승패 통계
 
 목적: 중앙·북부·남부 선점과 최종 승패의 관계를 나중에 검증할 수 있도록 완료 경기 원장에 자료를 쌓는다. 빈도/승률은 상관관계이며 인과 효과나 강화학습의 발견 자체를 증명하지 않는다.
 
@@ -30,3 +30,9 @@ mode/rules_version/catalog_version/map_id/map_version/map_family/swapped/policy_
 Python14개(거점 수집·필터·보유/상실/회복·동시 점령·누락·원장/JSONL·순수성·API 포함), JavaScript24개, production build 통과. 추가로 기존 training enhancement 관련 검사를 포함한17개도 통과했다. Chromium의 desktop/mobile 필터·횡스크롤·Escape는 명시적인 fixture로 검사했다. desktop-fixture.png/mobile-fixture.png는 실제 누적 승률이 아니다.
 
 향후 전체 학습 교정·GitHub 정책 이관·전술 발견 검증은 docs/learning-repair-plan.md에 정리돼 있으며 이번 거점 통계 구현이 그 전체 계획 완료를 뜻하지 않는다.
+
+## 실제 적용 확인 — 2026-10-26 KST
+
+정식 배포 aea6b716, 사이트 https://mw-nv.pages.dev. 공개 /api/objectives HTTP200과 원격 Chromium 표/필터 진입 및 pageerror0을 확인했다. 실제 학습 완료 경기의 최초 점령 팀·소유 상실·최종 소유가 SQLite에 기록됐으며, 공개 집계에도 새 자료1경기가 반영된 것을 확인했다(production.json/deployed.png). 이는 기능 동작 증거이며 선점 효과에 대한 충분한 통계 표본이 아니다.
+
+원장에는 기존 경기의 선점 정보를 추정해 채우지 않았다. 수집률의 '과거 정보 없음'에 남아 있으며 새로 완료되는 경기부터 증가한다. 학습은 안전 checkpoint에서 그대로 재개했고 가중치/optimizer/보상/엔진 규칙은 변경하지 않았다. 확인 시 generation1876,681경기,120064스텝까지 이어졌다.
