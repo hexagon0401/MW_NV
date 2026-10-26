@@ -61,6 +61,7 @@ def run(root,source,pilot=200,teacher_enabled=True,max_updates=0):
             if progress_path.exists():evaluation_cases=len(json.loads(progress_path.read_text())['results'])
         reporter.round=state['generation'];reporter.base_steps=sum(m.num_timesteps for m in models)
         reporter(dict(phase=phase,status='running',games=state['completed_games'],policy_steps=reporter.base_steps,sim_seconds=simulated,algorithm='Independent MaskablePPO',learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows),imitation_updates=buffers[i].stats.get('imitation_updates',0)) for i,m in enumerate(models)],teacher=dict(querier.stats),nim_in_training=teacher_enabled,decision_seconds=10,teacher_seconds=30,initial_evaluation_parallel=state.get('initial_evaluation_parallel',False),evaluation_cases=evaluation_cases,evaluation_total=80,backup=state.get('backup','pending'),pilot=pilot,assignments=state['assignments'],rules_version=RULES_VERSION,map_id='river-districts',map_version='2'),force=force)
+    if hasattr(reporter,'advance_simulation'):report.advance_simulation=reporter.advance_simulation
     def teach(e):
         if not teacher_enabled:return
         querier.rows.clear();querier.collect(e)

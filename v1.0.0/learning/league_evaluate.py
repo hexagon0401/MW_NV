@@ -33,8 +33,11 @@ def evaluate(root,models,state,progress=None,seeds=range(10000,10005),scenario_f
                         else:
                             env=CandidateEnv(scenario_factory=scenario_factory,decision_seconds=10);env.reset(seed,options={'swap':swap});initial=frame(env.engine.world);other='B' if team=='A' else 'A'
                             while env.agents:
+                                before=env.engine.world.tick
                                 action={a:(policy.predict(env.vector(a),env.mask(a)) if a==team else baseline.predict(env.vector(a),env.mask(a)) if opponent_name=='initial' else env.heuristic(a)) for a in env.agents};env.step(action)
-                                if progress:progress('evaluation')
+                                if progress:
+                                    if hasattr(progress,'advance_simulation'):progress.advance_simulation((env.engine.world.tick-before)*.2)
+                                    progress('evaluation')
                             w=env.engine.world;score=.5 if w.winner is None else float(int(w.winner)==('A','B').index(team))
                             policies={team:policy.policy_id,other:baseline.policy_id if opponent_name=='initial' else 'algorithm'}
                             mid=f'{state["run"]}-eval-{state["completed_games"]}-{hashlib.sha256(identity.encode()).hexdigest()[:16]}'

@@ -39,8 +39,10 @@ def play(seed,scenario_id,policies=None,swap=False,progress=None,limit=None,reco
             for command in batches[t]:
                 try:e.submit_for(t,command)
                 except OrderError:pass
-        e.step(10);decisions+=1
-        if progress:progress('evaluation')
+        before=w.tick;e.step(10);decisions+=1
+        if progress:
+            if hasattr(progress,'advance_simulation'):progress.advance_simulation((w.tick-before)*.2)
+            progress('evaluation')
     return e,dict(seed=seed,scenario_id=str(scenario_id),swapped=swap,complete=bool(getattr(w,'ended',False)),winner=None if getattr(w,'winner',None) is None else int(w.winner),scores=[w.teams[t].score for t in (0,1)],tick=w.tick,hash=w.checksum(),metrics=collect(w,initial),failures=dict(Counter(ev['payload'].get('reason','unknown') for ev in w.events if ev['event_kind']=='ORDER_FAILED')))
 
 

@@ -21,7 +21,9 @@ class TeacherBuffer:
             self.cooldown=time.monotonic()+max(0,float(d['cooldown_until'])-time.time()) if 'cooldown_until' in d else 0
             for row in zip(d['x'],d['mask'],d['action'],d['team']):self.rows.append(row)
     def collect(self,env,clients=None):
-        if time.monotonic()<self.cooldown:self.stats['skipped']+=1;return
+        if time.monotonic()<self.cooldown:
+            self.stats['skipped']+=1;self.stats['retry_in_seconds']=round(self.cooldown-time.monotonic(),1);return
+        started=time.monotonic()
         try:
             if clients is None:clients=[LocalHQ('https://integrate.api.nvidia.com/v1',model='nvidia/nemotron-3.5-lightning-30b-a3b',timeout=30,api_key=os.environ.get('NVIDIA_API_KEY_A' if t==0 else 'NVIDIA_API_KEY_B')) for t in (0,1)]
             observations=[env.raw(a) for a in ('A','B')];self.stats['requests']+=2
@@ -39,6 +41,7 @@ class TeacherBuffer:
                     staged.append((values,mask,action,team))
                     if action!=64:selected.append(next(c for c in available if c['id']==action))
             self.rows.extend(staged);self.stats['paired']+=1
+            self.stats.update(consecutive_network_failures=0,last_error=None,last_error_code=None)
         except Exception as exc:
             # Teacher failures never create one-sided labels or stop PPO.
             self.stats['skipped']+=1
@@ -49,7 +52,15 @@ class TeacherBuffer:
                     try:delay=parsedate_to_datetime(exc.headers['Retry-After']).timestamp()-time.time()
                     except (ValueError,TypeError,KeyError):delay=60
                 self.cooldown=time.monotonic()+max(1,delay)
-            self.stats['last_error']=type(exc).__name__;self.stats['last_error_code']=getattr(exc,'code',None)
+            code=getattr(exc,'code',None)
+            if (code is None and isinstance(exc,OSError)) or (code is not None and 500<=code<600):
+                failures=min(4,self.stats.get('consecutive_network_failures',0)+1)
+                self.stats['consecutive_network_failures']=failures
+                self.cooldown=time.monotonic()+min(300,60*2**(failures-1))
+            self.stats['last_error']=type(exc).__name__;self.stats['last_error_code']=code
+        finally:
+            self.stats['last_request_seconds']=round(time.monotonic()-started,3)
+            self.stats['retry_in_seconds']=round(max(0,self.cooldown-time.monotonic()),1)
     def imitate(self,model):
         import torch
         groups=[[r for r in self.rows if r[3]==t] for t in (0,1)]

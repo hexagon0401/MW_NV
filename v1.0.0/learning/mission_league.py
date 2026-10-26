@@ -73,6 +73,7 @@ def run(root,source,pilot=192,teacher_enabled=True,max_updates=0,collection_roun
             if progress_path.exists():evaluation_cases=len(json.loads(progress_path.read_text())['results'])
         reporter.round=state['generation'];reporter.base_steps=sum(m.num_timesteps for m in models)
         reporter(dict(phase=phase,status='running',games=state['completed_games'],policy_steps=reporter.base_steps,sim_seconds=simulated,algorithm='Independent multi-mode MaskablePPO',maps='3 balanced mission modes',learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows),imitation_updates=buffers[i].stats.get('imitation_updates',0)) for i,m in enumerate(models)],teacher=dict(querier.stats),nim_in_training=teacher_enabled,decision_seconds=10,teacher_seconds=30,game_mode=getattr(env.engine.world,'mode','conquest'),scenario_id=env.scenario_id,initial_evaluation_parallel=False,evaluation_cases=evaluation_cases,evaluation_total=240,backup=state.get('backup','pending'),pilot=pilot,assignments=state['assignments'],rules_version=RULES_VERSION,map_id='mixed-2-3-4',map_version='1'),force=force)
+    if hasattr(reporter,'advance_simulation'):report.advance_simulation=reporter.advance_simulation
     def teach(e):
         if not teacher_enabled:return
         querier.rows.clear();querier.collect(e)

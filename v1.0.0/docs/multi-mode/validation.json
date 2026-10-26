@@ -1,6 +1,6 @@
 {
   "static_checks_passed": true,
-  "code_sha256": "32cae9bc6e8a5915ef0b3a6387e83ecbdce34caca176c811c5c6b2643c8cdaa2",
+  "code_sha256": "6635b567344732148ae9808e7b0da22305a89c420c0007874d3e5f562a76547e",
   "geometry_complete": true,
   "geometry_seeds_per_mode": 30,
   "python_full_suite": {
@@ -53,5 +53,11 @@
   "heli_interruption_regression": {
     "passed": 40,
     "report": "../heli-interruption/verification.json"
+  },
+  "speed_reporting_regression": {
+    "status": "passed",
+    "tests": 29,
+    "engine_rules_changed": false,
+    "report": "../speed-reporting/README.md"
   }
 }
