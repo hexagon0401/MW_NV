@@ -1,0 +1,3 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {introSpec} from './src/dashboard/intro.js';import {number,percentage} from './src/dashboard/components.js';
+test('unknown telemetry differs from measured zero',()=>{assert.equal(number(null),'—');assert.equal(number(0),'0');assert.equal(percentage(0,0),'—');assert.equal(percentage(0,20),'0.0%');});
+test('intro has a finite glyph and duration budget on mobile and desktop',()=>{assert.deepEqual(introSpec(390),{columns:6,characters:120,duration:900});assert.deepEqual(introSpec(1440),{columns:12,characters:240,duration:900});});

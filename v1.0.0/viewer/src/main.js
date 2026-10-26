@@ -1,11 +1,7 @@
 import {renderMission} from './mission-view.js';
-import {startLeagueView} from './league-view.js';
-import {startObjectiveStatistics} from './objective-statistics.js';
 import {entityName,currentOrder,orderState,orderTarget,orderVerb} from './command-view.js';
-import {startHistory} from './history.js';
 import {watchLatestReplay} from './latest-replay.js';
-import {startTrainingStatus} from './training.js';
-import './style.css';import {refreshStats} from './stats.js';import {configureCatalog} from './catalog.js';import {Timeline} from './timeline.js';import {Battlefield} from './battlefield.js';import {renderHud,tooltip} from './ui.js';
+import './style.css';import {configureCatalog} from './catalog.js';import {Timeline} from './timeline.js';import {Battlefield} from './battlefield.js';import {renderHud,tooltip} from './ui.js';
 const $=id=>document.getElementById(id),host=$('field'),live=new URLSearchParams(location.search).get('mode')==='live';
 let scene,timeline,currentFrame,elapsed=0,paused=false,last=performance.now(),lastHud='',streamId,seq=-1,pointer=null,touchStart=null;const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 function connection(text){$('connection').textContent=text;}
@@ -22,7 +18,7 @@ $('pause').onclick=()=>{paused=!paused;$('pause').textContent=paused?'재생':'�
 host.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;if(e.target.closest('button,select,input,#minimap')){pointer=null;if(scene)scene.hovered=null;tooltip(null);return;}const r=host.getBoundingClientRect();pointer={x:e.clientX-r.left,y:e.clientY-r.top};});host.addEventListener('pointerleave',e=>{if(e.pointerType==='touch')return;pointer=null;if(scene)scene.hovered=null;tooltip(null);});
 for(const button of document.querySelectorAll('[data-panel]'))button.onclick=()=>{const side=button.dataset.panel,opening=!$(`team-${side}`).classList.contains('open');for(const id of ['a','b']){$(`team-${id}`).classList.toggle('open',id===side&&opening);document.querySelector(`[data-panel=${id}]`).setAttribute('aria-expanded',id===side&&opening);}tooltip(null);};
 let lastViewStamp='';
-function tick(now){const viewStamp=scene&&JSON.stringify([scene.camera.x,scene.camera.y,scene.camera.zoom,scene.selected,scene.follow,pointer,elapsed]);if(!live&&paused&&currentFrame&&viewStamp===lastViewStamp){last=now;requestAnimationFrame(tick);return;}lastViewStamp=viewStamp;const dt=Math.min((now-last)/1000,.25);last=now;if(!live&&timeline&&scene){if(!paused)elapsed=Math.min(timeline.duration,elapsed+dt*Number($('speed').value));const frame=timeline.at(elapsed);paint(frame,reducedMotion?0:elapsed,`${frame.tick}`);$('seek').value=elapsed;}else if(live&&scene&&currentFrame)scene.update(currentFrame,reducedMotion?0:currentFrame.tick/5);requestAnimationFrame(tick);}requestAnimationFrame(tick);
+function tick(now){if(document.hidden){last=now;requestAnimationFrame(tick);return;}const viewStamp=scene&&JSON.stringify([scene.camera.x,scene.camera.y,scene.camera.zoom,scene.selected,scene.follow,pointer,elapsed]);if(!live&&paused&&currentFrame&&viewStamp===lastViewStamp){last=now;requestAnimationFrame(tick);return;}lastViewStamp=viewStamp;const dt=Math.min((now-last)/1000,.25);last=now;if(!live&&timeline&&scene){if(!paused)elapsed=Math.min(timeline.duration,elapsed+dt*Number($('speed').value));const frame=timeline.at(elapsed);paint(frame,reducedMotion?0:elapsed,`${frame.tick}`);$('seek').value=elapsed;}else if(live&&scene&&currentFrame)scene.update(currentFrame,reducedMotion?0:currentFrame.tick/5);requestAnimationFrame(tick);}requestAnimationFrame(tick);
 if(!['localhost','127.0.0.1','[::1]'].includes(location.hostname))$('live-link').hidden=true;
 if(live)connectLive();else replay();
 fetch('/api/matches').then(r=>{if(!r.ok)throw Error();return r.json();}).then(matches=>{const isLocal=['localhost','127.0.0.1','[::1]'].includes(location.hostname);if(!isLocal)$('matches').replaceChildren();for(const match of matches.filter(m=>m.id==='training-latest')){const option=document.createElement('option'),summary=match.summary??match;option.value=match.id;option.textContent=`최신 학습 경기 · ${summary.scores?.[0]??0}:${summary.scores?.[1]??0}`;$('matches').append(option);}$('matches').value=new URLSearchParams(location.search).get('match')??(isLocal?'':'training-latest');}).catch(()=>{});$('matches').onchange=e=>{const params=new URLSearchParams();if(e.target.value)params.set('match',e.target.value);location.search=params.toString();};
@@ -30,10 +26,6 @@ fetch('/api/matches').then(r=>{if(!r.ok)throw Error();return r.json();}).then(ma
 host.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch'||e.target.closest('button,select,input,#minimap'))return;touchStart={x:e.clientX,y:e.clientY,id:e.pointerId};pointer=null;if(scene)scene.hovered=null;tooltip(null);});
 host.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'||touchStart?.id!==e.pointerId)return;const start=touchStart;touchStart=null;if(Math.hypot(e.clientX-start.x,e.clientY-start.y)>8)return;const r=host.getBoundingClientRect();pointer={x:e.clientX-r.left,y:e.clientY-r.top};tooltip(scene?.hit(pointer.x,pointer.y),pointer.x,pointer.y,host);});
 host.addEventListener('pointercancel',()=>{touchStart=null;pointer=null;if(scene)scene.hovered=null;tooltip(null);});
-
-function updateStats(){return refreshStats().then(()=>{lastHud="";if(currentFrame)renderHud(currentFrame,focus);});}updateStats();setInterval(updateStats,5000);
-
-startTrainingStatus();startHistory();startObjectiveStatistics();
 
 function selectedEntity(frame){const id=scene?.selected,u=frame.units.find(u=>u.id===id);if(u)return u;const s=frame.squads?.find(s=>s.id===id),members=frame.units.filter(u=>s?.member_ids.includes(u.id)&&u.alive!==false&&u.carrier_id==null);return members.length?{id,team:s.team,members:members.map(u=>u.id),x_cm:members.reduce((n,u)=>n+u.x_cm,0)/members.length,y_cm:members.reduce((n,u)=>n+u.y_cm,0)/members.length}:null;}
 let inspectorSignature='',combatSignature='';
@@ -46,5 +38,3 @@ host.addEventListener('keydown',e=>{if(e.key==='Escape'&&scene){scene.selected=n
 for(const team of [0,1]){const b=document.createElement('button');b.textContent=`${team===0?'A':'B'} 본진`;b.onclick=()=>{const f=currentFrame?.facilities.find(f=>f.kind==='HQ'&&f.owner===team);if(f){scene.follow=false;scene.camera.zoom=.4;scene.camera.focus(f.x_cm*.12,f.y_cm*.12);}};document.querySelector('.map-tools').append(b);}
 
 if(['localhost','127.0.0.1'].includes(location.hostname))window.__mwViewState=()=>({zoom:scene?.camera.zoom,detail:scene?.detail,resolution:scene?.app.renderer.resolution,visibleVehicles:scene?[...scene.sprites.values()].filter(a=>a.turret?.visible).length:0,camera:{x:scene?.camera.x,y:scene?.camera.y},trackingPosition:currentFrame&&selectedEntity(currentFrame),fireSources:scene?.vfx.sourceLabels.filter(p=>p.visible).map(p=>p.text),effects:scene?.vfx.pool.filter(p=>p.visible).length??0,hovered:scene?.hovered?.id,selected:scene?.selected,follow:!!scene?.follow,badges:scene?.overlay.badges?.map(b=>({id:b.id,x:b.ax,y:b.ay,label:b.showLabel,w:b.w,h:b.h,type:b.type_id})),combat:scene?.overlay.combats?.length??0});
-
-startLeagueView();
