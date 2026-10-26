@@ -35,7 +35,10 @@ def find_path(terrain, start, end, vehicle=False, offsets=((0,0),)):
         for nxt in ((x-1,y),(x,y-1),(x,y+1),(x+1,y)):
             if not (0 <= nxt[0] < terrain.cols and 0 <= nxt[1] < terrain.rows):
                 continue
-            if not legal(centre(nxt)) or not clear(centre(current),centre(nxt)):
+            # A cardinal edge is exactly one cell wide: for every translated
+            # member, its segment touches only its two endpoint cells. Full
+            # segment checks remain on start/final connections and final route.
+            if not legal(centre(nxt)):
                 continue
             cost = costs[current]+1
             if cost < costs.get(nxt,float('inf')):

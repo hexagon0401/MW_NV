@@ -34,7 +34,11 @@ def save(root,models,env,buffers,querier,generators,state):
         with sqlite3.connect('data/results.sqlite') as source,sqlite3.connect(folder/'results.sqlite') as dest:source.backup(dest)
     atomic_json(root/'current.json',dict(path=str(folder.relative_to(root))));atomic_json(root/'state.json',state)
     # Archive spooling owns any files it needs before old consumed checkpoints are pruned.
-    for old in sorted((root/'checkpoints').glob('checkpoint-*'),key=lambda p:p.stat().st_mtime)[:-2]:shutil.rmtree(old)
+    seen=set()
+    for old in sorted((root/'checkpoints').glob('checkpoint-*'),key=lambda p:p.stat().st_mtime,reverse=True):
+        generation=old.name.split('-')[1]
+        if generation in seen or len(seen)>=2:shutil.rmtree(old)
+        else:seen.add(generation)
     return folder
 
 
@@ -53,3 +57,13 @@ def load(root,env,buffers,querier,generators):
     rng=json.loads((folder/'rng.json').read_text());random.setstate(decode(rng['python']));n=rng['numpy'];np.random.set_state((n[0],np.array(n[1],dtype=np.uint32),*n[2:]));torch.set_rng_state(torch.tensor(rng['torch'],dtype=torch.uint8))
     for g,value in zip(generators,rng['actors']):g.set_state(torch.tensor(value,dtype=torch.uint8))
     return models,state
+
+
+def record_update(root,state,models):
+    """Called only after the durable checkpoint pointer; safe to backfill on resume."""
+    if state['generation']<=0:return
+    from .results import record_training
+    root=Path(root);folder=root/json.loads((root/'current.json').read_text())['path']
+    for i,m in enumerate(models):
+        learner=f'PPO{i+1}';steps=state.get(f'ppo{i+1}_last_update',{}).get('steps',0);policy=CandidatePolicy(folder/f'ppo{i+1}.npz').policy_id
+        record_training('data/results.sqlite',policy,steps,'league-mixed',run_id=f'{state["run"]}-{learner}-update-{state["generation"]:08d}',training_run=state['run']+':'+learner,metadata={'league':dict(run=state['run'],learner=learner,generation=state['generation'])})

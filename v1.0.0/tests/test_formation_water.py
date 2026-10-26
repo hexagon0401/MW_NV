@@ -38,3 +38,26 @@ def test_impossible_goal_fails_bounded_and_records_cooldown():
         except OrderError as exc:assert str(exc)=='FORMATION_UNREACHABLE';break
     else:pytest.fail('unreachable command did not terminate')
     assert w.failed_goals[-1]['until_tick']==152
+
+def test_cardinal_endpoint_optimization_matches_reference_routes():
+    import random,types
+    from engine.pathfinding import find_path
+    # Reference reinstates the former redundant per-edge segment scan.
+    import inspect
+    source=inspect.getsource(__import__('engine.pathfinding',fromlist=['find_path']))
+    reference=source.replace('if not legal(centre(nxt)):', 'if not legal(centre(nxt)) or not clear(centre(current),centre(nxt)):')
+    module=types.ModuleType('engine.reference_path');module.__package__='engine';exec(reference,module.__dict__)
+    rng=random.Random(773)
+    for n in range(100):
+        terrain=Terrain(48,48)
+        for row in range(terrain.rows):
+            for col in range(terrain.cols):
+                if rng.random()<.12:terrain.set_tile(col,row,Tile.DEEP_WATER)
+        start=(rng.randrange(2,10)*400+200,rng.randrange(2,10)*400+200);end=(rng.randrange(2,10)*400+200,rng.randrange(2,10)*400+200)
+        offsets=((0,0),(-150,0),(0,150),(-150,150)) if n%2 else ((0,0),)
+        outcomes=[]
+        for function in (find_path,module.find_path):
+            terrain.cache.clear()
+            try:outcomes.append(function(terrain,start,end,offsets=offsets))
+            except OrderError as exc:outcomes.append(str(exc))
+        assert outcomes[0]==outcomes[1]

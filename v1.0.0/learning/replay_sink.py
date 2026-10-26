@@ -3,8 +3,11 @@ import gzip,json,hashlib,os
 from engine.viewer_export import export_view
 from cloud.supabase_storage import PrivateStorage
 
-def publish_latest(engine,initial):
-    doc=export_view(engine,initial);body=gzip.compress(json.dumps(doc,separators=(',',':')).encode(),mtime=0)
+def publish_latest(engine,initial,metadata=None):
+    doc=export_view(engine,initial)
+    if metadata and metadata.get('league'):
+        doc['league']=metadata['league'];doc['initial']['learner_assignments']=dict(metadata['league']['assignments'])
+    body=gzip.compress(json.dumps(doc,separators=(',',':')).encode(),mtime=0)
     store=PrivateStorage(os.environ['SUPABASE_URL'],os.environ['SUPABASE_SERVICE_ROLE_KEY']);key='training-latest.view.json.gz'
     store._request('object/'+store.bucket+'/'+key,'PUT',body)
     received=store._request('object/authenticated/'+store.bucket+'/'+key)

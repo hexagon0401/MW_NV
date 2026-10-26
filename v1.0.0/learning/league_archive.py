@@ -17,11 +17,14 @@ def spool(root,checkpoint,state,full=False):
         if full:
             for p in sorted((root/'opponents').glob('*.npz')):tar.add(p,arcname='opponents/'+p.name)
             for p in sorted((root/'baseline').glob('*.npz')):tar.add(p,arcname='baseline/'+p.name)
+        initial_report=root/'evaluations'/'games-00000000'/'report.json'
+        if full and initial_report.exists():tar.add(initial_report,arcname='initial-evaluation.json')
         from .results import records
-        body=''.join(json.dumps(r,separators=(',',':'))+'\n' for r in records('data/results.sqlite') if r.get('league',{}).get('run')==state['run']).encode()
+        body=''.join(json.dumps(r,separators=(',',':'))+'\n' for r in records(Path(checkpoint)/'results.sqlite' if (Path(checkpoint)/'results.sqlite').exists() else 'data/results.sqlite') if r.get('league',{}).get('run')==state['run']).encode()
         import io
         info=tarfile.TarInfo('statistics.jsonl');info.size=len(body);tar.addfile(info,io.BytesIO(body))
-    temporary.replace(path)
+    digest=hashlib.sha256(temporary.read_bytes()).hexdigest();path=folder/(name.removesuffix('.tar.gz')+'-'+digest[:16]+'.tar.gz');temporary.replace(path)
+    name=path.name
     atomic_json(path.with_suffix('.json'),dict(asset=name,sha256=hashlib.sha256(path.read_bytes()).hexdigest(),full=full,run=state['run'],games=state['completed_games'],generation=state['generation']))
     return path
 
@@ -59,6 +62,12 @@ def publish_pending(root):
     root=Path(root)
     if shutil.disk_usage(root).free<1024**3 or sum(p.stat().st_size for p in (root/'archive-pending').glob('*'))>=2*1024**3:raise RuntimeError('ARCHIVE_DISK_LIMIT')
     failures=[]
+    # Normalize pending names before upload so a retry can never reuse an immutable
+    # remote name for different bytes (e.g. an interrupted initial evaluation).
+    for m in list((root/'archive-pending').glob('*.json')):
+        d=json.loads(m.read_text());old=(root/'archive-pending')/d['asset']
+        if old.exists() and not d['asset'].removesuffix('.tar.gz').endswith(d['sha256'][:16]):
+            new=old.with_name(old.name.removesuffix('.tar.gz')+'-'+d['sha256'][:16]+'.tar.gz');old.rename(new);d['asset']=new.name;atomic_json(new.with_suffix('.json'),d);m.unlink()
     for manifest in sorted((root/'archive-pending').glob('*.json')):
         metadata=json.loads(manifest.read_text());path=manifest.with_suffix('.tar.gz')
         # with_suffix on foo.tar.json produces foo.tar.tar.gz; canonical name is in manifest.
@@ -134,6 +143,8 @@ def restore_bundle(path,destination,digest):
         source=checkpoint/name
         if source.exists():shutil.move(source,root/name)
         else:(root/name).mkdir()
+    if (checkpoint/'initial-evaluation.json').exists():
+        report=root/'evaluations'/'games-00000000';report.mkdir(parents=True,exist_ok=True);shutil.copyfile(checkpoint/'initial-evaluation.json',report/'report.json')
     if (checkpoint/'results.sqlite').exists():shutil.copyfile(checkpoint/'results.sqlite',root/'results.sqlite')
     atomic_json(root/'current.json',dict(path='checkpoints/restored'));shutil.copyfile(checkpoint/'state.json',root/'state.json')
     return root

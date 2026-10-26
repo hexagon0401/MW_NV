@@ -1,0 +1,9 @@
+{
+  "before_profile_seconds": 31.406,
+  "after_profile_seconds": 6.066539084989927,
+  "sim_seconds": 30,
+  "profile_overhead": true,
+  "identical_initial_actors": true,
+  "route_differential_cases": 100,
+  "strategic_improvement": false
+}

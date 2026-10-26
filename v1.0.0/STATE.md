@@ -1,13 +1,15 @@
 # MW-NV v1.0.0 STATE
-Current: T09 dual league implementation validated; pilot launch pending final checks
-Viewer: production233d76e4 wheel zoom/drag; real units>=20%; DPR1/2 labels; shot-origin trails
-Movement: rules4 full-footprint routes + physical column recovery; mirrored4m bridge fixtures pass
-Audit: headless10 games A4/B6 west7/east3; same-action reexecution hash PASS; traffic failures remain
-Models: rules3 gen2090 full recovery remotely downloaded/SHA/model/optimizer/world verified
-Archive:512KiB immutable chunks;10game policy/50game full; safe restoration/index; no remote history deletion
-Learning: two independent PPOs;10s tactics, paired30s NIM; fair32game block and4map crossing
-Verified: full Python166 earlier; new league/restore/pattern/archive tests passing; JS25/build/browser
-NIM: actual paired query0.6s/8labels; token usage UNKNOWN
-Evidence: docs/league-transition/README.md, legacy-backup.json, engine-audit/REPORT.md
-Next: finish public insights/UI QA, launch data/league-v1 then frozen initial evaluation and200game pilot
-Limits: traffic issues remain;200games/strategy improvement/Mac input/permanent CPU unverified
+Current: T09 implementation COMPLETE;200game pilot RUNNING (not completed)
+Viewer: production17e65f49; final preview1cc36084; latest UI promotion pending
+Features: wheel/pinch zoom+drag; real units>=20%; DPR<=2 screen text; tank/artillery origin trails
+Movement: rules4 footprint paths/physical column; mirrored bridge tests; reference-route comparisons100 pass
+Audit:10games A4/B6 west7/east3; deterministic reexecution PASS; traffic failures remain
+Learning: independent PPO1/PPO2;10s tactics/paired30s NIM; initial evaluation1CPU + learning1CPU
+Runtime: stopped safely at generation18/6games for final code refresh; resume same root, never reinitialize
+Recovery: data/league-v1/current.json; source data/preserved/pre-league-checkpoint-00002090-d95aa585/latest.npz
+Archive: old2090 and new initial full recovery remotely verified; immutable10policy/50full; distinct2 local generations
+Verified: Python175 + focused23; JS26/build; Chromium DPR/LOD/effects/hover/mobile/500units
+Evidence: docs/league-transition/README.md, engine-audit/REPORT.md, legacy-backup.json
+Next: resume league-v1, promote final viewer, update PR1;200game/confirmation evaluation still pending
+Limits:500units SwiftShader~11.7FPS under load; actual Mac/strategy improvement/permanent CPU unverified
+Environment: league-v1 startup draft saved; user Save/Publish required; usage UNKNOWN

@@ -21,4 +21,5 @@ def test_upload_failure_preserves_pending_and_remote_history(tmp_path,monkeypatc
     (pending/'bundle.tar.json').write_text(json.dumps(meta))
     def fail(*a,**kw):raise RuntimeError('upload failed')
     monkeypatch.setattr(archive,'gh',fail);result=archive.publish_pending(tmp_path)
-    assert result['status']=='deferred' and data.exists() and (pending/'bundle.tar.json').exists()
+    assert result['status']=='deferred' and any(pending.glob('*.tar.gz')) and any(pending.glob('*.json'))
+    assert next(pending.glob('*.tar.gz')).read_bytes()==b'payload'

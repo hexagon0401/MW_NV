@@ -87,3 +87,41 @@ def confirm(root,models,state,progress=None):
         summary[learner]=paired_interval([sum(v)/len(v) for v in groups.values()])
     result=dict(schema=1,run=state['run'],games=state['completed_games'],learners=summary,evidence={k:'reproduced_policy_improvement_in_tested_scope' if v and v['low']>0 else 'not_confirmed' for k,v in summary.items()},tactical_causality=False,new_map_transfer=False)
     atomic_json(root/'confirmation-report.json',result);return result
+
+
+def initial_complete(root):
+    p=Path(root)/'evaluations'/'games-00000000'/'report.json'
+    try:return bool(json.loads(p.read_text()).get('complete'))
+    except (OSError,ValueError):return False
+
+
+def ensure_initial_worker(root,state):
+    """Initial baseline is frozen before training, computed on one separate CPU."""
+    import os,sys,subprocess
+    root=Path(root).resolve()
+    if initial_complete(root):return False
+    pidfile=root/'initial-evaluation.pid'
+    if pidfile.exists():
+        try:
+            pid=int(pidfile.read_text());args=(Path('/proc')/str(pid)/'cmdline').read_bytes().split(b'\0')
+            if b'learning.league_evaluate' in args and str(root).encode() in args:return True
+        except (OSError,ValueError):pass
+    atomic_json(root/'initial-evaluation-state.json',dict(run=state['run'],generation=0,completed_games=0))
+    log=(root/'initial-evaluation.log').open('ab');environment=dict(os.environ,OMP_NUM_THREADS='1',MKL_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',MW_NV_TORCH_THREADS='1')
+    process=subprocess.Popen([sys.executable,'-u','-m','learning.league_evaluate','--initial-root',str(root)],stdout=log,stderr=log,stdin=subprocess.DEVNULL,start_new_session=True,env=environment);log.close();pidfile.write_text(str(process.pid));return True
+
+
+if __name__=='__main__':
+    import argparse,fcntl,torch
+    p=argparse.ArgumentParser();p.add_argument('--initial-root',required=True);args=p.parse_args();root=Path(args.initial_root);torch.set_num_threads(1)
+    lock=(root/'initial-evaluation.lock').open('a')
+    try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+    except BlockingIOError:raise SystemExit(0)
+    state=json.loads((root/'initial-evaluation-state.json').read_text());folder=root/'evaluations'/'games-00000000';folder.mkdir(parents=True,exist_ok=True)
+    import shutil
+    for i in (1,2):
+        if not (folder/f'ppo{i}.npz').exists():shutil.copyfile(root/'baseline'/f'ppo{i}.npz',folder/f'ppo{i}.npz')
+    def progress(*_):
+        if (root/'STOP').exists():raise InterruptedError('initial evaluation paused')
+    try:evaluate(root,[None,None],state,progress)
+    except InterruptedError:pass

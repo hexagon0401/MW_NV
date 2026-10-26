@@ -10,7 +10,7 @@ from .candidate_policy import CandidatePolicy,export
 from .training_maps import training_scenario
 from .teacher import TeacherBuffer
 from .league_policy import initialize,choose,update,schedule
-from .league_state import save,load
+from .league_state import save,load,record_update
 from .league_metrics import new_metrics,opportunity,selection,finish
 from .self_play import atomic_json,current
 from .training_status import Reporter
@@ -43,14 +43,24 @@ def run(root,source,pilot=200,teacher_enabled=True,max_updates=0):
         state=dict(schema=1,run='league-'+uuid.uuid4().hex[:12],rules_version=RULES_VERSION,catalog_version=CATALOG_VERSION,contract='tactics-2',map_id='river-districts',map_version='2',generation=0,completed_games=0,episode=0,active=False,initial_frame=None,metrics=None,assignments={},policy_spans={},episode_starts={},rounds=0,last_policy_archive=0,last_full_archive=0,last_evaluation=-1,pilot=pilot,teacher_enabled=teacher_enabled,source_sha256=hashlib.sha256(Path(source).read_bytes()).hexdigest())
         for i,m in enumerate(models):export(m,root/'baseline'/f'ppo{i+1}.npz')
         save(root,models,env,buffers,querier,generators,state)
+    import subprocess
+    revision=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip()
+    if revision and revision!=state.get('code_commit'):
+        state.setdefault('code_commits',[]).append(revision);state['code_commit']=revision
+    record_update(root,state,models)
     state['teacher_enabled']=teacher_enabled;state['pilot']=pilot
     stop={'value':False}
     def on_stop(*_):stop['value']=True
     old={s:signal.signal(s,on_stop) for s in (signal.SIGINT,signal.SIGTERM)}
     reporter=Reporter(root,state['generation'],sum(m.num_timesteps for m in models));start=time.monotonic();simulated=0;updates=0
     def report(phase='learning',force=False):
+        if phase=='evaluation' and (stop['value'] or (root/'STOP').exists()):raise InterruptedError('evaluation paused at simulation boundary')
+        evaluation_cases=0
+        if phase=='evaluation':
+            progress_path=root/'evaluations'/f'games-{state["completed_games"]:08d}'/'report.json'
+            if progress_path.exists():evaluation_cases=len(json.loads(progress_path.read_text())['results'])
         reporter.round=state['generation'];reporter.base_steps=sum(m.num_timesteps for m in models)
-        reporter(dict(phase=phase,status='running',games=state['completed_games'],policy_steps=reporter.base_steps,sim_seconds=simulated,algorithm='Independent MaskablePPO',learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows),imitation_updates=buffers[i].stats.get('imitation_updates',0)) for i,m in enumerate(models)],teacher=dict(querier.stats),nim_in_training=teacher_enabled,decision_seconds=10,teacher_seconds=30,backup=state.get('backup','pending'),pilot=pilot,assignments=state['assignments'],rules_version=RULES_VERSION,map_id='river-districts',map_version='2'),force=force)
+        reporter(dict(phase=phase,status='running',games=state['completed_games'],policy_steps=reporter.base_steps,sim_seconds=simulated,algorithm='Independent MaskablePPO',learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows),imitation_updates=buffers[i].stats.get('imitation_updates',0)) for i,m in enumerate(models)],teacher=dict(querier.stats),nim_in_training=teacher_enabled,decision_seconds=10,teacher_seconds=30,initial_evaluation_parallel=state.get('initial_evaluation_parallel',False),evaluation_cases=evaluation_cases,evaluation_total=80,backup=state.get('backup','pending'),pilot=pilot,assignments=state['assignments'],rules_version=RULES_VERSION,map_id='river-districts',map_version='2'),force=force)
     def teach(e):
         if not teacher_enabled:return
         querier.rows.clear();querier.collect(e)
@@ -71,11 +81,20 @@ def run(root,source,pilot=200,teacher_enabled=True,max_updates=0):
     try:
         # Evaluation is resumable and never consumes training/teacher samples.
         from .league_evaluate import evaluate
-        if state['last_evaluation']<0:
+        from .league_evaluate import ensure_initial_worker,initial_complete
+        if not state.get('initial_archived'):
             from .league_archive import spool,publish_pending
-            spool(root,current(root),state,True);initial_archive=publish_pending(root);state['backup']='verified' if initial_archive['status']=='verified' else 'deferred:archive'
-            report('evaluation',True);evaluate(root,models,state,report);state['last_evaluation']=0;save(root,models,env,buffers,querier,generators,state)
+            spool(root,current(root),state,True);initial_archive=publish_pending(root);state['backup']='verified' if initial_archive['status']=='verified' else 'deferred:archive';state['initial_archived']=initial_archive['status']=='verified'
+            save(root,models,env,buffers,querier,generators,state)
+        if state['last_evaluation']<0:
+            state['last_evaluation']=0;save(root,models,env,buffers,querier,generators,state)
+        baseline_running=ensure_initial_worker(root,state) if not max_updates else False
+        state['initial_evaluation_parallel']=baseline_running
+        torch.set_num_threads(1 if baseline_running else int(os.environ.get('MW_NV_TORCH_THREADS','2')))
         while (not max_updates or updates<max_updates) and not stop['value'] and not (root/'STOP').exists():
+            if not max_updates:
+                baseline_running=ensure_initial_worker(root,state);state['initial_evaluation_parallel']=baseline_running
+                torch.set_num_threads(1 if baseline_running else int(os.environ.get('MW_NV_TORCH_THREADS','2')))
             rows=[[],[]]
             for _ in range(64):
                 if not state['active']:begin()
@@ -93,6 +112,7 @@ def run(root,source,pilot=200,teacher_enabled=True,max_updates=0):
                         else:action=fixed.predict(observation,mask) if fixed else env.heuristic(a)
                         if action!=64:selection(state['metrics'],a,next(c for c in env.items[a] if c['id']==action),before)
                         actions[a]=action
+                    env.decision_sources={a:(learner+' 지휘' if learner in ('PPO1','PPO2') else '과거 정책' if learner=='past' else '규칙 지휘') for a,learner in state['assignments'].items()}
                     _,rewards,done,_,_=env.step(actions)
                     # _round resets finished after advancing; time, not flags, is the barrier.
                     if env.engine.world.tick!=before or not env.agents:
@@ -112,7 +132,7 @@ def run(root,source,pilot=200,teacher_enabled=True,max_updates=0):
                     if os.environ.get('MW_NV_PUBLISH_TRAINING')=='1':
                         try:
                             from .replay_sink import publish_latest
-                            publish_latest(env.engine,state['initial_frame'])
+                            publish_latest(env.engine,state['initial_frame'],metadata={'league':dict(run=state['run'],assignments=state['assignments'],generation=state['generation'])})
                         except (OSError,ValueError) as exc:state['replay_publish_error']=type(exc).__name__
                 report()
                 if stop['value'] or (root/'STOP').exists():break
@@ -127,25 +147,35 @@ def run(root,source,pilot=200,teacher_enabled=True,max_updates=0):
                 paths=sorted((root/'opponents').glob(f'ppo{i+1}-*.npz'))
                 for p in paths[:-8]:
                     if str(p.relative_to(root))!=state.get('fixed_opponent'):p.unlink()
-            state['generation']+=1;checkpoint=save(root,models,env,buffers,querier,generators,state);updates+=1
+            state['generation']+=1;checkpoint=save(root,models,env,buffers,querier,generators,state);record_update(root,state,models);updates+=1
             from .league_archive import spool,publish_pending
+            created_archive=False
             if state['completed_games']-state['last_policy_archive']>=10:
-                spool(root,checkpoint,state);state['last_policy_archive']=state['completed_games']//10*10
+                spool(root,checkpoint,state);created_archive=True;state['last_policy_archive']=state['completed_games']//10*10
             if state['completed_games']-state['last_full_archive']>=50:
-                spool(root,checkpoint,state,True);state['last_full_archive']=state['completed_games']//50*50
-            if time.time()>=state.get('archive_retry_at',0):
+                spool(root,checkpoint,state,True);created_archive=True;state['last_full_archive']=state['completed_games']//50*50
+            if created_archive or time.time()>=state.get('archive_retry_at',0):
                 archive=publish_pending(root);state['backup']='verified' if archive['status']=='verified' and list((root/'archive-verified').glob('*.json')) else 'deferred:archive' if archive['failures'] else 'pending';state['archive_retry_at']=time.time()+300
             if state['completed_games']//50>state['last_evaluation']//50:
                 report('evaluation',True);evaluate(root,models,state,report);state['last_evaluation']=state['completed_games']//50*50
             if state['completed_games']>=pilot and not state.get('pilot_report'):
                 from .league_evaluate import pilot_report
+                while not max_updates and not initial_complete(root):
+                    ensure_initial_worker(root,state);report('evaluation',True);time.sleep(5)
                 verdict=pilot_report(root,state);state['pilot_report']=verdict
                 if verdict['pause']:state['pause_reason']='pilot_regression';stop['value']=True
                 elif any(v and v['mean']>0 for v in verdict.get('learners',{}).values()):
                     from .league_evaluate import confirm
                     report('evaluation',True);state['confirmation']=confirm(root,models,state,report)
             save(root,models,env,buffers,querier,generators,state);report('checkpoint_saved',True)
+    except InterruptedError:
+        pass
     finally:
+        if stop['value'] or (root/'STOP').exists():
+            try:
+                pid=int((root/'initial-evaluation.pid').read_text());cmd=(Path('/proc')/str(pid)/'cmdline').read_bytes()
+                if b'learning.league_evaluate' in cmd:os.kill(pid,signal.SIGTERM)
+            except (OSError,ValueError):pass
         for s,h in old.items():signal.signal(s,h)
         reporter(dict(phase='stopped',status='stopped',games=state['completed_games']),force=True)
     return state
