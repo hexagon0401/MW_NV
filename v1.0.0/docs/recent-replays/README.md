@@ -22,4 +22,6 @@ JavaScript47검사와 build 통과. Chromium에서3→4→5 목록, 과거 선�
 발행 lane만 재시작했다. T11 완료 진단13개를 보존하고, publication 모듈 외
 전체 runtime 파일 SHA가 동일함을 검사해 재검증 지문과 연결했다.
 진단기의 미완료 사례는 다시 수행한다. 모델 학습 프로세스는 유지했다.
-근거:runtime-revalidation.json. Production 검사는 production.json.
+근거:runtime-revalidation.json. Production 실제 최근3개·이전 경기 로딩·
+갱신 중 시간 유지·모바일 버튼 검사 통과(production.json).
+리플레이는 발행 완료 기준 최근3개이며 전체 경기 전적은 별도 ledger에 남는다.
