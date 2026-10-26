@@ -20,3 +20,8 @@ def test_nonblocking_frozen_pair_routes_original_learner():
     assert list(buffers[0].rows)==[('x','m',0,0)] and list(buffers[1].rows)==[('y','n',1,1)]
     assert not a.offer(env,{'A':'PPO1','B':'PPO2'})
     a.close()
+
+def test_admission_budget_survives_restart():
+    q=TeacherBuffer();q.stats.update(next_request_at=time.time()+30,async_inflight=True,async_worker=2)
+    a=AsyncTeacher(q,[TeacherBuffer(),TeacherBuffer()]);assert a.next_request>time.monotonic()+28 and a.last_worker==2
+    assert not q.stats['async_inflight'];a.close()

@@ -1,0 +1,23 @@
+{
+  "generation": 123,
+  "games": 51,
+  "checkpoint": "checkpoint-00000123-52ddf83c",
+  "local_preserved": "pre-adaptive-checkpoint-00000123-52ddf83c",
+  "hashes": {
+    "PPO2.json": "4ed3ab7dee977697fbe2c9c5941aab4d2f5a8e268bb0f4bb77ee8a5445b8d7fa",
+    "PPO1.json": "e770e7f6a38c8ab4f12367ca4ba4ea0e62539df9b51b52aeb1859709c6a3dd86",
+    "ppo2.zip": "bafeab37073b9cf72897aecb35848d482d3b7bc4b7ce68f1360536df9bea143e",
+    "results.sqlite": "5de888881bbed514d3b3c8f3e79de4170aac8869e5590438780230877c9a5037",
+    "state.json": "9c4efa7e8516b762ce6aa5d947f9afe18000a26b22ab9620241202cbd2ee7aff",
+    "A.json": "5a38b038e733a8b6d131b4c246d2965f2953fe34a0fc6893ccb7772da4c64ed4",
+    "ppo2.npz": "af428cbed58d7ccf8d656943e159d9ba4cdeb406a80268b1effe2d92e708f3f0",
+    "teacher1.npz": "5b209b7c8b59b89a10ffff330f60736b1fbbeb827221dbce2b3b8aa5432c3813",
+    "teacher-query.npz": "9d63238375ba19a1a37c323e3b3c98c76485e31c91d6938cff8d6760f8868a49",
+    "environment.json.gz": "e7e98f4bd8d271b08d397da633d085a29f7d98bd36623b710543d3394e2bba13",
+    "rng.json": "2d08e15b2f81e734ecd3a2fe21b7a3a2ab717ad3a7cd1315bda215548cb309e1",
+    "B.json": "34e03156ec5a6c7ffa35f229f3185d8ef6c4614ea196962935b5e670a4076d82",
+    "ppo1.npz": "af6ed669c9621069b0ef980a255cfaae5a91c0f62748a1ba39afd5b41f6d721a",
+    "teacher2.npz": "22aa9ccb874c626672c8e050d718049c6f6d4267ad4b159d34ba73dffd5cfe66",
+    "ppo1.zip": "1a099308a0be90d77d554f2cea3722ffc6a89f714a41ff43e506b933913895dd"
+  }
+}

@@ -6,6 +6,7 @@ def latest(root,kind,value):
     folder=Path(root)/'io-jobs';folder.mkdir(parents=True,exist_ok=True)
     target=folder/(kind+('.pkl' if kind=='replay' else '.json'));temp=target.with_name(target.name+'.'+uuid.uuid4().hex+'.partial')
     if kind=='replay':
+        engine,initial,metadata=value;metadata=dict(metadata or {});metadata.setdefault('completed_at',time.time());value=(engine,initial,metadata)
         with temp.open('wb') as f:pickle.dump(value,f,protocol=5)
     else:temp.write_text(json.dumps(value))
     temp.replace(target)
@@ -14,6 +15,15 @@ def archive(root,checkpoint,state,full):
     root=Path(root);folder=root/'io-jobs'/'archives';folder.mkdir(parents=True,exist_ok=True)
     disk_guard(root)
     temp=folder/('.'+uuid.uuid4().hex);temp.mkdir();shutil.copytree(checkpoint,temp/'checkpoint')
+
+    if full:
+        for name in ('baseline','opponents'):
+            if (root/name).exists():shutil.copytree(root/name,temp/name)
+        step=96 if state.get('contract')=='tactics-3' else 50
+        milestone=state['completed_games']//step*step
+        for name in sorted({'games-00000000',f'games-{state["completed_games"]:08d}',f'games-{milestone:08d}'}):
+            src=root/'evaluations'/name
+            if src.exists():shutil.copytree(src,temp/'evaluations'/name,dirs_exist_ok=True)
     (temp/'job.json').write_text(json.dumps(dict(state=state,full=full)))
     temp.rename(folder/temp.name[1:])
 
@@ -55,7 +65,7 @@ def process_archives(root):
     for job in sorted(folder.glob('*')):
         if job.name.startswith('.'):continue
         info=json.loads((job/'job.json').read_text())
-        spool(root,job/'checkpoint',info['state'],info['full']);shutil.rmtree(job)
+        spool(root,job/'checkpoint',info['state'],info['full'],asset_root=job);shutil.rmtree(job)
     return publish_pending(root)
 
 def run(root,lane):
@@ -68,7 +78,8 @@ def run(root,lane):
         if time.monotonic()<retry:time.sleep(1);continue
         try:
             if lane=='archive':
-                process_archives(root);retry=time.monotonic()+30
+                result=process_archives(root);retry=time.monotonic()+30
+                if result['status']!='verified':raise OSError('archive verification deferred')
             else:
                 process_latest(root,'status');process_latest(root,'replay')
                 db=Path('data/results.sqlite');stamp=db.stat().st_mtime_ns if db.exists() else None

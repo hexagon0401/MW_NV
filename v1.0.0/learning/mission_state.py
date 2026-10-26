@@ -31,6 +31,9 @@ def save(root,models,env,buffers,querier,generators,state):
     for team in ('A','B'):atomic_json(folder/f'{team}.json',dict(team=team,learner=state.get('assignments',{}).get(team),generation=state['generation'],rules_version=RULES_VERSION,contract='tactics-3'))
     state['teacher_stats']=dict(querier.stats);state['teacher_buffers']=[dict(b.stats) for b in buffers]
     querier.save(folder/'teacher-query.npz')
+    if hasattr(env,'accelerated_snapshot'):
+        with gzip.open(folder/'environments.json.gz','wt') as f:json.dump(encode(env.accelerated_snapshot),f)
+        state['runtime_schema']='adaptive-1'
     atomic_json(folder/'state.json',state)
     if (root/'validation-gates.json').exists():shutil.copy2(root/'validation-gates.json',folder/'validation-gates.json')
     if Path('data/results.sqlite').exists():

@@ -43,6 +43,7 @@ def run(root,source,pilot=200,teacher_enabled=True,max_updates=0):
         state=dict(schema=1,run='league-'+uuid.uuid4().hex[:12],rules_version=RULES_VERSION,catalog_version=CATALOG_VERSION,contract='tactics-2',map_id='river-districts',map_version='2',generation=0,completed_games=0,episode=0,active=False,initial_frame=None,metrics=None,assignments={},policy_spans={},episode_starts={},rounds=0,last_policy_archive=0,last_full_archive=0,last_evaluation=-1,pilot=pilot,teacher_enabled=teacher_enabled,source_sha256=hashlib.sha256(Path(source).read_bytes()).hexdigest())
         for i,m in enumerate(models):export(m,root/'baseline'/f'ppo{i+1}.npz')
         save(root,models,env,buffers,querier,generators,state)
+    if state.get('runtime_schema')=='adaptive-1':raise ValueError('adaptive checkpoint: resume with learning.accelerated_league')
     import subprocess
     revision=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip()
     if revision and revision!=state.get('code_commit'):

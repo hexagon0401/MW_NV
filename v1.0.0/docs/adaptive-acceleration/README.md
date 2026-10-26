@@ -26,3 +26,27 @@ retaining mutable-list API and world isolation.23 sensing/live/water/flight test
 passed. Identical seed19/commands retained the exact final hash; instrumented
 workload59.98s ->45.74s (~1.31x). Concurrent host activity and profiling affect
 these numbers; they do not establish a production learning-speed improvement.
+
+Adaptive collector: persistent spawn processes own engines; the coordinator owns
+both Torch policies and per-environment actor RNG.64 total HQ rounds share fixed
+weights; GAE is computed per(environment,episode,team) before batching. Shrinking
+execution slots parks live environments and retains them in atomic checkpoints.
+The adaptive-1 runtime adds environments.json.gz; serial runners explicitly
+refuse it instead of silently dropping other games. Full recovery verification
+checks every engine branch/RNG, and restores the current/initial frozen evaluation
+artifacts and ledger. Existing serial checkpoints migrate without actor/optimizer
+reset. T11 rollout recognizes both runner modules and retains its validation gate.
+
+Scaling: unprofiled equal-command12-round engine-only tests measured14.17/23.51/
+32.53 aggregate sim-seconds/wall-second with1/2/3workers; RSS60/121/182MiB approx
+(worker-only KiB figures are authoritative in scaling.json). Process startup,
+Torch updates, network and checkpoint overhead are excluded. All hashes match.
+This is evidence for process scaling in this workload, not a guaranteed training
+rate. The coordinator starts1slot, tests growth after120s and accepts>=5% gains
+only after>=60s/two update windows. Quota/memory/CPU-pressure backoff is automatic.
+
+Run legacy: `.venv/bin/python -m learning.accelerated_league --kind legacy --root data/league-v1 --source data/preserved/pre-league-checkpoint-00002090-d95aa585/latest.npz --pilot 200`.
+Mission is launched only by the T11 validation pipeline with `--kind mission
+--pilot 192`; it requires the current code fingerprint's validated gate.
+
+Final scaling CPU use averaged1.00/1.97/2.91 cores (workers only); Torch/coordinator and I/O are additional and constrained by the shared4-core cgroup budget.

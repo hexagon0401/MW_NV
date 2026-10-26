@@ -51,7 +51,7 @@ def update(model,rows,last_value,teacher):
     buffer=MaskableRolloutBuffer(len(rows),model.observation_space,model.action_space,device='cpu',n_envs=1)
     for row in rows:
         buffer.add(row['obs'][None],np.array([row['action']]),np.array([row['reward']]),np.array([row['start']]),torch.tensor([row['value']]),torch.tensor([row['logp']]),action_masks=row['mask'][None])
-    values=advantages(rows,last_value);buffer.advantages[:,0]=values;buffer.returns[:,0]=values+buffer.values[:,0]
+    values=np.array([r['advantage'] for r in rows],dtype=np.float32) if all('advantage' in r for r in rows) else advantages(rows,last_value);buffer.advantages[:,0]=values;buffer.returns[:,0]=values+buffer.values[:,0]
     if not np.isfinite(buffer.returns).all():raise ValueError('nonfinite PPO return')
     model.rollout_buffer=buffer;model.num_timesteps+=len(rows);model._current_progress_remaining=1.
     # A minibatch of one makes SB3 advantage std undefined. Use whole batches if needed.

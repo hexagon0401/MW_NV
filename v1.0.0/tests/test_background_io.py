@@ -16,7 +16,7 @@ def test_latest_coalesces_and_failure_preserves_pending(tmp_path,monkeypatch):
 
 def test_archive_pins_checkpoint_before_original_pruning(tmp_path):
     checkpoint=tmp_path/'current';checkpoint.mkdir();(checkpoint/'model').write_bytes(b'weights')
-    archive(tmp_path,checkpoint,dict(generation=10),True)
+    archive(tmp_path,checkpoint,dict(generation=10,completed_games=0),True)
     (checkpoint/'model').unlink()
     jobs=list((tmp_path/'io-jobs/archives').glob('*'));assert len(jobs)==1
     assert (jobs[0]/'checkpoint/model').read_bytes()==b'weights'

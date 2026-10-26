@@ -38,14 +38,14 @@ def run(root,legacy):
         report('preserve_legacy_at_update_boundary')
         try:
             pid=int((legacy/'runner.pid').read_text());argv=(Path('/proc')/str(pid)/'cmdline').read_bytes().split(b'\0');legacy_command=[a.decode() for a in argv if a]
-            if 'learning.league' not in legacy_command:legacy_command=None
+            if not any(m in legacy_command for m in ('learning.league','learning.accelerated_league')):legacy_command=None
         except (OSError,ValueError):pass
         (legacy/'STOP').write_text('T11 validated migration; preserve final consumed checkpoint before switch\n')
         deadline=time.monotonic()+1800
         while True:
             try:
                 pid=int((legacy/'runner.pid').read_text());cmd=(Path('/proc')/str(pid)/'cmdline').read_bytes()
-                running=b'learning.league' in cmd
+                running=any(m in cmd.split(b'\0') for m in (b'learning.league',b'learning.accelerated_league'))
             except (OSError,ValueError):running=False
             if not running:legacy_stopped=True;break
             if time.monotonic()>deadline:raise ValueError('legacy worker did not stop at a safe boundary; do not force kill')
@@ -55,7 +55,7 @@ def run(root,legacy):
         if verified['status']!='verified':raise ValueError('final legacy recovery upload/download/load verification failed; preserved locally, no mixed launch')
         atomic_json(root/'validation-gates.json',dict(approved_for_pilot=True,code_sha256=identity,engine_games=30,retention=retention['intervals'],legacy_generation=state['generation'],source_archive_verified=True))
         report('mixed_pilot',mixed_training_started=True)
-        command=[sys.executable,'-u','-m','learning.mission_league','--root',str(root),'--source',str(root/'migrated'),'--pilot','192']
+        command=[sys.executable,'-u','-m','learning.accelerated_league','--kind','mission','--root',str(root),'--source',str(root/'migrated'),'--pilot','192']
         result=subprocess.run(command,env=dict(os.environ,MW_NV_TORCH_THREADS='2',MW_NV_PUBLISH_TRAINING='1'))
         report('mixed_worker_stopped',status='stopped',returncode=result.returncode)
     except (OSError,ValueError,KeyError,RuntimeError,InterruptedError) as exc:

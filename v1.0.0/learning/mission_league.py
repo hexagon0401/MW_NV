@@ -55,6 +55,7 @@ def run(root,source,pilot=192,teacher_enabled=True,max_updates=0,collection_roun
         for i,m in enumerate(models):
             export(m,root/'baseline'/f'ppo{i+1}.npz');m.save(root/'baseline'/f'ppo{i+1}.zip')
         save(root,models,env,buffers,querier,generators,state)
+    if state.get('runtime_schema')=='adaptive-1':raise ValueError('adaptive checkpoint: resume with learning.accelerated_league')
     import subprocess
     revision=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip()
     if revision and revision!=state.get('code_commit'):

@@ -1,13 +1,18 @@
 """Immutable policy/recovery spool. Never delete unverified local or old remote assets."""
-import gzip,hashlib,json,tarfile,tempfile,time,shutil,os
+import gzip,hashlib,json,tarfile,tempfile,time,shutil,os,fcntl
 from datetime import datetime,timezone
 from pathlib import Path
 from .backup import gh,restore,REPO
 from .self_play import atomic_json
 
 
-def spool(root,checkpoint,state,full=False):
-    root=Path(root);folder=root/'archive-pending';folder.mkdir(exist_ok=True)
+def spool(root,checkpoint,state,full=False,asset_root=None):
+    with (Path(root)/'archive-publish.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX)
+        return _spool(root,checkpoint,state,full,asset_root)
+
+def _spool(root,checkpoint,state,full=False,asset_root=None):
+    root=Path(root);asset_root=Path(asset_root) if asset_root else root;folder=root/'archive-pending';folder.mkdir(exist_ok=True)
     name=f'{state["run"]}-{state["completed_games"]:08d}-{state["generation"]:08d}-'+('recovery' if full else 'policies')+'.tar.gz';path=folder/name
     if path.exists():return path
     temporary=path.with_suffix('.partial')
@@ -15,10 +20,16 @@ def spool(root,checkpoint,state,full=False):
         for p in sorted(Path(checkpoint).iterdir()):
             if p.is_file() and (full or p.name in ('ppo1.npz','ppo2.npz','PPO1.json','PPO2.json','state.json')):tar.add(p,arcname=p.name)
         if full:
-            for p in sorted((root/'opponents').glob('*.npz')):tar.add(p,arcname='opponents/'+p.name)
-            for p in sorted((root/'baseline').glob('*')):tar.add(p,arcname='baseline/'+p.name)
-        initial_report=root/'evaluations'/'games-00000000'/'report.json'
+            for p in sorted((asset_root/'opponents').glob('*.npz')):tar.add(p,arcname='opponents/'+p.name)
+            for p in sorted((asset_root/'baseline').glob('*')):tar.add(p,arcname='baseline/'+p.name)
+        initial_report=asset_root/'evaluations'/'games-00000000'/'report.json'
         if full and initial_report.exists():tar.add(initial_report,arcname='initial-evaluation.json')
+        if full:
+            step=96 if state.get('contract')=='tactics-3' else 50
+            milestone=state['completed_games']//step*step
+            for name in sorted({'games-00000000',f'games-{state["completed_games"]:08d}',f'games-{milestone:08d}'}):
+                for p in sorted((asset_root/'evaluations'/name).glob('*')):
+                    if p.is_file():tar.add(p,arcname='evaluations/'+name+'/'+p.name)
         from .results import records
         body=''.join(json.dumps(r,separators=(',',':'))+'\n' for r in records(Path(checkpoint)/'results.sqlite' if (Path(checkpoint)/'results.sqlite').exists() else 'data/results.sqlite') if r.get('league',{}).get('run')==state['run']).encode()
         import io
@@ -42,7 +53,7 @@ def verify(path,digest,full):
         with tarfile.open(path,'r:gz') as tar:
             entries=tar.getmembers()
             if len(entries)>100 or sum(e.size for e in entries)>512*1024**2:raise ValueError('archive size')
-            if any(not e.isfile() or Path(e.name).is_absolute() or '..' in Path(e.name).parts or len(Path(e.name).parts)>2 for e in entries):raise ValueError('archive path')
+            if any(not e.isfile() or Path(e.name).is_absolute() or '..' in Path(e.name).parts or len(Path(e.name).parts)>(3 if e.name.startswith('evaluations/') else 2) for e in entries):raise ValueError('archive path')
             tar.extractall(tmp,filter='data')
         p=Path(tmp);state=json.loads((p/'state.json').read_text())
         if (state['rules_version'],state['contract']) not in (('combined-arms-4','tactics-2'),('combined-arms-5','tactics-3')):raise ValueError('archive contract')
@@ -59,10 +70,27 @@ def verify(path,digest,full):
             with gzip.open(p/'environment.json.gz','rt') as f:doc=json.load(f)
             a=Engine(decode(doc)['world']);b=Engine(decode(doc)['world']);a.step(.2);b.step(.2)
             if a.world.checksum()!=b.world.checksum():raise ValueError('archive isolated replay mismatch')
+            if state.get('runtime_schema')=='adaptive-1':
+                with gzip.open(p/'environments.json.gz','rt') as f:environments=decode(json.load(f))
+                if not 1<=len(environments)<=3:raise ValueError('archive environment count')
+                import torch
+                for entry in environments:
+                    w=entry['environment']['world']
+                    if w.rules_version!=state['rules_version']:raise ValueError('archive worker rules')
+                    left=Engine(w);right=Engine(decode(__import__('engine.replay',fromlist=['encode']).encode(w)))
+                    left.step(.2);right.step(.2)
+                    if left.world.checksum()!=right.world.checksum():raise ValueError('archive worker replay')
+                    if len(entry['actor_rng'])!=2:raise ValueError('archive actor RNG')
+                    for rng in entry['actor_rng']:torch.Generator().set_state(torch.tensor(rng,dtype=torch.uint8))
         return True
 
 
 def publish_pending(root):
+    with (Path(root)/'archive-publish.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX)
+        return _publish_pending(root)
+
+def _publish_pending(root):
     root=Path(root)
     if shutil.disk_usage(root).free<1024**3 or sum(p.stat().st_size for p in (root/'archive-pending').glob('*'))>=2*1024**3:raise RuntimeError('ARCHIVE_DISK_LIMIT')
     failures=[]
@@ -143,7 +171,7 @@ def restore_bundle(path,destination,digest):
     if root.exists() and any(root.iterdir()):raise ValueError('restore destination must be empty')
     root.mkdir(parents=True,exist_ok=True);checkpoint=root/'checkpoints'/'restored';checkpoint.mkdir(parents=True)
     with tarfile.open(path,'r:gz') as tar:tar.extractall(checkpoint,filter='data')
-    for name in ('baseline','opponents'):
+    for name in ('baseline','opponents','evaluations'):
         source=checkpoint/name
         if source.exists():shutil.move(source,root/name)
         else:(root/name).mkdir()

@@ -7,7 +7,7 @@ from collections import deque
 class Reporter:
     def __init__(self,root,round,base_steps=0):
         self.root=Path(root);self.round=round;self.base_steps=base_steps;self.start=time.monotonic();self.last=0;self.state={}
-        self.evaluation_sim_seconds=0.;self.speed_phase='learning';self.samples=deque([(self.start,0.)])
+        self.evaluation_sim_seconds=0.;self.speed_phase='learning';self.samples=deque([(self.start,0.)]);self.worker_samples={}
     def advance_simulation(self,seconds,phase='evaluation'):
         """Count evaluation ticks without changing training progress or policy steps."""
         if phase!='evaluation' or seconds<0:raise ValueError('invalid evaluation increment')
@@ -38,6 +38,12 @@ class Reporter:
         speed,window=self._speed(now,phase,counter)
         if doc.get('phase')=='stopped':speed=None
         doc.update(sim_speed=speed,sim_speed_basis='recent_phase_wall_time',speed_phase=phase,speed_window_seconds=round(window,1),evaluation_sim_seconds=self.evaluation_sim_seconds,device='CPU',algorithm=doc.get('algorithm','MaskablePPO'),maps=doc.get('maps','4 terrain variants'),replay_speed=1,nim_in_training=doc.get('nim_in_training',False))
+        worker_rates={}
+        for worker,seconds in doc.get('worker_sim_seconds',{}).items():
+            previous=self.worker_samples.get(worker)
+            worker_rates[worker]=round((seconds-previous[1])/(now-previous[0]),1) if previous and now>previous[0] and phase=='learning' and previous[2]==phase else None
+            self.worker_samples[worker]=(now,seconds,phase)
+        if worker_rates:doc['worker_sim_speeds']=worker_rates
         tmp=self.root/'training-status.partial';tmp.write_text(json.dumps(doc));tmp.replace(self.root/'training-status.json')
         Path('data/training-status.json').write_text(json.dumps(doc))
         if os.environ.get('MW_NV_PUBLISH_TRAINING')=='1' and os.environ.get('MW_NV_ASYNC_IO')=='1':
