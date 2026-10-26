@@ -17,14 +17,16 @@
    `https://mw-nv.pages.dev`, Redirect URLs에 아래 주소를 정확히 추가한다.
    `https://mw-nv.pages.dev/api/admin/auth/callback`
 4. 운영자가 Pages Production에 32자 이상 무작위 `ADMIN_SESSION_SECRET`을
-   Secret으로 넣고, `MW_NV_ADMIN_AUTH_ENABLED=true`를 설정·재배포한다.
+   Secret으로 넣고, viewer/wrangler.jsonc의 `MW_NV_ADMIN_AUTH_ENABLED=true`로
+   배포한다. 이 값은 저장소 설정이 기준이므로 Pages 화면에서만 바꾸지 않는다.
    `SUPABASE_URL`, 기존 서버 전용 `SUPABASE_SERVICE_ROLE_KEY`가 필요하다.
    선택적으로 `SUPABASE_AUTH_API_KEY`에 공개 Auth 키를 별도로 넣을 수 있다.
 5. 대시보드의 GitHub 로그인으로 `hexagon0401` 계정으로 로그인한다.
    서버는 실제 GitHub `/user` 응답 숫자 ID `82876856`을 확인한다.
    세션에는 키나 OAuth 토큰을 넣지 않으며 1시간 뒤 만료한다.
 6. 소유자 로그인과 에이전트 ONLINE을 확인한 뒤에만 Production의
-   `MW_NV_ADMIN_CONTROL_ENABLED=true`로 제어를 열고 재배포한다.
+   viewer/wrangler.jsonc의 `MW_NV_ADMIN_CONTROL_ENABLED=true`로 제어를 열고
+   재배포한다.
    제어가 닫힌 동안 CONTROL API는 503을 반환한다.
 
 제어는 PPO 일시정지·재개만 허용한다. 일시정지는 HQ 경계까지 실행한 뒤

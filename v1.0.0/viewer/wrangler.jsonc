@@ -6,6 +6,8 @@
     "PUBLIC_VIEWER": "true",
     "SUPABASE_URL": "https://gwxwntyxjcfbrrcpqgtj.supabase.co",
     "REPLAY_BUCKET": "mw-nv-replays",
-    "REPLAY_MANIFEST": "storage"
+    "REPLAY_MANIFEST": "storage",
+    "MW_NV_ADMIN_AUTH_ENABLED": "true",
+    "MW_NV_ADMIN_CONTROL_ENABLED": "false"
   }
 }
