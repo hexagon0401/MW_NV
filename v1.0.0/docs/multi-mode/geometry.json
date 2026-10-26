@@ -1,0 +1,1387 @@
+{
+  "complete": true,
+  "seeds_per_mode": 30,
+  "total_seconds": 123.34225082799094,
+  "results": [
+    {
+      "scenario": "3",
+      "seed": 0,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          575.3781365328371,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0564029583488563,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 1,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 2,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 3,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          575.3781365328371,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0564029583488563,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 4,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 5,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          575.3781365328371,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0500615624492013,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 6,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          752.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.001178381895467,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 7,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 8,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          575.3781365328371,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0564029583488563,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 9,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 10,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 11,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          756.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          575.3781365328371,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0588897202345435,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 12,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          575.3781365328371,
+          796.9868254870968,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.1721213588879136,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 13,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 14,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          575.3781365328371,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0500615624492013,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 15,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 16,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 17,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 18,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 19,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 20,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          575.3781365328371,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0500615624492013,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 21,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 22,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 23,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 24,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 25,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 26,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          796.9868254870968,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.1057392356088587,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 27,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 28,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          748.8284271247462,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0035434968715204,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "3",
+      "seed": 29,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          575.3781365328371,
+          1132.8284271247462,
+          1516.828427124746
+        ],
+        [
+          744.8284271247462,
+          1128.8284271247462,
+          1512.828427124746
+        ]
+      ],
+      "route_ratio": 1.0500615624492013,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 0,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 1,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 2,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 3,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 4,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 5,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 6,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          944.2986815621422,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0451382068434396,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 7,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          944.2986815621422,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0404703221097271,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 8,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 9,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 10,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1093.5392082591277,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1093.5392082591277,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.001942126540859,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 11,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 12,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 13,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 14,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 15,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          944.2986815621422,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0404703221097271,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 16,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 17,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          944.2986815621422,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0451382068434396,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 18,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          944.2986815621422,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0404703221097271,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 19,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1093.5392082591277,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0996534239315072,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 20,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 21,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          944.2986815621422,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0404703221097271,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 22,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 23,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 24,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1339.7268378292645
+        ]
+      ],
+      "route_ratio": 1.142940654131816,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 25,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          944.2986815621422,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0404703221097271,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 26,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 27,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 28,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    },
+    {
+      "scenario": "4",
+      "seed": 29,
+      "valid": true,
+      "approaches": 3,
+      "vehicle_width_m": 16,
+      "team_route_m": [
+        [
+          1132.8284271247462,
+          1516.828427124746,
+          1900.828427124746
+        ],
+        [
+          1128.8284271247462,
+          1512.828427124746,
+          1896.828427124746
+        ]
+      ],
+      "route_ratio": 1.0026440539642703,
+      "attempt": 0,
+      "fallback": false,
+      "failures": []
+    }
+  ]
+}

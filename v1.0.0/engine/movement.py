@@ -14,7 +14,8 @@ def move(world, key, unit, destination, speed_mps=1.6, ignore_ids=(), offsets=((
         world.motions[key] = dict(route=route,x=float(unit.pos.x_cm),y=float(unit.pos.y_cm))
     motion = world.motions[key]
     route = motion['route']
-    budget = speed_mps*20
+    from .mission_actions import speed
+    budget = (speed_mps if ignore_ids else speed(world,unit,speed_mps))*20
     unit.task_state = 'MOVING'
     while route and budget > 0:
         x,y = motion['x'],motion['y']

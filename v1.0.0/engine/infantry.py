@@ -37,7 +37,9 @@ def move_squad(w,key,squad,destination,engage=True):
         state['members']=ids;state['planned']=False
         w.motions=getattr(w,'motions',{})
         w.motions.pop(key,None)
-    leader=members[0];speed=min(w.unit_specs[s.type_id]['speed_mps'] for s in members)
+    leader=members[0]
+    from .mission_actions import speed as mission_speed
+    speed=min(mission_speed(w,s,w.unit_specs[s.type_id]['speed_mps']) for s in members)
     old={s.id:s.pos for s in members};previous=deepcopy(getattr(w,'motions',{}).get(key));event_count=len(w.events)
     try:
         if state['mode']=='formation':

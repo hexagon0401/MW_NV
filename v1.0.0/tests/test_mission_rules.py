@@ -49,3 +49,20 @@ def test_wall_blocks_direct_room_entry_but_doors_are_reachable():
     assert not w.terrain.segment_clear(start,(hq.pos.x_cm,hq.pos.y_cm))
     assert find_path(w.terrain,start,(hq.pos.x_cm,hq.pos.y_cm))
     assert not FootprintTerrain(w.terrain,[900,450]).passable(hq.pos.x_cm,hq.pos.y_cm)
+
+def test_engine_entry_command_and_no_vehicle_entry():
+    from engine.runtime import Engine
+    from engine.orders import OrderError
+    import pytest
+    w=create(scenario_id='4');e=Engine(w);s=next(s for s in w.soldiers.values() if s.team==0);h=w.facilities[101];s.pos=WorldPos(h.pos.x_cm+3200,h.pos.y_cm)
+    e.submit_for(0,dict(cmd_id=1,team=0,op=18,unit=s.id,target=101,ttl=2000));e.step(45)
+    assert w.queue.status['0:1']=='COMPLETED'
+    from engine.mission_rules import inside
+    assert inside(s.pos,w.bases[0]['room'])
+    v=next(v for v in w.vehicles.values() if v.team==0);e.submit_for(0,dict(cmd_id=2,team=0,op=18,unit=v.id,target=101));e.step(.2)
+    assert w.queue.status['0:2']=='FAILED'
+
+def test_ctf_checkpoint_replays_with_flags_and_neutral_weapons():
+    import json
+    from engine.replay import encode,decode
+    w=create(4,scenario_id='4');restored=decode(json.loads(json.dumps(encode(w))));assert w.checksum()==restored.checksum()

@@ -56,10 +56,12 @@ def observation(w,team):
         recent={k for k,c in own[-10:]}
         orders=[dict(cmd_id=c.cmd_id,status=w.queue.status[k],unit=c.unit,op=int(c.op),target=c.target,arg0=c.arg0,arg1=c.arg1) for k,c in own if k in recent or w.queue.status[k] in ('QUEUED','RUNNING')]
     visible=getattr(w,'visible',{}).get(team,[])
-    return deepcopy(dict(rules_version=w.rules_version,catalog=dict(units=w.unit_specs,vehicles=w.vehicle_specs,weapons=w.weapon_specs),team=int(team),map_width_m=w.config.map_width_m,map_height_m=w.config.map_height_m,color='blue' if team==Team.A else 'red',tick=w.tick,
+    from .mission_observation import observed
+    mission=observed(w,team)
+    return deepcopy(dict(mission=mission,rules_version=w.rules_version,catalog=dict(units=w.unit_specs,vehicles=w.vehicle_specs,weapons=w.weapon_specs),team=int(team),map_width_m=w.config.map_width_m,map_height_m=w.config.map_height_m,color='blue' if team==Team.A else 'red',tick=w.tick,
         units=[s.to_dict() for s in sorted(w.soldiers.values(),key=lambda s:s.id) if s.team==team],
         squads=[s.to_dict() for s in w.squads.values() if s.team==team],
         vehicles=[v.to_dict() for v in w.vehicles.values() if v.team==team],
-        enemies=[u.to_dict() for uid in visible if (u:=w.soldiers.get(uid) or w.vehicles.get(uid)) is not None and u.alive],
+        enemies=[u.to_dict() for uid in visible if (u:=w.soldiers.get(uid) or w.vehicles.get(uid)) is not None and u.alive and u.team is not None],
         failed_goals=[g for g in getattr(w,'failed_goals',[]) if g['team']==int(team) and g['until_tick']>w.tick and g['terrain_revision']==w.terrain.revision],last_seen=list(getattr(w,'last_seen',{}).get(team,{}).values()),facilities=[asdict(f) for f in w.facilities.values()],orders=orders,
         terrain=w.terrain.cells if w.config.map_width_m>=1024 else None,resources=asdict(w.teams[team]),scores={int(t):v.score for t,v in w.teams.items()}))

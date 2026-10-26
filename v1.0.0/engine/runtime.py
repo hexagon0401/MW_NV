@@ -103,6 +103,14 @@ class Engine:
         w = self.world
         actor=w.soldiers.get(c.unit) or w.vehicles.get(c.unit)
         if actor is not None and not actor.alive:raise OrderError('ILLEGAL_STATE')
+        if c.op==Op.ENTER_BUILDING:
+            from .mission_actions import enter
+            c=enter(w,c)
+        if c.op==Op.INTERACT_OBJECTIVE:
+            from .mission_actions import interact
+            w.queue.status[key]='RUNNING'
+            if interact(w,key,c):w.queue.finish(w,key)
+            return
         if c.op in (Op.OPERATE_EMPLACEMENT,Op.LEAVE_EMPLACEMENT):
             from .emplacements import operate
             w.queue.status[key]='RUNNING'

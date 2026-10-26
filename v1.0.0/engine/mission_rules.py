@@ -62,6 +62,9 @@ def flags_update(w):
                 if flag['progress_ms']>=config['steal_seconds']*1000:
                     flag.update(status='carried',carrier=attackers[0].id,return_ms=0)
                     w.emit('FLAG_STOLEN',owner=owner,team=enemy,carrier=flag['carrier'],participants=[u.id for u in attackers])
+    for key,request in getattr(w,'mission_interactions',{}).items():
+        flag=w.flags[request['owner']]
+        if w.queue.status.get(key)=='RUNNING' and (flag['status']!=request['status'] or request['team'] in scored):w.queue.finish(w,key)
     if scored:
         winners=set(scored)
         for team in winners:w.teams[team].score+=1
