@@ -10,6 +10,7 @@ from engine.runtime import Engine
 from engine.version import RULES_VERSION,CATALOG_VERSION
 from .candidate_policy import export,CandidatePolicy
 from .self_play import atomic_json
+from .checkpoint_io import write_environment
 
 
 def save(root,models,env,buffers,querier,generators,state):
@@ -20,7 +21,7 @@ def save(root,models,env,buffers,querier,generators,state):
             obs=env.vector(a);mask=env.mask(a)
             if int(model.predict(obs,deterministic=True,action_masks=mask)[0])!=CandidatePolicy(folder/f'ppo{i+1}.npz').predict(obs,mask):raise ValueError('NumPy parity')
     payload=dict(world=env.engine.world,presentation_events=env.engine.presentation_events,agents=env.agents,items=env.items,selected=env.selected,finished=env.finished,reserved_supply=env.reserved_supply,initial_costs=env.initial_costs,history=env.history)
-    with gzip.open(folder/'environment.json.gz','wt') as f:json.dump(encode(payload),f)
+    write_environment(folder/'environment.json.gz',payload)
     rng=dict(python=encode(random.getstate()),numpy=None,torch=torch.get_rng_state().tolist(),actors=[g.get_state().tolist() for g in generators])
     # numpy state ndarray is handled explicitly, never through pickle.
     n=np.random.get_state();rng['numpy']=[n[0],n[1].tolist(),*n[2:]]
@@ -30,7 +31,7 @@ def save(root,models,env,buffers,querier,generators,state):
     state['teacher_stats']=dict(querier.stats);state['teacher_buffers']=[dict(b.stats) for b in buffers]
     querier.save(folder/'teacher-query.npz')
     if hasattr(env,'accelerated_snapshot'):
-        with gzip.open(folder/'environments.json.gz','wt') as f:json.dump(encode(env.accelerated_snapshot),f)
+        write_environment(folder/'environments.json.gz',env.accelerated_snapshot)
         state['runtime_schema']='adaptive-1'
     atomic_json(folder/'state.json',state)
     if Path('data/results.sqlite').exists():

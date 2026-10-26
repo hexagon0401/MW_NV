@@ -8,7 +8,7 @@ from .dashboard_data import sample,publish
 from . import ppo_control
 
 BASE=Path(__file__).resolve().parents[1]
-TRAIN_KEYS=('status','phase','updated_at','games','round','policy_steps','completed_steps','sim_speed','workers','cpu_budget','adaptation_reason','learners','decision_seconds','teacher_seconds','rules_version','map_id','map_version','run_id','control_version','backup','pause_reason')
+TRAIN_KEYS=('status','phase','updated_at','games','round','policy_steps','completed_steps','sim_speed','workers','cpu_budget','adaptation_reason','learners','decision_seconds','teacher_seconds','rules_version','map_id','map_version','run_id','control_version','operation','operation_elapsed_seconds','checkpoint_seconds','backup','pause_reason')
 TEACHER_KEYS=('paired','skipped','requests','last_error','last_error_code','last_request_seconds','retry_in_seconds','async_inflight')
 def training():
     try:d=json.loads(Path('data/training-status.json').read_text())

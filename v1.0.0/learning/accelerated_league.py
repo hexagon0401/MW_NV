@@ -11,6 +11,7 @@ from .league_policy import choose,update,advantages
 from .league_metrics import finish
 from .self_play import atomic_json,current
 from .training_status import Reporter
+from .checkpoint_io import commit_metadata
 from engine.replay import decode
 from server import ppo_control as control
 
@@ -126,17 +127,19 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         reporter(dict(phase=phase,games=state['completed_games'],sim_seconds=simulated,policy_steps=reporter.base_steps,algorithm='Independent adaptive MaskablePPO',maps='3 balanced modes' if kind=='mission' else '4 terrain variants',nim_in_training=teacher_enabled,teacher=dict(query.stats),learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows)) for i,m in enumerate(models)],decision_seconds=10,teacher_seconds=30,workers=adaptive.workers,cpu_budget=resources()['cpu_budget'],adaptation_reason=adaptive.reason,aggregate_sim_speed=True,worker_sim_seconds=dict(worker_sim),games_per_hour=(state['completed_games']-completed_start)*3600/elapsed,updates_per_hour=updates*3600/elapsed,evaluation_cases=cases,evaluation_total=240 if kind=='mission' else 80,backup=state.get('backup','pending'),map_id=state['map_id'],map_version=state['map_version'],rules_version=state['rules_version'],runtime_schema='adaptive-1',publication=publication,run_id=state['run'],control_version=control.state().get('version',0)),force=force)
     report.advance_simulation=reporter.advance_simulation
     def checkpoint():
-        all_bundles=[]
-        for slot in slots:
-            b=slot['worker'].call('snapshot');b['info'].update(active=slot['info']['active'],episode_starts=slot['info'].get('episode_starts',{'A':True,'B':True}));b['actor_rng']=[g.get_state().tolist() for g in slot['generators']];all_bundles.append(b)
-        primary=restore(make_env(kind),all_bundles[0]['environment']);primary.accelerated_snapshot=all_bundles
-        info=all_bundles[0]['info']
-        for k in ('descriptor','assignments','fixed_opponent','initial_frame','metrics','episode_starts','policy_spans'):state[k]=info.get(k)
-        state['control_desired']=control.state()['desired']
-        state.update(active=info['active'],episode=info.get('episode',next_episode),next_episode=next_episode,adaptive=dict(workers=adaptive.workers,reason=adaptive.reason))
-        safe_query=backend.TeacherBuffer();safe_query.stats=dict(query.stats);safe_query.cooldown=query.cooldown
-        path=backend.save(root,models,primary,buffers,safe_query,generators,state);backend.record_update(root,state,models)
-        return path
+        with reporter.busy():
+            for slot in slots:slot['worker'].call('mark','WAITING')
+            all_bundles=[]
+            for slot in slots:
+                b=slot['worker'].call('snapshot');b['info'].update(active=slot['info']['active'],episode_starts=slot['info'].get('episode_starts',{'A':True,'B':True}));b['actor_rng']=[g.get_state().tolist() for g in slot['generators']];all_bundles.append(b)
+            primary=restore(make_env(kind),all_bundles[0]['environment']);primary.accelerated_snapshot=all_bundles
+            info=all_bundles[0]['info']
+            for k in ('descriptor','assignments','fixed_opponent','initial_frame','metrics','episode_starts','policy_spans'):state[k]=info.get(k)
+            state['control_desired']=control.state()['desired']
+            state.update(active=info['active'],episode=info.get('episode',next_episode),next_episode=next_episode,adaptive=dict(workers=adaptive.workers,reason=adaptive.reason))
+            safe_query=backend.TeacherBuffer();safe_query.stats=dict(query.stats);safe_query.cooldown=query.cooldown
+            path=backend.save(root,models,primary,buffers,safe_query,generators,state);backend.record_update(root,state,models)
+            return path
     def archive_checkpoint(path,full):
         io.archive(root,path,state,full)
         if not publish:return
@@ -249,7 +252,9 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
                     if verdict['pause']:state['pause_reason']='pilot_regression';stop['value']=True
                     elif any(v and v['mean']>0 for v in verdict.get('modes' if kind=='mission' else 'learners',{}).values()):
                         evaluated=True;evaluation.confirm(root,models,state,report)
-            checkpoint();report('checkpoint_saved',True)
+            if evaluated:checkpoint()
+            else:commit_metadata(root,state)
+            report('checkpoint_saved',True)
             if evaluated:adaptive.resume_measurement()
     except InterruptedError:pass
     except RuntimeError as exc:

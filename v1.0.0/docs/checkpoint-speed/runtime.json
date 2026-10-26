@@ -1,0 +1,16 @@
+{
+  "changed_files": [
+    "learning/accelerated_league.py",
+    "learning/league_state.py",
+    "learning/mission_state.py",
+    "learning/training_status.py",
+    "server/dashboard_service.py"
+  ],
+  "engine_agents_config_unchanged": true,
+  "tests_initial": 16,
+  "tests_final": 12,
+  "tests_overlap": true,
+  "restore_model_optimizer_rng_environment_passed": true,
+  "preserved_generation": 258,
+  "preserved_games": 107
+}
