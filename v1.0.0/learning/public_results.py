@@ -32,6 +32,8 @@ def publish(db='data/results.sqlite'):
     from .objective_stats import document as objective_document
     objectives=objective_document(doc['matches']);objectives['updated_at']=doc['updated_at']
     store._request('object/'+store.bucket+'/objective-stats.json.gz','PUT',gzip.compress(json.dumps(objectives,separators=(',',':')).encode(),mtime=0))
+    from .league_metrics import document as league_document
+    league=league_document(db);store._request('object/'+store.bucket+'/league-insights.json.gz','PUT',gzip.compress(json.dumps(league,separators=(',',':')).encode(),mtime=0))
     obsolete=set(cache.get('previous',[]))-set(paths)-set(cache.get('current',[]))
     if obsolete:store._request('object/'+store.bucket,'DELETE',json.dumps({'prefixes':sorted(obsolete)}).encode())
     temporary=cache_path.with_suffix('.partial');temporary.write_text(json.dumps(dict(current=paths,previous=cache.get('current',[]))));temporary.replace(cache_path)

@@ -3,7 +3,7 @@ from math import hypot,ceil,isfinite
 from zipfile import BadZipFile
 from collections import defaultdict
 
-CONTRACT='tactics-1'
+CONTRACT='tactics-2'
 ROLES=('capture','defend','recon','anti_armor','fire','transport','supply','repair','retreat')
 BUSY=('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS','UNLOADING','DEPLOYING','PACKING','WAITING_TRAFFIC')
 
@@ -34,7 +34,7 @@ def candidates(obs):
             if terrain[actor['pos']['y_cm']//400][actor['pos']['x_cm']//400]==2:detect*=.7
             if terrain[target['pos']['y_cm']//400][target['pos']['x_cm']//400]==2:detect*=.8
         return distance(actor,target)<=min(s['attack']['range_m'],detect) and clear(actor,target)
-    def add(actor,role,score,reason,op,target=0,x=0,y=0,reservations=None):
+    def add(actor,role,score,reason,op,target=0,x=0,y=0,reservations=None,variant='direct'):
         members=actor.get('member_ids',[]);troops=[own_by[i] for i in members if i in own_by]
         representative=troops[0] if troops else actor
         pos=representative['pos'];kind=representative.get('type_id','INF');spec=(catalog['units'] if kind in catalog['units'] else catalog['vehicles'])[kind]
@@ -44,7 +44,9 @@ def candidates(obs):
         goal=next((u for u in [*enemies,*vehicles,*obs['facilities']] if u['id']==target),None)
         goal_pos=goal['pos'] if goal else dict(x_cm=x*100,y_cm=y*100)
         meters=hypot(pos['x_cm']-goal_pos['x_cm'],pos['y_cm']-goal_pos['y_cm'])/100 if target or x or y else 0
-        analysis=dict(distance_m=round(meters,1),eta_s=round(meters/max(.1,min(catalog['units'][u['type_id']]['speed_mps'] for u in troops) if troops else spec['speed_mps']),1),observed_threats=round(threat,2))
+        if any(g['unit']==actor['id'] and hypot(g['x_cm']-goal_pos['x_cm'],g['y_cm']-goal_pos['y_cm'])<400 for g in obs.get('failed_goals',[])):return
+        if any(o['unit']==actor['id'] and o['op']==op and o['target']==target and o['arg0']==x and o['arg1']==y and o['status'] in ('QUEUED','RUNNING') for o in obs.get('orders',[])):return
+        analysis=dict(tactic=variant,distance_m=round(meters,1),eta_s=round(meters/max(.1,min(catalog['units'][u['type_id']]['speed_mps'] for u in troops) if troops else spec['speed_mps']),1),observed_threats=round(threat,2))
         if op==13 and goal and spec['attack']:
             enemy_spec=(catalog['units'] if goal['type_id'] in catalog['units'] else catalog['vehicles'])[goal['type_id']]
             defense='light' if goal['type_id']=='HEL' and goal['task_state'] not in ('MOVING','TAKEOFF','LANDING') else enemy_spec['armor']
@@ -53,7 +55,9 @@ def candidates(obs):
             expected=spec['attack']['damage']*catalog['weapons']['multipliers'][spec['weapon']][defense]*hit
             analysis.update(expected_damage=round(expected,2),target_type=goal['type_id'],target_armor=defense,hit_probability=round(hit,3))
             score+=min(25,expected/max(1,goal['hp'])*20);reason+=f' · {goal["type_id"]} 예상 {expected:.1f}'
-        features=[score/200,pos['x_cm']/(obs['map_width_m']*100),pos['y_cm']/(obs['map_height_m']*100),health,ammo,representative.get('fuel',100)/100,min(1,threat/4),len(troops)/8,float(kind in catalog['vehicles']),float(role=='fire'),float(role=='anti_armor'),float(role=='transport'),float(role=='supply'),float(role=='retreat'),x/obs['map_width_m'],y/obs['map_height_m']]
+        hq=next((f for f in obs['facilities'] if f['kind']=='HQ' and f['owner']==obs['team']),None)
+        mirrored=hq is not None and hq['pos']['x_cm']>obs['map_width_m']*50
+        features=[score/200,(1-pos['x_cm']/(obs['map_width_m']*100)) if mirrored else pos['x_cm']/(obs['map_width_m']*100),pos['y_cm']/(obs['map_height_m']*100),health,ammo,representative.get('fuel',100)/100,min(1,threat/4),len(troops)/8,float(kind in catalog['vehicles']),float(role=='fire'),float(role=='anti_armor'),float(role=='transport'),float(role=='supply'),float(role=='retreat'),(1-goal_pos['x_cm']/(obs['map_width_m']*100)) if mirrored else goal_pos['x_cm']/(obs['map_width_m']*100),goal_pos['y_cm']/(obs['map_height_m']*100)]
         cost=0
         if op==17:cost=2
         elif op==9:cost=1
@@ -75,7 +79,11 @@ def candidates(obs):
         if cost>budget:return
         result.append(dict(analysis=analysis,credits=credits,tickets=tickets,credit_budget=obs['resources']['credits'],ticket_budget=obs['resources']['tickets'],supply_cost=cost,supply_budget=budget,role=role,score=round(score,4),reason=reason,command=dict(op=op,unit=actor['id'],target=target,arg0=x,arg1=y),features=features,locks=sorted(set([actor['id'],*members,*(reservations or [])]))) )
     def goto(actor,role,target,score,reason,op=2):
-        add(actor,role,score,reason,op,x=target['pos']['x_cm']//100,y=target['pos']['y_cm']//100)
+        x=target['pos']['x_cm']//100;y=target['pos']['y_cm']//100
+        troops=[own_by[i] for i in actor.get('member_ids',[]) if i in own_by]
+        if role=='supply' and troops:
+            x-=round((sum(t['pos']['x_cm'] for t in troops)/len(troops)-troops[0]['pos']['x_cm'])/100);y-=round((sum(t['pos']['y_cm'] for t in troops)/len(troops)-troops[0]['pos']['y_cm'])/100)
+        add(actor,role,score,reason,op,x=x,y=y)
     for g in sorted(obs['squads'],key=lambda g:g['id']):
         troops=[own_by[i] for i in g['member_ids'] if i in own_by];dismounted=[u for u in troops if u['carrier_id'] is None]
         if not troops or not dismounted:continue
@@ -88,6 +96,19 @@ def candidates(obs):
             score=70-d*.12+(15 if role=='capture' else 0)+min(20,len(troops)*2)
             if role=='defend' and not nearby:score-=30
             add(g,role,score,'거점 확보' if role=='capture' else '거점 방어',3 if role=='capture' else 4,target=f['id'])
+            terrain=obs.get('terrain')
+            if terrain:
+                for side in (-1,1):
+                    gx=f['pos']['x_cm']//100;gy=f['pos']['y_cm']//100+side*48
+                    if 4<=gx<obs['map_width_m']-4 and 4<=gy<obs['map_height_m']-4 and terrain[gy//4][gx//4] in (0,1,2,5,7,8):
+                        add(g,role,score-12,'거점 측면 경유',2,x=gx,y=gy,variant='flank_north' if side<0 else 'flank_south')
+                cover=[]
+                for cy in range(max(0,actor['pos']['y_cm']//400-10),min(len(terrain),actor['pos']['y_cm']//400+11)):
+                    for cx in range(max(0,actor['pos']['x_cm']//400-10),min(len(terrain[0]),actor['pos']['x_cm']//400+11)):
+                        if terrain[cy][cx]==2:cover.append((abs(cx*400-f['pos']['x_cm'])+abs(cy*400-f['pos']['y_cm']),cx,cy))
+                if cover:
+                    _,cx,cy=min(cover);add(g,'defend',score-8,'엄폐 위치 확보',2,x=cx*4+2,y=cy*4+2,variant='cover')
+
         if any(u['type_id']=='REC' for u in troops) and objectives:
             f=objectives[(g['id']+obs['tick']//150)%len(objectives)];goto(g,'recon',f,70-distance(actor,f)*.1,'거점 접근 정찰')
         if hp<.35 and depots:goto(g,'retreat',min(depots,key=lambda d:distance(actor,d)),115,'분대 체력 부족',10)
@@ -112,7 +133,8 @@ def candidates(obs):
                 damaged=[v for v in vehicles if v['hp']<catalog['vehicles'][v['type_id']]['hp'] and v['task_state'] not in BUSY]
                 if damaged:
                     v=min(damaged,key=lambda v:distance(u,v))
-                    if distance(u,v)<=3:add(u,'repair',120,'손상 차량 수리',17,target=v['id'],reservations=[v['id']])
+                    hull=catalog['vehicles'][v['type_id']]['footprint_cm'];dx=max(0,abs(u['pos']['x_cm']-v['pos']['x_cm'])-hull[0]/2);dy=max(0,abs(u['pos']['y_cm']-v['pos']['y_cm'])-hull[1]/2)
+                    if hypot(dx,dy)<=300:add(u,'repair',120,'손상 차량 수리',17,target=v['id'],reservations=[v['id']])
                     else:goto(u,'repair',v,80-distance(u,v)*.1,'손상 차량 접근')
             if u['type_id']=='MED' and u['heal_pool']>=8:
                 wounded=[s for s in troops if s['hp']<catalog['units'][s['type_id']]['hp'] and distance(u,s)<=3 and s['task_state']!='MOVING']
@@ -172,13 +194,30 @@ def candidates(obs):
             living=own if kind in catalog['units'] else vehicles
             deficit=amount-sum(u['type_id']==kind for u in living)
             if deficit>0 and len(living)<(96 if kind in catalog['units'] else 14):add(hq,'supply',100+min(25,deficit*3),'손실 병종 우선 충원',11,target=hq['id'],x=PURCHASE_TYPES.index(kind))
+    # Offer alternative disembark objectives instead of hard-wiring the nearest point.
+    for v in sorted(vehicles,key=lambda v:v['id']):
+        if not v['passenger_ids'] or v['task_state'] in ('TAKEOFF','LANDING','UNLOADING'):continue
+        from engine.traffic import arrival_slot
+        for f in objectives:
+            slot=arrival_slot(obs,v,f['pos'])
+            if slot:add(v,'transport',125-distance(v,f)*.03,'수송 목적지 선택',7,x=slot[0],y=slot[1],variant='transport_destination')
     # Fair role allocation keeps scarce support actions in the bounded candidate set.
-    buckets=defaultdict(list)
-    for item in sorted(result,key=lambda c:(-c['score'],c['command']['unit'],c['command']['op'],c['command']['target'],c['command']['arg0'],c['command']['arg1'])):buckets[item['role']].append(item)
-    chosen=[]
-    while len(chosen)<64 and any(buckets.values()):
+    buckets=defaultdict(lambda:defaultdict(list))
+    for item in sorted(result,key=lambda c:(-c['score'],c['command']['unit'],c['command']['op'],c['command']['target'],c['command']['arg0'],c['command']['arg1'])):buckets[item['role']][item['command']['unit']].append(item)
+    chosen=[];seen=set();cycle=0
+    while len(chosen)<64:
+        added=False
         for role in ROLES:
-            if buckets[role] and len(chosen)<64:chosen.append(buckets[role].pop(0))
+            for uid in sorted(buckets[role]):
+                items=buckets[role][uid]
+                if cycle>=len(items):continue
+                item=items[cycle];identity=tuple(item['command'].values())
+                if identity in seen:continue
+                seen.add(identity);chosen.append(item);added=True
+                if len(chosen)==64:break
+            if len(chosen)==64:break
+        cycle+=1
+        if not added:break
     for i,c in enumerate(chosen):c['id']=i
     return chosen
 

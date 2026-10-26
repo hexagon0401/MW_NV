@@ -33,7 +33,7 @@ def insert(db,record):
     return True
 
 
-def record_world(db,w,mode,policies,match_id=None,steps=0,initial_frame=None):
+def record_world(db,w,mode,policies,match_id=None,steps=0,initial_frame=None,metadata=None):
     if not getattr(w,'ended',False):return False
     if match_id and Path(db).exists():
         with sqlite3.connect(db) as conn:
@@ -41,7 +41,7 @@ def record_world(db,w,mode,policies,match_id=None,steps=0,initial_frame=None):
             if conn.execute('SELECT 1 FROM records WHERE id=?',(match_id,)).fetchone():return False
     from .objective_stats import collect
     objectives=collect(w,initial_frame)
-    return insert(db,dict(objective_stats=objectives,map_family=getattr(w,'training_map_family',None),kind='match',id=match_id or uuid.uuid4().hex,rules_version=w.rules_version,catalog_version=w.catalog_version,map_id=getattr(w,'map_id',None),map_version=getattr(w,'map_version',None),mode=mode,policies=policies,seed=w.seed,swapped=getattr(w,'swapped',False),winner=None if w.winner is None else int(w.winner),scores=[w.teams[t].score for t in (0,1)],ended=True,ticks=w.tick,created_at=datetime.now(timezone.utc).isoformat()))
+    return insert(db,dict(**(metadata or {}),objective_stats=objectives,map_family=getattr(w,'training_map_family',None),kind='match',id=match_id or uuid.uuid4().hex,rules_version=w.rules_version,catalog_version=w.catalog_version,map_id=getattr(w,'map_id',None),map_version=getattr(w,'map_version',None),mode=mode,policies=policies,seed=w.seed,swapped=getattr(w,'swapped',False),winner=None if w.winner is None else int(w.winner),scores=[w.teams[t].score for t in (0,1)],ended=True,ticks=w.tick,created_at=datetime.now(timezone.utc).isoformat()))
 
 
 def record_training(db,policy,steps,opponent='algorithm',run_id=None,training_run=None):

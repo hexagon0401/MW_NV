@@ -1,0 +1,138 @@
+{
+  "status": "verified",
+  "asset": "pre-league-rules3-g2090.tar.gz",
+  "sha256": "50d3f90bb2f835d6b67b1e3984111b796f0023a134c0b62a1787e7595543c1c7",
+  "generation": 2090,
+  "code_commit": "65fe24595bf5ce55523b8f74da83156905ca35b7",
+  "rules": "combined-arms-3",
+  "transport": {
+    "asset": "pre-league-rules3-g2090.tar.gz",
+    "sha256": "50d3f90bb2f835d6b67b1e3984111b796f0023a134c0b62a1787e7595543c1c7",
+    "chunks": [
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part000",
+        "sha256": "b4775e4cfc3f39c7c921e93d6fe53bd15977b02f17bc8bbd5b866a05bf060f44",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part001",
+        "sha256": "2540fc56cac310ea249718ced6aa506cadb9071c24f9b5f998f4dc7c74434792",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part002",
+        "sha256": "95a2cc3b56a52974db744789ed0ed6cfeb25db24d6a04621cd7999ba4ec809ae",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part003",
+        "sha256": "699013bc38e2f1842c6c500a613a1487073019a4d06a01ad647b759430a34f02",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part004",
+        "sha256": "c47ce2d2b7c3f064eb89979b53087f49ca57380afec11c6e1d234728ed7e12cf",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part005",
+        "sha256": "184928a4be11da4e47eff356ba329d0f99a157d46d6dad360df888fec831f151",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part006",
+        "sha256": "b12d5db71674ab158fa679480bab0d0425d9f3de3237e65c7e0d9d7158991184",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part007",
+        "sha256": "0c0aa6ea6077ff686e562f282a103a845ab5ab893a03a1e5623d15c1f5c4e41b",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part008",
+        "sha256": "256b4910d2f3bf78aa8ae58b7f97ebb67b6c5a669ed59c1d87e5f0c8b1607fb4",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part009",
+        "sha256": "b2dbdadf99b96f75ca154247c0752dd1964955b0fb30a334503d2f6f108fbc7d",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part010",
+        "sha256": "377b566307ed524d618aaba8de3421e89b0935445577f0fc8ce8db17f90fd3eb",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part011",
+        "sha256": "b7ea07b0d7069a2a8e0740822d3ed31d07652248605b5f0377f68683076209b2",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part012",
+        "sha256": "8af8b72332bff83c7a6abfcc4d44ca1dcdc689de46101d78d2fed869ee5e1082",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part013",
+        "sha256": "613766e6efeacc3fa742e8d3478f19e12088d8b5548e872146cab94a9b83a6e0",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part014",
+        "sha256": "993d1f200d97b86e879095bd11dd09e8f3f63108cc4aedfc263b43898b8b5a34",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part015",
+        "sha256": "b1e98226d87bc4fedefc22e704111559b4d840815746fa4788dd7bdb2afefcd2",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part016",
+        "sha256": "ad79fd754a18b5848253adeff5b07187dff258e69013eac8ae5225f9d87f19e5",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part017",
+        "sha256": "27aa455842c682cc6c2217cd64951e394482c77d2b8bab51193de51a45a239fa",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part018",
+        "sha256": "75ff563994236c91e7b23e5799c67c33291bb7532a8b915ef8f39702af0ade50",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part019",
+        "sha256": "4c8a7163d370edc51b71a2c88cf85affb78f55871efb594b30c5dee1be530488",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part020",
+        "sha256": "de41d4e1ff94b6ad12a36616b345fd3701066fce1ca02d6c8c74e03afb548eb8",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part021",
+        "sha256": "b5883593a6a8fadd881671e3da364bc80fef64f5c1867f7cf1c62bb753b4c0d1",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part022",
+        "sha256": "4e75fbf24d3e67ba4e2f8a52aa4214fc35fdc892620a5fd2990afa4436ad834f",
+        "size": 524288
+      },
+      {
+        "name": "pre-league-rules3-g2090.tar.gz.part023",
+        "sha256": "2310bfda09dc400097fc7617ed42c905ca87a9b9e10d36e5d8ec52f66fb31359",
+        "size": 286640
+      }
+    ]
+  },
+  "model_load": true,
+  "optimizer_load": true,
+  "world_decode": true,
+  "requires_matching_code_for_execution": true
+}

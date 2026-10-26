@@ -1,12 +1,13 @@
 # MW-NV v1.0.0 STATE
-Current: T09 viewer fixes validated; movement and dual PPO IN PROGRESS
-Viewer: wheel zoom/drag pan; real units >=20%; DPR1/2 screen-space labels; shot trails/origin arrows
-Verified: JS25, build, Chromium DPR1/2 zoom6/18/19/20/35/65 desktop/tablet/mobile; screenshots docs/league-transition
-Old worker: safely stopped at generation2090; preserved data/preserved/pre-league-checkpoint-00002090-d95aa585
-Actual replay: saved ignored data/league-audit/previous-latest.json; seed39 BLOCKED91 traffic-timeout10
-Movement: rules4 footprint routes/physical column recovery; mirrored bridge + bounded fail tests pass; ten-game audit running
-Deployment: viewer233d76e4; previous production aea6b716 remains recovery
-Models: GitHub Release upload HTTP401; user asked to configure GH_TOKEN; no verified remote backup
-Next: movement regression, dual PPO/10s/paired30s NIM, archival and 200game pilot
-Learning repair/discovery: previous plan pending; do not claim progress in strategy
-Limits: actual Mac trackpad/performance unverified; no permanent external CPU; usage UNKNOWN
+Current: T09 dual league implementation validated; pilot launch pending final checks
+Viewer: production233d76e4 wheel zoom/drag; real units>=20%; DPR1/2 labels; shot-origin trails
+Movement: rules4 full-footprint routes + physical column recovery; mirrored4m bridge fixtures pass
+Audit: headless10 games A4/B6 west7/east3; same-action reexecution hash PASS; traffic failures remain
+Models: rules3 gen2090 full recovery remotely downloaded/SHA/model/optimizer/world verified
+Archive:512KiB immutable chunks;10game policy/50game full; safe restoration/index; no remote history deletion
+Learning: two independent PPOs;10s tactics, paired30s NIM; fair32game block and4map crossing
+Verified: full Python166 earlier; new league/restore/pattern/archive tests passing; JS25/build/browser
+NIM: actual paired query0.6s/8labels; token usage UNKNOWN
+Evidence: docs/league-transition/README.md, legacy-backup.json, engine-audit/REPORT.md
+Next: finish public insights/UI QA, launch data/league-v1 then frozen initial evaluation and200game pilot
+Limits: traffic issues remain;200games/strategy improvement/Mac input/permanent CPU unverified

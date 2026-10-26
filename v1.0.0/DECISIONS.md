@@ -161,3 +161,7 @@ NIM 키 Value 수정 후 실제 지휘 JSON 성공. NIM 요청에는 enable_thin
 ## T08 거점 선점 통계
 
 최초 점령은 해당 중립 거점을 처음 점령 완료한 팀이다. 이후 중립화/상대 재점령/회복으로 덮어쓰지 않는다. 각 거점·선점 조합·팀 첫 점령 장소를 승패와 연결한다. 관측 정보가 없는 과거 기록은 추측하지 않고 제외/누락으로 표시한다. 이번 구현은 관측·집계이며 보상/AI 지휘/게임 규칙을 바꾸지 않는다. 선점과 승리의 상관관계를 원인 또는 학습 향상의 증거로 단정하지 않는다.
+
+## T09 movement/viewer/independent league
+
+User approved wheel/pinch zoom + drag pan, real sprites from20%(icons below18%), DPR<=2 screen labels and physical squad crossing recovery. Fix movement before learning expansion. New rules combined-arms-4/tactics-2; two independent PPOs exchange teams/locations, tactics10s and paired NIM30s. Initial actor warm start only; critic/optimizer/buffers fresh.200-completed-game pilot with frozen crossed evaluation and regression pause. Immutable10-game policy/50-game recovery history replaces remote overwrite; chunked transport verifies full recovery before cleanup. No new paid/permanent CPU resource. See docs/league-transition/README.md for implemented behavior and limitations.

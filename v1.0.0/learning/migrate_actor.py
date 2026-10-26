@@ -13,7 +13,7 @@ def migrate(source,output):
     source=Path(source);output=Path(output)
     if output.with_suffix('.zip').exists():raise ValueError('migration destination exists')
     with np.load(source,allow_pickle=False) as data:
-        if str(data['contract'].item())!='tactics-1' or str(data['rules_version'].item())!='combined-arms-2' or RULES_VERSION!='combined-arms-3':raise ValueError('explicit migration requires rules2 actor and rules3 target')
+        if str(data['contract'].item())!='tactics-1' or str(data['rules_version'].item())!='combined-arms-2' or RULES_VERSION not in ('combined-arms-3','combined-arms-4'):raise ValueError('explicit migration requires rules2 actor and rules3 target')
         weights={k:data[k].copy() for k in ('w0','b0','w1','b1','wo','bo')}
     expected={'w0':(128,1056),'b0':(128,),'w1':(128,128),'b1':(128,),'wo':(65,128),'bo':(65,)}
     if any(weights[k].shape!=shape or not np.isfinite(weights[k]).all() for k,shape in expected.items()):raise ValueError('invalid actor weights')
@@ -26,7 +26,7 @@ def migrate(source,output):
     output.parent.mkdir(parents=True,exist_ok=True);model.save(output);export(model,output.with_suffix('.npz'))
     policy=CandidatePolicy(output.with_suffix('.npz'));obs=np.zeros(1056,dtype=np.float32)
     mask=np.ones(65,dtype=bool);assert int(model.predict(obs,deterministic=True,action_masks=mask)[0])==policy.predict(obs,mask)
-    output.with_suffix('.json').write_text(json.dumps(dict(source_rules='combined-arms-2',target_rules=RULES_VERSION,contract='tactics-1',source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),policy_id=policy.policy_id,actor_only=True,critic='fresh',optimizer='fresh',policy_steps=0,map_id='river-districts',map_version='2'),indent=2)+'\n')
+    output.with_suffix('.json').write_text(json.dumps(dict(source_rules='combined-arms-2',target_rules=RULES_VERSION,contract=__import__('agents.tactics',fromlist=['CONTRACT']).CONTRACT,source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),policy_id=policy.policy_id,actor_only=True,critic='fresh',optimizer='fresh',policy_steps=0,map_id='river-districts',map_version='2'),indent=2)+'\n')
     return model
 
 if __name__=='__main__':

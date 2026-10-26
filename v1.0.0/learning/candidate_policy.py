@@ -11,8 +11,10 @@ ACTIONS=65
 def vector(obs,items):
     result=np.zeros(OBS_SIZE,dtype=np.float32)
     own=[u for u in obs['units'] if u['alive']];vehicles=[v for v in obs['vehicles'] if v['alive']]
-    result[:12]=[len(own)/96,len(vehicles)/14,obs['resources']['credits']/5000,obs['resources']['supply']/2000,obs['resources']['tickets']/96,obs['scores'][obs['team']]/100,obs['scores'][1-obs['team']]/100,obs['tick']/15000,len(obs['enemies'])/128,len(items)/64,sum(u['carrier_id'] is not None for u in own)/96,obs['team']]
+    result[:12]=[len(own)/96,len(vehicles)/14,obs['resources']['credits']/5000,obs['resources']['supply']/2000,obs['resources']['tickets']/96,obs['scores'][obs['team']]/100,obs['scores'][1-obs['team']]/100,obs['tick']/15000,len(obs['enemies'])/128,len(items)/64,sum(u['carrier_id'] is not None for u in own)/96,0.]
     for i,f in enumerate(sorted((f for f in obs['facilities'] if f['kind']=='OBJECTIVE'),key=lambda f:f['id'])[:3]):result[12+i]=0 if f['owner'] is None else 1 if f['owner']==obs['team'] else -1
+    history=obs.get('recent_summary',[])
+    if history:result[18:18+min(14,len(history))]=history[:14]
     for c in items:result[32+c['id']*16:32+(c['id']+1)*16]=c['features']
     return np.clip(result,-1,1)
 
