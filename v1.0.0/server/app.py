@@ -15,6 +15,10 @@ def create_app(store=None,live_runner=None,lifespan=None):
         data=json.loads(path.read_text())
         if not data.get('summary',{}).get('ended'):raise HTTPException(404)
         return data
+    @app.get('/api/insights')
+    def learning_insights():
+        from learning.league_metrics import document
+        return document(root/'results.sqlite')
     @app.get('/api/objectives')
     def objective_statistics(mode:str='',rules_version:str='',catalog_version:str='',map_id:str='',map_version:str='',map_family:str='',swapped:str='',policy_a:str='',policy_b:str=''):
         from learning.objective_stats import document,report

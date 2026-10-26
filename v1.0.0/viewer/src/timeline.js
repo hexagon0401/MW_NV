@@ -22,7 +22,7 @@ export class Timeline{
   if(kind==='UNIT_REPAIRED'&&u)u.hp=p.hp;
   if(kind==='UNIT_HEALED'&&u&&u.hp!=null)u.hp+=p.amount;
   if(kind==='DEPLOYMENT_CHANGED'&&u)u.deployment=p.deployment;
-  if(kind==='ARTILLERY_FIRED'){(this.state.projectiles??=[]).push({...p});if(u&&u.ammo!=null)u.ammo--;}
+  if(kind==='ARTILLERY_FIRED'){(this.state.projectiles??=[]).push({...p,fired_tick:p.fired_tick==null?undefined:p.fired_tick+1,impact_tick:p.impact_tick+1});if(u&&u.ammo!=null)u.ammo--;}
   if(['ARTILLERY_IMPACT','TANK_IMPACT'].includes(kind))(this.state.impacts??=[]).push({...p,tick:e.sim_tick+1});
   if(kind==='UNIT_DAMAGED'&&p.damage)(this.state.damage??=[]).push({...p,tick:e.sim_tick+1});
   if(kind==='HQ_DECISION')(this.state.decisions??={})[p.team]=structuredClone(p.metadata);

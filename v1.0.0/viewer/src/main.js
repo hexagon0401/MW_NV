@@ -1,3 +1,4 @@
+import {startLeagueView} from './league-view.js';
 import {startObjectiveStatistics} from './objective-statistics.js';
 import {entityName,currentOrder,orderState,orderTarget,orderVerb} from './command-view.js';
 import {startHistory} from './history.js';
@@ -43,3 +44,5 @@ host.addEventListener('keydown',e=>{if(e.key==='Escape'&&scene){scene.selected=n
 for(const team of [0,1]){const b=document.createElement('button');b.textContent=`${team===0?'A':'B'} 본진`;b.onclick=()=>{const f=currentFrame?.facilities.find(f=>f.kind==='HQ'&&f.owner===team);if(f){scene.follow=false;scene.camera.zoom=.4;scene.camera.focus(f.x_cm*.12,f.y_cm*.12);}};document.querySelector('.map-tools').append(b);}
 
 if(['localhost','127.0.0.1'].includes(location.hostname))window.__mwViewState=()=>({zoom:scene?.camera.zoom,detail:scene?.detail,resolution:scene?.app.renderer.resolution,visibleVehicles:scene?[...scene.sprites.values()].filter(a=>a.turret?.visible).length:0,camera:{x:scene?.camera.x,y:scene?.camera.y},trackingPosition:currentFrame&&selectedEntity(currentFrame),effects:scene?.vfx.pool.filter(p=>p.visible).length??0,hovered:scene?.hovered?.id,selected:scene?.selected,follow:!!scene?.follow,badges:scene?.overlay.badges?.map(b=>({id:b.id,x:b.ax,y:b.ay,label:b.showLabel,w:b.w,h:b.h,type:b.type_id})),combat:scene?.overlay.combats?.length??0});
+
+startLeagueView();
