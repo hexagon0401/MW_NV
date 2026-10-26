@@ -1,0 +1,10 @@
+{
+  "collection_seconds": 0.07632300599652808,
+  "materialization_seconds": 2.5868945270049153,
+  "objects": 81,
+  "network_outside_training_loop": true,
+  "raw_retention_days": 7,
+  "hourly_retention_days": 90,
+  "max_chart_points": 240,
+  "learning_throughput_delta": "not established; benchmark pending runtime restart"
+}

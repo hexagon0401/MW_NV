@@ -1,15 +1,15 @@
 # MW-NV v1.0.0 STATE
-Current:T15 dashboard UI stage COMPLETE;telemetry/auth/control in progress
-Read:docs/dashboard/README.md;docs/adaptive-acceleration/STATE references
-Runtime:league-v1 adaptive PID131572;checkpoint gen127/53games;learning active
-Both PPO models/optimizers preserved;50-game frozen evaluation completed
-CPU:quota<=4;central+1..3 engines;64 HQ rounds;GAE per environment/episode
-Timing:initialization/evaluation excluded from trials;correction10tests passed
-I/O:async paired NIM<=2pairs/min;durable latest publications;verified archive cleanup
-Recovery:adaptive-1 all-env/RNG;pre-adaptive/pre-timing copies;gen125 remote verified
-Verified:Python234+focused14/disk3/publication7/timing10(overlap);JS33;real Pages Chromium
-Perf:engine-only1/2/3workers14.17/23.51/32.53 sim s/s;hash equal;not strategy evidence
-Site:https://mw-nv.pages.dev production4c7929b0;rollback28e58fa5
-T11:validator safely paused for backend instrumentation;PPO still running
-Next:inspect both runtime statuses;no duplicate workers;no mixed pilot before gates
+Current:T15 telemetry + safe PPO control COMPLETE;OAuth/deployment in progress
+Read:docs/dashboard/README.md;OPERATIONS.md;ADMIN_SETUP.md
+UI:independent dark /dashboard/;spectator retains current-match controls
+Verified:JS43/build;Python21(164.48s);preview Chromium six menus/mobile/CSP
+Data:incremental SQLite;CPU/RSS/activity30s;raw7d/hourly90d;charts<=240
+Control:typed pause/resume,version/TTL/idempotency;safe checkpoint;eval continues
+Runtime:legacy safely stopped at gen144/58games for instrumentation
+Recovery:pre-dashboard gen144 preserved;full archive queued;never delete unverified
+Agents:dashboard collect/publish/control active;Storage aggregates published
+T11:paused;old diagnostic reports preserved before fingerprint revalidation
+Site:production4c7929b0;previewf99be5b0 verified with real sanitized data bridge
+Blocker:Supabase GitHub provider disabled;admin flags closed;setup requested
+Next:pin fingerprint/resume preserved learning;production deploy and verify
 Usage:UNKNOWN

@@ -12,6 +12,7 @@ from .league_metrics import finish
 from .self_play import atomic_json,current
 from .training_status import Reporter
 from engine.replay import decode
+from server import ppo_control as control
 
 
 def trajectory_rows(model,paths,packets):
@@ -61,6 +62,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             if kind=='mission':m.save(root/'baseline'/f'ppo{i+1}.zip')
         backend.save(root,models,env,buffers,query,generators,state)
     state['pilot']=pilot;state['teacher_enabled']=teacher_enabled
+    control.register(root,source,kind,pilot,state['run'],state.get('control_desired'))
     state.setdefault('last_policy_update',state['generation']);state.setdefault('last_full_update',state['generation'])
     import subprocess
     revision=subprocess.run(['git','rev-parse','HEAD'],capture_output=True,text=True).stdout.strip()
@@ -87,16 +89,24 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             info=bundle['info'];packets[index]=worker.call('load',bundle)
             for g,value in zip(gs,bundle['actor_rng']):g.set_state(torch.tensor(value,dtype=torch.uint8))
         slots.append(dict(worker=worker,info=info,generators=gs));worker_sim[index]=0.
-    for bundle in bundles:add_slot(bundle)
+    for bundle in bundles:
+        bundle['info']['run_id']=state['run'];add_slot(bundle)
     def begin(index):
         nonlocal next_episode
         slot=slots[index];block_size=96 if kind=='mission' else 32;descriptor=backend.schedule(next_episode//block_size)[next_episode%block_size]
         assignment=backend.assignments(descriptor);fixed=None
         if descriptor['kind']=='past':
             files=sorted((root/'opponents').glob('*.npz'));options=files if files and random.random()>=.5 else sorted((root/'baseline').glob('*.npz'));fixed=str(random.choice(options).relative_to(root))
-        info=dict(active=True,episode=next_episode,descriptor=descriptor,assignments=assignment,fixed_opponent=fixed,generation=state['generation'],episode_starts={'A':True,'B':True})
+        info=dict(run_id=state['run'],active=True,episode=next_episode,descriptor=descriptor,assignments=assignment,fixed_opponent=fixed,generation=state['generation'],episode_starts={'A':True,'B':True})
         slot['info']=info;next_episode+=1;packets[index]=slot['worker'].call('reset',info)
+    last_phase={'value':None}
     def report(phase='learning',force=False):
+        category='evaluation' if phase=='evaluation' else 'paused' if phase=='paused' else 'learning'
+        if category!=last_phase['value']:
+            for index,slot in enumerate(slots):
+                mark='PAUSED' if category=='paused' else 'WAITING' if category=='evaluation' or index>=adaptive.workers else 'RUNNING'
+                slot['worker'].call('mark',mark)
+            last_phase['value']=category
         if phase=='evaluation' and stopped():raise InterruptedError('evaluation paused at boundary')
         elapsed=max(.001,time.monotonic()-started);cases=0
         p=root/'evaluations'/f'games-{evaluation_games:08d}'/'report.json'
@@ -113,7 +123,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         except (OSError,ValueError):pass
         if publish:io.start(root)
         reporter.round=state['generation'];reporter.base_steps=sum(m.num_timesteps for m in models)
-        reporter(dict(phase=phase,games=state['completed_games'],sim_seconds=simulated,policy_steps=reporter.base_steps,algorithm='Independent adaptive MaskablePPO',maps='3 balanced modes' if kind=='mission' else '4 terrain variants',nim_in_training=teacher_enabled,teacher=dict(query.stats),learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows)) for i,m in enumerate(models)],decision_seconds=10,teacher_seconds=30,workers=adaptive.workers,cpu_budget=resources()['cpu_budget'],adaptation_reason=adaptive.reason,aggregate_sim_speed=True,worker_sim_seconds=dict(worker_sim),games_per_hour=(state['completed_games']-completed_start)*3600/elapsed,updates_per_hour=updates*3600/elapsed,evaluation_cases=cases,evaluation_total=240 if kind=='mission' else 80,backup=state.get('backup','pending'),map_id=state['map_id'],map_version=state['map_version'],rules_version=state['rules_version'],runtime_schema='adaptive-1',publication=publication),force=force)
+        reporter(dict(phase=phase,games=state['completed_games'],sim_seconds=simulated,policy_steps=reporter.base_steps,algorithm='Independent adaptive MaskablePPO',maps='3 balanced modes' if kind=='mission' else '4 terrain variants',nim_in_training=teacher_enabled,teacher=dict(query.stats),learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows)) for i,m in enumerate(models)],decision_seconds=10,teacher_seconds=30,workers=adaptive.workers,cpu_budget=resources()['cpu_budget'],adaptation_reason=adaptive.reason,aggregate_sim_speed=True,worker_sim_seconds=dict(worker_sim),games_per_hour=(state['completed_games']-completed_start)*3600/elapsed,updates_per_hour=updates*3600/elapsed,evaluation_cases=cases,evaluation_total=240 if kind=='mission' else 80,backup=state.get('backup','pending'),map_id=state['map_id'],map_version=state['map_version'],rules_version=state['rules_version'],runtime_schema='adaptive-1',publication=publication,run_id=state['run'],control_version=control.state().get('version',0)),force=force)
     report.advance_simulation=reporter.advance_simulation
     def checkpoint():
         all_bundles=[]
@@ -122,6 +132,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         primary=restore(make_env(kind),all_bundles[0]['environment']);primary.accelerated_snapshot=all_bundles
         info=all_bundles[0]['info']
         for k in ('descriptor','assignments','fixed_opponent','initial_frame','metrics','episode_starts','policy_spans'):state[k]=info.get(k)
+        state['control_desired']=control.state()['desired']
         state.update(active=info['active'],episode=info.get('episode',next_episode),next_episode=next_episode,adaptive=dict(workers=adaptive.workers,reason=adaptive.reason))
         safe_query=backend.TeacherBuffer();safe_query.stats=dict(query.stats);safe_query.cooldown=query.cooldown
         path=backend.save(root,models,primary,buffers,safe_query,generators,state);backend.record_update(root,state,models)
@@ -143,10 +154,17 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         if not max_updates:evaluation.ensure_initial_worker(root,state)
         adaptive.resume_measurement()
         while not stopped() and (not max_updates or updates<max_updates):
+            if control.paused():
+                checkpoint();report('paused',True)
+                while control.paused() and not stopped():
+                    teacher.drain();report('paused');time.sleep(1)
+                adaptive.resume_measurement()
+                if stopped():break
             io.disk_guard(root);teacher.drain();paths=[{},{}];total_rounds=0;batch_sim=0.;evaluated=False
             active=fixed_workers or adaptive.workers
             while len(slots)<active:add_slot()
-            while total_rounds<collection_rounds and not stopped():
+            for index,slot in enumerate(slots):slot['worker'].call('mark','RUNNING' if index<active else 'WAITING')
+            while total_rounds<collection_rounds and not stopped() and not control.paused():
                 ids=list(range(min(active,collection_rounds-total_rounds)))
                 for index in ids:
                     if not slots[index]['info']['active']:begin(index)
@@ -190,12 +208,14 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
                             engine=restore(make_env(kind),b['environment']).engine
                             io.latest(root,'replay',(engine,meta['initial_frame'],{'league':dict(run=state['run'],assignments=info['assignments'],generation=state['generation'])}))
                 eligible=[i for i in ids if not packets[i]['ended'] and packets[i]['tick']%150==0]
-                if teacher_enabled and eligible and time.monotonic()>=max(teacher.next_request,query.cooldown) and teacher.future is None:
+                if teacher_enabled and not control.paused() and eligible and time.monotonic()>=max(teacher.next_request,query.cooldown) and teacher.future is None:
                     origin=(teacher.last_worker+1) if teacher.last_worker is not None else 0
                     index=min(eligible,key=lambda i:(i-origin)%len(slots));slot=slots[index]
                     frozen=slot['worker'].call('teacher');teacher.offer(frozen,slot['info']['assignments'],index,state['generation'])
                 teacher.drain();report()
-            if not total_rounds:break
+            if not total_rounds:
+                if control.paused() and not stopped():continue
+                break
             # Each trajectory gets its own terminal/bootstrap GAE before flattening.
             teacher.drain()
             for i,model in enumerate(models):

@@ -13,36 +13,39 @@ from .mission_features import vector
 from .candidate_policy import CandidatePolicy as LegacyPolicy,vector as legacy_vector
 from .mission_statistics import collect
 from .league_evaluate import paired_interval
+from server.telemetry import Activity
 from .self_play import atomic_json
 from agents.mission_tactics import candidates,commands
 from agents.tactics import candidates as legacy_candidates,compatible
 
 
-def play(seed,scenario_id,policies=None,swap=False,progress=None,limit=None,record=False,scenario_factory=None):
+def play(seed,scenario_id,policies=None,swap=False,progress=None,limit=None,record=False,scenario_factory=None,activity_role='diagnostic',activity_run='T11'):
     from engine.replay import RecordingEngine
     world=scenario_factory(seed,swap=swap) if scenario_factory else create(seed,swap=swap,scenario_id=scenario_id)
     e=(RecordingEngine if record else Engine)(world);w=e.world;initial=frame(w);history={0:[],1:[]};policies=policies or {};decisions=0
-    while not getattr(w,'ended',False) and (limit is None or w.tick*.2<limit):
-        # Both observations fixed before either team submits; no enemy command leakage.
-        observations={t:e.observe(t) for t in (0,1)};batches={}
-        for t in (0,1):
-            o=observations[t];o['recent_summary']=history[t];policy=policies.get(t);old=isinstance(policy,LegacyPolicy);items=(legacy_candidates if old else candidates)(o);selected=[]
-            for _ in range(4):
-                available=compatible(items,selected);mask=np.zeros(65,dtype=bool);mask[64]=True
-                for c in available:mask[c['id']]=True
-                x=(legacy_vector if old else vector)(o,available);x[16]=len(selected)/4;x[17]=sum(c.get('supply_cost',0) for c in selected)/2000
-                action=policy.predict(x,mask) if policy else max(available,key=lambda c:(c['score'],-c['id']))['id'] if available else 64
-                if action==64:break
-                selected.append(next(c for c in available if c['id']==action))
-            batches[t]=commands(o,selected);history[t]=x[:7].tolist()+history[t][:7]
-        for t in (0,1):
-            for command in batches[t]:
-                try:e.submit_for(t,command)
-                except OrderError:pass
-        before=w.tick;e.step(10);decisions+=1
-        if progress:
-            if hasattr(progress,'advance_simulation'):progress.advance_simulation((w.tick-before)*.2)
-            progress('evaluation')
+    with Activity(activity_role,f'{scenario_id}:{seed}:{int(swap)}',activity_run,str(scenario_id),[getattr(p,'policy_id','algorithm') for p in policies.values()]) as activity:
+        while not getattr(w,'ended',False) and (limit is None or w.tick*.2<limit):
+            # Both observations fixed before either team submits; no enemy command leakage.
+            observations={t:e.observe(t) for t in (0,1)};batches={}
+            for t in (0,1):
+                o=observations[t];o['recent_summary']=history[t];policy=policies.get(t);old=isinstance(policy,LegacyPolicy);items=(legacy_candidates if old else candidates)(o);selected=[]
+                for _ in range(4):
+                    available=compatible(items,selected);mask=np.zeros(65,dtype=bool);mask[64]=True
+                    for c in available:mask[c['id']]=True
+                    x=(legacy_vector if old else vector)(o,available);x[16]=len(selected)/4;x[17]=sum(c.get('supply_cost',0) for c in selected)/2000
+                    action=policy.predict(x,mask) if policy else max(available,key=lambda c:(c['score'],-c['id']))['id'] if available else 64
+                    if action==64:break
+                    selected.append(next(c for c in available if c['id']==action))
+                batches[t]=commands(o,selected);history[t]=x[:7].tolist()+history[t][:7]
+            for t in (0,1):
+                for command in batches[t]:
+                    try:e.submit_for(t,command)
+                    except OrderError:pass
+            before=w.tick;e.step(10);decisions+=1
+            activity.update(w.tick)
+            if progress:
+                if hasattr(progress,'advance_simulation'):progress.advance_simulation((w.tick-before)*.2)
+                progress('evaluation')
     return e,dict(seed=seed,scenario_id=str(scenario_id),swapped=swap,complete=bool(getattr(w,'ended',False)),winner=None if getattr(w,'winner',None) is None else int(w.winner),scores=[w.teams[t].score for t in (0,1)],tick=w.tick,hash=w.checksum(),metrics=collect(w,initial),failures=dict(Counter(ev['payload'].get('reason','unknown') for ev in w.events if ev['event_kind']=='ORDER_FAILED')))
 
 
@@ -61,10 +64,10 @@ def evaluate(root,models,state,progress=None,seeds=range(10000,10005),stage='sta
                         for swap in (False,True):
                             case=f'{mode}:{learner}:{opponent}:{seed}:{team}:{int(swap)}'
                             if case in completed:continue
-                            e,result=play(seed,mode,{team:policy,1-team:initial if opponent=='initial' else None},swap,progress)
+                            e,result=play(seed,mode,{team:policy,1-team:initial if opponent=='initial' else None},swap,progress,activity_role='evaluation',activity_run=state['run'])
                             from .results import record_world
                             match_id=state['run']+'-eval-'+str(state['completed_games'])+'-'+hashlib.sha256(case.encode()).hexdigest()[:16]
-                            record_world('data/results.sqlite',e.world,'evaluation',{('A','B')[team]:policy.policy_id,('A','B')[1-team]:initial.policy_id if opponent=='initial' else 'algorithm'},match_id=match_id,metadata={'league':dict(run=state['run'],assignments={('A','B')[team]:f'PPO{learner}',('A','B')[1-team]:opponent})})
+                            record_world('data/results.sqlite',e.world,'evaluation',{('A','B')[team]:policy.policy_id,('A','B')[1-team]:initial.policy_id if opponent=='initial' else 'algorithm'},match_id=match_id,metadata={'league':dict(run=state['run'],assignments={('A','B')[team]:f'PPO{learner}',('A','B')[1-team]:opponent},evaluation_games=state['completed_games'],frozen_policy=policy.policy_id)})
                             result.update(case=case,learner=f'PPO{learner}',opponent=opponent,team=team,score=.5 if result['winner'] is None else float(result['winner']==team));report['results'].append(result);atomic_json(path,report)
     report['complete']=True;atomic_json(path,report);return report
 
@@ -109,7 +112,7 @@ def migration_gate(root,seeds=range(10000,10005),progress=None):
                     for version,policy in policies.items():
                         case=f'{learner}:{seed}:{team}:{int(swap)}:{version}'
                         if case in done:continue
-                        _,result=play(seed,'2',{team:policy},swap,progress);result.update(case=case,learner=learner,team=team,version=version,score=.5 if result['winner'] is None else float(result['winner']==team));report['results'].append(result);atomic_json(path,report)
+                        _,result=play(seed,'2',{team:policy},swap,progress,activity_role='evaluation');result.update(case=case,learner=learner,team=team,version=version,score=.5 if result['winner'] is None else float(result['winner']==team));report['results'].append(result);atomic_json(path,report)
     lookup={(r['learner'],r['seed'],r['team'],r['swapped'],r['version']):r['score'] for r in report['results']};intervals={}
     for learner in (1,2):
         differences=[np.mean([lookup[(learner,seed,t,s,'new')]-lookup[(learner,seed,t,s,'old')] for t in (0,1) for s in (False,True)]) for seed in seeds];intervals[str(learner)]=paired_interval(differences)

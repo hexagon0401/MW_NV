@@ -6,7 +6,7 @@ from .mission_evaluate import audit,migration_gate
 
 
 def code_fingerprint():
-    files=sorted(p for folder in ('engine','agents','learning','config') for p in Path(folder).glob('*') if p.suffix in ('.py','.yaml'))
+    files=sorted(p for folder in ('engine','agents','learning','config','server') for p in Path(folder).glob('*') if p.suffix in ('.py','.yaml'))
     return hashlib.sha256(b''.join(str(p).encode()+p.read_bytes() for p in files)).hexdigest()
 
 

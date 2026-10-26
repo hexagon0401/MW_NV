@@ -45,7 +45,17 @@ def record_world(db,w,mode,policies,match_id=None,steps=0,initial_frame=None,met
 
 
 def record_training(db,policy,steps,opponent='algorithm',run_id=None,training_run=None,metadata=None,rules_version=None):
-    return insert(db,dict(**(metadata or {}),kind='training',id=run_id or uuid.uuid4().hex,rules_version=rules_version or RULES_VERSION,policies={'A':policy,'B':opponent},steps=int(steps),training_run=training_run))
+    record=dict(**(metadata or {}),kind='training',id=run_id or uuid.uuid4().hex,rules_version=rules_version or RULES_VERSION,policies={'A':policy,'B':opponent},steps=int(steps),training_run=training_run)
+    if run_id and Path(db).exists():
+        with sqlite3.connect(db) as conn:
+            if conn.execute("SELECT 1 FROM sqlite_master WHERE name='records'").fetchone():
+                row=conn.execute('SELECT payload FROM records WHERE id=?',(run_id,)).fetchone()
+                if row:
+                    previous=json.loads(row[0]);previous.pop('created_at',None)
+                    if previous!=record:raise ValueError('record id conflict')
+                    return False
+    record['created_at']=datetime.now(timezone.utc).isoformat()
+    return insert(db,record)
 
 
 def records(db,kind=None):

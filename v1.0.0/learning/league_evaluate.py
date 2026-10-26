@@ -9,6 +9,7 @@ from .candidate_policy import CandidatePolicy,export
 from .training_maps import training_scenario
 from .self_play import atomic_json
 from .results import record_world
+from server.telemetry import Activity
 
 
 def evaluate(root,models,state,progress=None,seeds=range(10000,10005),scenario_factory=training_scenario,stage='standard'):
@@ -32,12 +33,14 @@ def evaluate(root,models,state,progress=None,seeds=range(10000,10005),scenario_f
                             result=dict(cache[identity],case=case,learner=f'PPO{i+1}',reused=True)
                         else:
                             env=CandidateEnv(scenario_factory=scenario_factory,decision_seconds=10);env.reset(seed,options={'swap':swap});initial=frame(env.engine.world);other='B' if team=='A' else 'A'
-                            while env.agents:
-                                before=env.engine.world.tick
-                                action={a:(policy.predict(env.vector(a),env.mask(a)) if a==team else baseline.predict(env.vector(a),env.mask(a)) if opponent_name=='initial' else env.heuristic(a)) for a in env.agents};env.step(action)
-                                if progress:
-                                    if hasattr(progress,'advance_simulation'):progress.advance_simulation((env.engine.world.tick-before)*.2)
-                                    progress('evaluation')
+                            with Activity('evaluation',case,state['run'],'2',[f'PPO{i+1}',opponent_name]) as activity:
+                                while env.agents:
+                                    before=env.engine.world.tick
+                                    action={a:(policy.predict(env.vector(a),env.mask(a)) if a==team else baseline.predict(env.vector(a),env.mask(a)) if opponent_name=='initial' else env.heuristic(a)) for a in env.agents};env.step(action)
+                                    activity.update(env.engine.world.tick)
+                                    if progress:
+                                        if hasattr(progress,'advance_simulation'):progress.advance_simulation((env.engine.world.tick-before)*.2)
+                                        progress('evaluation')
                             w=env.engine.world;score=.5 if w.winner is None else float(int(w.winner)==('A','B').index(team))
                             policies={team:policy.policy_id,other:baseline.policy_id if opponent_name=='initial' else 'algorithm'}
                             mid=f'{state["run"]}-eval-{state["completed_games"]}-{hashlib.sha256(identity.encode()).hexdigest()[:16]}'

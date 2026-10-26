@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from .league_metrics import new_metrics,opportunity,selection
 from engine.runtime import Engine
 from engine.viewer_export import frame
+from server.telemetry import Activity
 
 FIELDS=('agents','items','selected','finished','reserved_supply','initial_costs','history')
 def snapshot(env):
@@ -30,17 +31,21 @@ def packet(env,rewards=None):
 
 def serve(conn,kind):
     for key in ('OMP_NUM_THREADS','OPENBLAS_NUM_THREADS','MKL_NUM_THREADS'):os.environ[key]='1'
-    env=make_env(kind);env.reset(0);info=dict(active=False,assignments={},episode_starts={'A':True,'B':True},policy_spans={});metric_tick=None
+    activity=None;env=make_env(kind);env.reset(0);info=dict(active=False,assignments={},episode_starts={'A':True,'B':True},policy_spans={});metric_tick=None
     while True:
         try:
             op,data=conn.recv()
-            if op=='close':return
+            if op=='close':
+                if activity:activity.close('IDLE')
+                return
             if op=='load':
-                restore(env,data['environment']);info=data['info'];metric_tick=env.engine.world.tick if any(env.selected.values()) else None;conn.send(packet(env))
+                restore(env,data['environment']);info=data['info'];activity=Activity('training',str(info.get('episode','unknown')),info.get('run_id'),getattr(env,'scenario_id','2'),list(info.get('assignments',{}).values())) if info.get('active') else None
+                if activity:activity.update(env.engine.world.tick,state='WAITING',force=True)
+                metric_tick=env.engine.world.tick if any(env.selected.values()) else None;conn.send(packet(env))
             elif op=='reset':
                 info=data;d=info['descriptor'];env.scenario_id=d.get('scenario_id','2')
                 seed=d['seed'] if kind=='mission' else (d['seed']%2000)*4+d['family']
-                env.reset(seed,options={'swap':d['swap']});info.update(initial_frame=frame(env.engine.world),metrics=new_metrics(),episode_starts={'A':True,'B':True},policy_spans={a:[info['generation']] for a,l in info['assignments'].items() if l in ('PPO1','PPO2')});metric_tick=None;conn.send(packet(env))
+                env.reset(seed,options={'swap':d['swap']});info.update(initial_frame=frame(env.engine.world),metrics=new_metrics(),episode_starts={'A':True,'B':True},policy_spans={a:[info['generation']] for a,l in info['assignments'].items() if l in ('PPO1','PPO2')});metric_tick=None;activity=Activity('training',str(info['episode']),info.get('run_id'),d.get('scenario_id','2'),list(info['assignments'].values()));conn.send(packet(env))
             elif op=='step':
                 actions,generation=data;before=env.engine.world.tick
                 if metric_tick!=before:
@@ -51,7 +56,12 @@ def serve(conn,kind):
                 env.decision_sources={a:l+' 지휘' for a,l in info['assignments'].items()}
                 for a,spans in info['policy_spans'].items():
                     if spans[-1]!=generation:spans.append(generation)
-                _,rewards,*_=env.step(actions);conn.send(packet(env,rewards))
+                _,rewards,*_=env.step(actions)
+                if activity:activity.update(env.engine.world.tick,state='RUNNING' if env.agents else 'COMPLETED')
+                conn.send(packet(env,rewards))
+            elif op=='mark':
+                if activity:activity.update(env.engine.world.tick,state=data if env.agents else 'IDLE',force=True)
+                conn.send(True)
             elif op=='teacher':conn.send(SimpleNamespace(cached_observations=env.cached_observations,items=env.items))
             elif op=='snapshot':conn.send(dict(environment=snapshot(env),info=info))
             else:raise ValueError('unknown environment operation')
