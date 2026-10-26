@@ -5,12 +5,12 @@ from .types import WorldPos
 from .orders import OrderError
 
 
-def move(world, key, unit, destination, speed_mps=1.6, ignore_ids=()):
+def move(world, key, unit, destination, speed_mps=1.6, ignore_ids=(), offsets=((0,0),)):
     if not hasattr(world,'motions'):
         world.motions = {}
     if key not in world.motions:
         unit.task_state = 'PATH_PENDING'
-        route = find_path(world.terrain,(unit.pos.x_cm,unit.pos.y_cm),destination)
+        route = find_path(world.terrain,(unit.pos.x_cm,unit.pos.y_cm),destination,offsets=offsets)
         world.motions[key] = dict(route=route,x=float(unit.pos.x_cm),y=float(unit.pos.y_cm))
     motion = world.motions[key]
     route = motion['route']
@@ -23,7 +23,7 @@ def move(world, key, unit, destination, speed_mps=1.6, ignore_ids=()):
         amount = min(distance,budget)
         nx,ny = (tx,ty) if distance <= amount else (x+(tx-x)*amount/distance,y+(ty-y)*amount/distance)
         candidate = WorldPos(round(nx),round(ny))
-        blocked_terrain = not world.terrain.segment_clear((unit.pos.x_cm,unit.pos.y_cm),(candidate.x_cm,candidate.y_cm))
+        blocked_terrain = any(not world.terrain.segment_clear((unit.pos.x_cm+dx,unit.pos.y_cm+dy),(candidate.x_cm+dx,candidate.y_cm+dy)) for dx,dy in offsets)
         blocked_unit = any(s.id != unit.id and s.id not in ignore_ids and s.alive and s.carrier_id is None and
                hypot(s.pos.x_cm-candidate.x_cm,s.pos.y_cm-candidate.y_cm)<84
                for s in world.soldiers.values())
@@ -33,7 +33,7 @@ def move(world, key, unit, destination, speed_mps=1.6, ignore_ids=()):
                 destination=route[-1]
                 if blocked_terrain:
                     try:
-                        motion['route']=find_path(world.terrain,(unit.pos.x_cm,unit.pos.y_cm),destination)
+                        motion['route']=find_path(world.terrain,(unit.pos.x_cm,unit.pos.y_cm),destination,offsets=offsets)
                         return False
                     except OrderError:pass
                 else:

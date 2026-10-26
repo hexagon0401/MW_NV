@@ -61,5 +61,5 @@ def observation(w,team):
         squads=[s.to_dict() for s in w.squads.values() if s.team==team],
         vehicles=[v.to_dict() for v in w.vehicles.values() if v.team==team],
         enemies=[u.to_dict() for uid in visible if (u:=w.soldiers.get(uid) or w.vehicles.get(uid)) is not None and u.alive],
-        last_seen=list(getattr(w,'last_seen',{}).get(team,{}).values()),facilities=[asdict(f) for f in w.facilities.values()],orders=orders,
+        failed_goals=[g for g in getattr(w,'failed_goals',[]) if g['team']==int(team) and g['until_tick']>w.tick and g['terrain_revision']==w.terrain.revision],last_seen=list(getattr(w,'last_seen',{}).get(team,{}).values()),facilities=[asdict(f) for f in w.facilities.values()],orders=orders,
         terrain=w.terrain.cells if w.config.map_width_m>=1024 else None,resources=asdict(w.teams[team]),scores={int(t):v.score for t,v in w.teams.items()}))
