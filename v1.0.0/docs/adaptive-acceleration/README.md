@@ -63,3 +63,21 @@ Chromium1440x900 DPR2 and390x844 verified aggregate labels, pinned paused timeli
 new-game offer, screenshots and no page errors. Preview assets were fetched from
 the existing allowed t11-multi-mode alias; preview has no Storage secret, so its
 asset check is distinct from production API verification.
+
+Live activation: PPO1/PPO2 full policy and optimizer tensors, step counters and
+training-world checksum matched the preserved source exactly.Three generation123/
+51-game full recovery manifests are remotely verified, and the source local copy
+is retained. Production deployment4c7929b0 uses the actual production branch
+`dev/v1.0.0`; previous28e58fa5 remains available for rollback. The real Storage
+latest replay was migrated byte-for-byte to its checksum object and read back;
+production Chromium consumed the real replay and all four public APIs returned200.
+
+Observed evaluation cohort averaged1.01 CPU core over10s and1695MiB summed RSS
+(shared pages counted multiple times; PSS unavailable). This is the existing
+ordered frozen evaluation, not the parallel PPO collector. NIM is intentionally
+not queried during evaluation; new async teacher sample yield is not yet measured
+in live training (configured cap2pairs/min, actual availability remains observable).
+Remaining costs include combat/visibility, path search, synchronous atomic local
+checkpoint serialization and ordered frozen evaluations. PPO worker adaptation
+begins after the preserved evaluation; T11 mixed-mode promotion still requires its
+engine/migration gates. CPU benchmark speedups do not prove strategic improvement.

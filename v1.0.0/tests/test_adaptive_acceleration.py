@@ -107,3 +107,15 @@ def test_disk_limit_is_a_durable_pause_not_unverified_cleanup(tmp_path,monkeypat
     assert (folder/'ppo1.zip').exists() and (folder/'environments.json.gz').exists()
     status=json.loads((tmp_path/'run/training-status.json').read_text())
     assert status['status']=='stopped' and status['pause_reason']=='ARCHIVE_DISK_LIMIT'
+
+def test_frozen_evaluation_time_never_dilutes_scaling_baseline():
+    r=dict(cpu_budget=4,memory_free_fraction=.8,cpu_pressure=0)
+    a=Adaptive(now=0);a.workers=2;a.baseline=12.;a.trial=True
+    a.resume_measurement(now=7200)
+    assert a.workers==2 and not a.trial and a.baseline is None
+    a.observe(640,r,now=7260);assert a.workers==2
+    a.observe(640,r,now=7320)
+    assert a.workers==3 and a.trial
+    assert a.baseline==pytest.approx(1280/120)
+    a.observe(320,r,now=7350);a.observe(320,r,now=7380)
+    assert a.workers==2 and a.reason=='trial_no_gain'

@@ -53,5 +53,10 @@
       "release": "training-2026-10-002",
       "status": "verified"
     }
-  ]
+  ],
+  "teacher_live_since_activation": {
+    "paired_samples": 0,
+    "reason": "frozen_evaluation_does_not_collect_teacher",
+    "configured_max_pairs_per_minute": 2
+  }
 }

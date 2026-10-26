@@ -65,7 +65,7 @@ def run(root,legacy):
         if stop.exists() and stop.read_text().startswith('T11 validated migration'):
             stop.unlink()
             try:
-                pid=int((legacy/'runner.pid').read_text());alive=b'learning.league' in (Path('/proc')/str(pid)/'cmdline').read_bytes().split(b'\0')
+                pid=int((legacy/'runner.pid').read_text());alive=any(m in (Path('/proc')/str(pid)/'cmdline').read_bytes().split(b'\0') for m in (b'learning.league',b'learning.accelerated_league'))
             except (OSError,ValueError):alive=False
             if alive:status['legacy_pause_cancelled']=True;atomic_json(root/'rollout-status.json',status);return status
             log=(legacy/'runner.log').open('ab');process=subprocess.Popen(legacy_command,stdout=log,stderr=log,stdin=subprocess.DEVNULL,start_new_session=True,env=dict(os.environ,MW_NV_PUBLISH_TRAINING='1'));log.close();status['legacy_resumed_pid']=process.pid;atomic_json(root/'rollout-status.json',status)

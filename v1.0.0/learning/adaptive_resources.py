@@ -17,6 +17,11 @@ def resources():
 class Adaptive:
     def __init__(self,now=None):
         self.workers=1;self.since=time.monotonic() if now is None else now;self.sim=0.;self.blocks=0;self.baseline=None;self.trial=False;self.next_trial=self.since+120;self.pressure_since=None;self.reason='warmup'
+    def resume_measurement(self,now=None):
+        """Exclude initialization/frozen evaluation from rollout throughput trials."""
+        self.since=time.monotonic() if now is None else now
+        self.sim=0.;self.blocks=0;self.baseline=None;self.trial=False
+        self.next_trial=self.since+120;self.pressure_since=None;self.reason='learning_warmup'
     def observe(self,seconds,resource=None,now=None,reserved=0):
         now=time.monotonic() if now is None else now;r=resource or resources();cap=max(1,min(3,r['cpu_budget']-1-reserved))
         self.sim+=seconds;self.blocks+=1

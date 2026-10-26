@@ -141,8 +141,9 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             evaluation_games=milestone if (root/'evaluations'/f'games-{milestone:08d}'/'report.json').exists() else state['completed_games']
             report('evaluation',True);evaluation.evaluate(root,models,dict(state,completed_games=evaluation_games),report);state['last_evaluation']=milestone;checkpoint()
         if not max_updates:evaluation.ensure_initial_worker(root,state)
+        adaptive.resume_measurement()
         while not stopped() and (not max_updates or updates<max_updates):
-            io.disk_guard(root);teacher.drain();paths=[{},{}];total_rounds=0;batch_sim=0.
+            io.disk_guard(root);teacher.drain();paths=[{},{}];total_rounds=0;batch_sim=0.;evaluated=False
             active=fixed_workers or adaptive.workers
             while len(slots)<active:add_slot()
             while total_rounds<collection_rounds and not stopped():
@@ -216,7 +217,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             if policy_due:archive_checkpoint(path,False);state.update(last_policy_archive=state['completed_games']//10*10,last_policy_update=state['generation'])
             if full_due:archive_checkpoint(path,True);state.update(last_full_archive=state['completed_games']//50*50,last_full_update=state['generation'])
             if state['completed_games']//evaluation_step>state.get('last_evaluation',0)//evaluation_step and not stopped():
-                evaluation_games=state['completed_games']
+                evaluated=True;evaluation_games=state['completed_games']
                 report('evaluation',True);evaluation.evaluate(root,models,state,report);state['last_evaluation']=state['completed_games']//evaluation_step*evaluation_step
                 if not max_updates and kind=='mission' and evaluation.initial_complete(root):
                     verdict=evaluation.pilot_report(root,state)
@@ -226,8 +227,10 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
                 else:
                     verdict=evaluation.pilot_report(root,state);state['pilot_report']=verdict
                     if verdict['pause']:state['pause_reason']='pilot_regression';stop['value']=True
-                    elif any(v and v['mean']>0 for v in verdict.get('modes' if kind=='mission' else 'learners',{}).values()):evaluation.confirm(root,models,state,report)
+                    elif any(v and v['mean']>0 for v in verdict.get('modes' if kind=='mission' else 'learners',{}).values()):
+                        evaluated=True;evaluation.confirm(root,models,state,report)
             checkpoint();report('checkpoint_saved',True)
+            if evaluated:adaptive.resume_measurement()
     except InterruptedError:pass
     except RuntimeError as exc:
         if str(exc)!='ARCHIVE_DISK_LIMIT':raise

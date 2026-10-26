@@ -2,11 +2,12 @@
   "url": "https://mw-nv.pages.dev",
   "passed": true,
   "network_interception": false,
-  "label": "평가 중 25/80 · 완료 51경기 · 평가 처리 16.9 sim초/초 · 학습 슬롯 1",
+  "label": "평가 중 27/80 · 완료 51경기 · 평가 처리 15.3 sim초/초 · 학습 슬롯 1",
   "apis": {
     "/api/matches": 200,
     "/api/stats": 200,
-    "/api/training": 200
+    "/api/training": 200,
+    "/api/matches/training-latest/view": 200
   },
   "page_errors": []
 }
