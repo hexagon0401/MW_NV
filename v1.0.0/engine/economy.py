@@ -16,7 +16,9 @@ def purchase(w,c):
     kind=PURCHASE_TYPES[c.arg0];infantry=kind in w.unit_specs
     collection=w.soldiers if infantry else w.vehicles
     active=sum(u.team==c.team and getattr(u,'alive',True) for u in collection.values())
-    if active>=(96 if infantry else 14):raise OrderError('NO_CAPACITY')
+    from .scenario_spec import rules
+    limits=rules(w)
+    if active>=limits['infantry_limit' if infantry else 'vehicle_limit']:raise OrderError('NO_CAPACITY')
     spec=(w.unit_specs if infantry else w.vehicle_specs)[kind]
     terrain=w.terrain if infantry else FootprintTerrain(w.terrain,spec['footprint_cm'])
     position=None

@@ -165,3 +165,7 @@ NIM 키 Value 수정 후 실제 지휘 JSON 성공. NIM 요청에는 enable_thin
 ## T09 movement/viewer/independent league
 
 User approved wheel/pinch zoom + drag pan, real sprites from20%(icons below18%), DPR<=2 screen labels and physical squad crossing recovery. Fix movement before learning expansion. New rules combined-arms-4/tactics-2; two independent PPOs exchange teams/locations, tactics10s and paired NIM30s. Initial actor warm start only; critic/optimizer/buffers fresh.200-completed-game pilot with frozen crossed evaluation and regression pause. Immutable10-game policy/50-game recovery history replaces remote overwrite; chunked transport verifies full recovery before cleanup. No new paid/permanent CPU resource. See docs/league-transition/README.md for implemented behavior and limitations.
+
+## T11 multi-mode expansion authorized
+
+User approved all stages in docs/multi-mode/PLAN.md: same independent PPO1/PPO2 across maps2(conquest),3(elimination),4(flag capture+return).96inf/16vehicles new modes,finite resources,60min draws,air+ground flag transport. Preserve live old league until migration/regression checks pass. Stages may continue autonomously with milestone tests/STATE/commit/push. New rules5/catalog3/tactics3 and1600-feature candidate-equivariant policy. No paid/permanent CPU; do not claim universal optimality or unmeasured transfer.

@@ -87,6 +87,8 @@ def heal(w,key,c):
 
 
 def regenerate(w):
+    from .scenario_spec import rules
+    if not rules(w)['regenerate_supply']:return
     if (w.tick+1)%300==0:
         for team in Team:
             amount=3+sum(getattr(f,'supply_per_minute',0) for f in w.facilities.values() if f.owner==team)

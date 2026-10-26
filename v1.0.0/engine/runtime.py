@@ -11,7 +11,7 @@ from .combat import update_combat,fire_mission,deployment
 from .economy import purchase
 from .logistics import resupply, heal, regenerate,repair
 from .transport import move_vehicle, embark, unload, release_transfer_locks
-from .objectives import update_capture, update_score
+from .mode_rules import update as update_mode_rules
 
 
 class Engine:
@@ -85,8 +85,7 @@ class Engine:
                 w.queue.finish(w, key, 'FAILED', str(exc))
 
         update_combat(w)
-        update_capture(w)
-        update_score(w)
+        update_mode_rules(w)
         regenerate(w)
 
     def record_presentation(self,kind,**payload):
