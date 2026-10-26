@@ -1,0 +1,9 @@
+{
+  "deployment_id": "4c7929b0-ffc8-4d24-b231-3bc4f20f2594",
+  "url": "https://mw-nv.pages.dev",
+  "production_branch": "dev/v1.0.0",
+  "rollback_deployment": "28e58fa5-a320-4318-ab87-8420011d3159",
+  "asset": "./assets/index-C5mjdx-u.js",
+  "storage": "storage.json",
+  "browser": "production-browser.json"
+}

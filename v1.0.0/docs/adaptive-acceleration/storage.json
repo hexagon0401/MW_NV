@@ -1,0 +1,11 @@
+{
+  "verified": true,
+  "sha256": "44259b341fd8542ae27cb045f44f4830f28f08d0395be3e3d8d1dcef62ad35d4",
+  "immutable_object": "training-replays/44259b341fd8542ae27cb045f44f4830f28f08d0395be3e3d8d1dcef62ad35d4.view.json.gz",
+  "old_object_retained": true,
+  "game_content_unchanged": true,
+  "scores": {
+    "0": 100,
+    "1": 0
+  }
+}

@@ -1,6 +1,6 @@
 {
   "static_checks_passed": true,
-  "code_sha256": "b21856052a4467a09514a72f6fb0486b14a431f972c6bfea6247cdc8e9cfec42",
+  "code_sha256": "bf363d73b718fa0a95915bca045d260cdf7bd119917585a4a51d228dac0d8f46",
   "geometry_complete": true,
   "geometry_seeds_per_mode": 30,
   "python_full_suite": {
@@ -66,6 +66,7 @@
     "focused": 14,
     "disk_pause": 3,
     "report": "../adaptive-acceleration/README.md",
-    "engine_hash_unchanged": true
+    "engine_hash_unchanged": true,
+    "production_report": "../adaptive-acceleration/production.json"
   }
 }
