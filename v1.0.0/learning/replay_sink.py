@@ -1,19 +1,36 @@
-"""Bounded latest completed training replay, uploaded at simulation speed."""
-import gzip,json,hashlib,os
+"""Verified immutable latest replay publication; old readers retain a grace period."""
+import gzip,json,hashlib,os,time,fcntl
+from pathlib import Path
 from engine.viewer_export import export_view
 from cloud.supabase_storage import PrivateStorage
 
 def publish_latest(engine,initial,metadata=None):
-    doc=export_view(engine,initial)
+    Path('data').mkdir(exist_ok=True)
+    with Path('data/replay-publication.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX)
+        return _publish(engine,initial,metadata)
+
+def _publish(engine,initial,metadata=None):
+    doc=export_view(engine,initial);now=time.time();completed_at=(metadata or {}).get('completed_at',now)
     if metadata and metadata.get('league'):
         doc['league']=metadata['league'];doc['initial']['learner_assignments']=dict(metadata['league']['assignments'])
-    body=gzip.compress(json.dumps(doc,separators=(',',':')).encode(),mtime=0)
-    store=PrivateStorage(os.environ['SUPABASE_URL'],os.environ['SUPABASE_SERVICE_ROLE_KEY']);key='training-latest.view.json.gz'
+    body=gzip.compress(json.dumps(doc,separators=(',',':')).encode(),mtime=0);digest=hashlib.sha256(body).hexdigest()
+    store=PrivateStorage(os.environ['SUPABASE_URL'],os.environ['SUPABASE_SERVICE_ROLE_KEY']);prefix='object/authenticated/'+store.bucket+'/'
+    entries=json.loads(store._request(prefix+'index.json'));previous=next((e for e in entries if e['id']=='training-latest'),None)
+    if previous and previous.get('completed_at',0)>completed_at:return False
+    key='training-replays/'+digest+'.view.json.gz'
     store._request('object/'+store.bucket+'/'+key,'PUT',body)
-    received=store._request('object/authenticated/'+store.bucket+'/'+key)
-    digest=hashlib.sha256(body).hexdigest()
-    if hashlib.sha256(received).hexdigest()!=digest:raise ValueError('replay checksum')
-    entries=json.loads(store._request('object/authenticated/'+store.bucket+'/index.json'))
-    entry=dict(id='training-latest',scores=doc['summary']['scores'],winner=doc['summary']['winner'],policy_version=doc['rules_version'],replay_uri='supabase://'+store.bucket+'/'+key,sha256=digest,mode='training')
-    entries=[entry]+[e for e in entries if e['id']!='training-latest']
-    store._request('object/'+store.bucket+'/index.json','PUT',json.dumps(entries[:20]).encode())
+    if hashlib.sha256(store._request(prefix+key)).hexdigest()!=digest:raise ValueError('replay checksum')
+    entry=dict(id='training-latest',scores=doc['summary']['scores'],winner=doc['summary']['winner'],policy_version=doc['rules_version'],replay_uri='supabase://'+store.bucket+'/'+key,sha256=digest,mode='training',completed_at=completed_at)
+    store._request('object/'+store.bucket+'/index.json','PUT',json.dumps([entry]+[e for e in entries if e['id']!='training-latest'][:19]).encode())
+    try:history=json.loads(store._request(prefix+'training-replay-retention.json'))
+    except OSError:history=[]
+    if previous:
+        old_key=previous['replay_uri'].split(store.bucket+'/',1)[1]
+        if not any(e['key']==old_key for e in history):history.append(dict(key=old_key,published_at=now))
+    history=[e for e in history if e['key']!=key]+[dict(key=key,published_at=now)]
+    protected={e['key'] for e in history[-2:]}|{e['replay_uri'].split(store.bucket+'/',1)[1] for e in entries if e['id']!='training-latest' and e.get('replay_uri','').startswith('supabase://'+store.bucket+'/')};obsolete=[e['key'] for e in history if e['key'] not in protected and now-e['published_at']>=600]
+    if obsolete:store._request('object/'+store.bucket,'DELETE',json.dumps(dict(prefixes=obsolete)).encode())
+    history=[e for e in history if e['key'] not in obsolete]
+    store._request('object/'+store.bucket+'/training-replay-retention.json','PUT',json.dumps(history).encode())
+    return True

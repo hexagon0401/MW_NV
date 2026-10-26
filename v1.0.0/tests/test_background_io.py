@@ -4,6 +4,7 @@ from learning.background_io import latest,archive,process_latest,disk_guard
 
 def test_latest_coalesces_and_failure_preserves_pending(tmp_path,monkeypatch):
     from cloud.supabase_storage import PrivateStorage
+    monkeypatch.chdir(tmp_path)
     monkeypatch.setenv('SUPABASE_URL','https://fixture');monkeypatch.setenv('SUPABASE_SERVICE_ROLE_KEY','fixture')
     latest(tmp_path,'status',{'round':1});latest(tmp_path,'status',{'round':2})
     def fail(*a):raise OSError('offline')
@@ -21,3 +22,14 @@ def test_archive_pins_checkpoint_before_original_pruning(tmp_path):
     jobs=list((tmp_path/'io-jobs/archives').glob('*'));assert len(jobs)==1
     assert (jobs[0]/'checkpoint/model').read_bytes()==b'weights'
     assert json.loads((jobs[0]/'job.json').read_text())['full']
+
+
+def test_old_runner_cannot_overwrite_newer_published_status(tmp_path,monkeypatch):
+    from cloud.supabase_storage import PrivateStorage
+    monkeypatch.chdir(tmp_path);monkeypatch.setenv('SUPABASE_URL','https://fixture');monkeypatch.setenv('SUPABASE_SERVICE_ROLE_KEY','fixture')
+    calls=[];monkeypatch.setattr(PrivateStorage,'_request',lambda *a:calls.append(json.loads(a[-1])))
+    latest(tmp_path/'new','status',{'updated_at':'2026-10-26T10:00:00+00:00','phase':'learning'})
+    assert process_latest(tmp_path/'new','status')
+    latest(tmp_path/'old','status',{'updated_at':'2026-10-26T09:00:00+00:00','phase':'stopped'})
+    assert process_latest(tmp_path/'old','status')
+    assert len(calls)==1 and calls[0]['phase']=='learning'

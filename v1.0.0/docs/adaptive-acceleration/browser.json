@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "viewports": [
+    "1440x900 DPR2",
+    "390x844"
+  ],
+  "pinned_timeline": true,
+  "new_game_button": true,
+  "aggregate_status": true,
+  "page_errors": []
+}

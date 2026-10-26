@@ -50,3 +50,16 @@ Mission is launched only by the T11 validation pipeline with `--kind mission
 --pilot 192`; it requires the current code fingerprint's validated gate.
 
 Final scaling CPU use averaged1.00/1.97/2.91 cores (workers only); Torch/coordinator and I/O are additional and constrained by the shared4-core cgroup budget.
+
+Publications: verified checksum-named replay objects switch index only after
+read-back validation; two generations and600s are retained. A delayed older
+completion cannot replace a newer one. Browser timeline remains pinned and offers
+an explicit new-game button. Status writes also use a shared monotonic timestamp
+pointer so a stopped old runner cannot overwrite a newer runner's status.
+
+Validation: Python full suite234passed (457.42s), later focused14passed,
+disk-pause3passed, final publication/teacher7passed; counts overlap. JS33passed.
+Chromium1440x900 DPR2 and390x844 verified aggregate labels, pinned paused timeline,
+new-game offer, screenshots and no page errors. Preview assets were fetched from
+the existing allowed t11-multi-mode alias; preview has no Storage secret, so its
+asset check is distinct from production API verification.

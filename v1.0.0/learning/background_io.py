@@ -29,7 +29,12 @@ def archive(root,checkpoint,state,full):
 
 def disk_guard(root):
     root=Path(root)
-    size=sum(p.stat().st_size for name in ('archive-pending','io-jobs/archives') for p in (root/name).rglob('*') if p.is_file())
+    size=0
+    for name in ('archive-pending','io-jobs/archives'):
+        for p in (root/name).rglob('*'):
+            try:
+                if p.is_file():size+=p.stat().st_size
+            except FileNotFoundError:pass
     if shutil.disk_usage(root).free<1024**3 or size>=2*1024**3:raise RuntimeError('ARCHIVE_DISK_LIMIT')
 
 def start(root):
@@ -52,7 +57,17 @@ def process_latest(root,kind):
     if kind=='status':
         from cloud.supabase_storage import PrivateStorage
         store=PrivateStorage(os.environ['SUPABASE_URL'],os.environ['SUPABASE_SERVICE_ROLE_KEY'])
-        store._request('object/'+store.bucket+'/training-status.json','PUT',working.read_bytes())
+        import fcntl
+        Path('data').mkdir(exist_ok=True);pointer=Path('data/training-publication-pointer.json')
+        with Path('data/training-publication.lock').open('a') as lock:
+            fcntl.flock(lock,fcntl.LOCK_EX)
+            payload=working.read_bytes();timestamp=json.loads(payload).get('updated_at','')
+            try:previous=json.loads(pointer.read_text()).get('updated_at','')
+            except (OSError,ValueError):previous=''
+            if not timestamp or timestamp>=previous:
+                store._request('object/'+store.bucket+'/training-status.json','PUT',payload)
+                if timestamp:
+                    temp=pointer.with_suffix('.partial');temp.write_text(json.dumps(dict(updated_at=timestamp)));temp.replace(pointer)
     else:
         from .replay_sink import publish_latest
         with working.open('rb') as f:engine,initial,metadata=pickle.load(f)

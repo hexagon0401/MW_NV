@@ -13,5 +13,5 @@ export async function matchView(env,id,fetcher=fetch){
  const path=rows[0].replay_uri.replace(/^supabase:\/\//,'');const bucket=env.REPLAY_BUCKET??'mw-nv-replays';
  if(!path.startsWith(bucket+'/')||path.includes('..')||!/^[A-Za-z0-9_./-]+$/.test(path))throw Error('invalid replay object');
  const doc=await cloudRequest(env,'/storage/v1/object/authenticated/'+path,fetcher);
- if(!doc.summary?.ended)throw Error('match incomplete');return doc;
+ if(!doc.summary?.ended)throw Error('match incomplete');if(rows[0].sha256)doc.publication_id=rows[0].sha256;return doc;
 }
