@@ -94,7 +94,7 @@ def embark(w,key,c):
     v=w.vehicles.get(c.target)
     if v is None or not v.alive:raise OrderError('INVALID_TARGET')
     if v.team!=c.team:raise OrderError('FOREIGN_UNIT')
-    if v.task_state in ('MOVING','TAKEOFF','LANDING','UNLOADING','WAITING_TRAFFIC'):
+    if airborne(w,v) or v.task_state in ('MOVING','TAKEOFF','LANDING','UNLOADING','WAITING_TRAFFIC'):
         raise OrderError('ILLEGAL_STATE')
     ids=[i for i in w.squads[c.unit].member_ids if i not in w.soldiers or w.soldiers[i].alive] if c.unit in w.squads else [c.unit]
     if not ids:raise OrderError('ILLEGAL_STATE')
@@ -142,6 +142,8 @@ def embark(w,key,c):
 
 def release_transfer_locks(w):
     for v in w.vehicles.values():
+        if v.alive and v.task_state not in ('TAKEOFF','MOVING','LANDING','HOVERING') and airborne(w,v):
+            v.task_state='HOVERING';w.emit('UNIT_TASK_CHANGED',unit=v.id,task_state='HOVERING',reason='INTERRUPTED_FLIGHT_RECOVERY')
         if v.task_state=='UNLOADING' and not any(t['ids'] and w.queue.commands[k].unit==v.id and w.queue.status.get(k) in ('QUEUED','RUNNING') for k,t in getattr(w,'unloads',{}).items()):
             v.task_state='READY'
         if v.task_state=='WAITING_PASSENGERS' and not any(t['vehicle']==v.id and t['remaining'] and w.queue.status.get(k) in ('QUEUED','RUNNING') for k,t in getattr(w,'transfers',{}).items()):
@@ -200,7 +202,7 @@ def fly(w,key,v,destination):
 
 def unload(w,key,c):
     v=w.vehicles.get(c.unit)
-    if v is None or not v.alive or v.task_state in ('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS','WAITING_TRAFFIC'):
+    if v is None or not v.alive or airborne(w,v) or v.task_state in ('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS','WAITING_TRAFFIC'):
         raise OrderError('ILLEGAL_STATE')
     if hypot(v.pos.x_cm-c.arg0*100,v.pos.y_cm-c.arg1*100)>400:
         raise OrderError('INVALID_TARGET')

@@ -120,8 +120,9 @@ class CommandQueue:
         if status in ('FAILED','CANCELLED') and actor is not None and actor.alive and actor.task_state in ('MOVING','TAKEOFF','LANDING','PATHING','DEPLOYING','PACKING','WAITING_TRAFFIC'):
             if actor.deployment=='DEPLOYING':actor.deployment='PACKED'
             elif actor.deployment=='PACKING':actor.deployment='DEPLOYED'
-            actor.task_state='READY'
-            world.emit('UNIT_TASK_CHANGED',unit=actor.id,task_state='READY',deployment=actor.deployment)
+            from .capabilities import airborne
+            actor.task_state='HOVERING' if airborne(world,actor) else 'READY'
+            world.emit('UNIT_TASK_CHANGED',unit=actor.id,task_state=actor.task_state,deployment=actor.deployment)
         world.emit('ORDER_' + status, team=int(c.team), cmd_id=c.cmd_id, reason=reason)
 
     def ready(self, world):

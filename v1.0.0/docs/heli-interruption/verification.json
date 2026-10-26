@@ -1,0 +1,40 @@
+{
+  "source": "public training-latest completed replay",
+  "sha256": "6a05ab5ae127d41ae1d9795ec8d11b25bb13c47b3093ba21d34611f00384e0f5",
+  "rules": "combined-arms-4",
+  "ticks": 8550,
+  "helicopters": [
+    {
+      "id": 10208,
+      "team": 0,
+      "x_cm": 22084,
+      "y_cm": 32840,
+      "task_state": "READY",
+      "fuel": 96.03999999999985,
+      "alive": true
+    },
+    {
+      "id": 20208,
+      "team": 1,
+      "x_cm": 86400,
+      "y_cm": 35399,
+      "task_state": "IDLE",
+      "fuel": 100,
+      "alive": true
+    }
+  ],
+  "failures": {
+    "ILLEGAL_STATE": 1,
+    "LANDING_INVALID": 165
+  },
+  "tests": {
+    "passed": 40,
+    "mirror_teams": true,
+    "aircraft": [
+      "HEL",
+      "BH",
+      "LB"
+    ],
+    "checkpoint_hash": true
+  }
+}
