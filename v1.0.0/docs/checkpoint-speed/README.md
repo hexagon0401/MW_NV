@@ -21,3 +21,8 @@ Python 초기16검사와 최종12검사(중복 포함),JS47/build,Chromium SAVIN
 일시정지와 평가 지속,heartbeat 실패 정리,metadata의 환경파일 비변경을 포함한다.
 기존107경기/258세대 전체 복구본을 data/preserved에 보존하고 원격 archive를 enqueue했다.
 이전 gzip 체크포인트도 그대로 읽는다. 실제 적용 상태는 live.json에 기록한다.
+
+실제 복구된107경기/258세대의 PPO1/2 NumPy 가중치가 이전 복구본과 동일했다.
+첫 다중 환경 전체 저장40.226초를 측정했고, 공개 API에서 checkpoint/경과16.2초/
+STALE=false를 확인했다. 이후 learning 상태와 시뮬레이션 시간 증가를 확인했다.
+이는 전체 경기 처리량 향상을 입증하는 장기 벤치마크는 아니다.

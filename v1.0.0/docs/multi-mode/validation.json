@@ -1,6 +1,6 @@
 {
   "static_checks_passed": true,
-  "code_sha256": "e930c9c7291330959bfcdb40ae23ba67db03ef45b4c733785e7f5f3b74788510",
+  "code_sha256": "500a2cb7c11b4418a33db3c18b9597cfa27cacf84dfa0fd4a3b9fc4689269977",
   "geometry_complete": true,
   "geometry_seeds_per_mode": 30,
   "python_full_suite": {
@@ -86,5 +86,11 @@
     "runtime_unchanged": true,
     "retained_engine_audit_cases": 13,
     "report": "../recent-replays/runtime-revalidation.json"
+  },
+  "fast_checkpoints": {
+    "final_tests": 12,
+    "initial_tests": 16,
+    "engine_unchanged": true,
+    "report": "../checkpoint-speed/README.md"
   }
 }

@@ -1,0 +1,20 @@
+{
+  "generation": 258,
+  "completed_games": 107,
+  "restored_numpy_weights_identical": [
+    true,
+    true
+  ],
+  "checkpoint_seconds": 40.226,
+  "phase": "learning",
+  "updated_at": "2026-10-26T23:44:01.113642+00:00",
+  "learner_pid": 171019,
+  "validator_pid": 171020,
+  "preserved_completed_diagnostics": 23,
+  "public_api_checkpoint_heartbeat_verified": true,
+  "public_api_was_stale": false,
+  "latest_phase": "checkpoint",
+  "latest_games": 107,
+  "simulation_seconds_since_resume": 640.0,
+  "deployment": "04868df7-3c38-494a-9637-c9c554a9ea86"
+}
