@@ -22,14 +22,28 @@ def _publish(engine,initial,metadata=None):
     store._request('object/'+store.bucket+'/'+key,'PUT',body)
     if hashlib.sha256(store._request(prefix+key)).hexdigest()!=digest:raise ValueError('replay checksum')
     entry=dict(id='training-latest',scores=doc['summary']['scores'],winner=doc['summary']['winner'],policy_version=doc['rules_version'],replay_uri='supabase://'+store.bucket+'/'+key,sha256=digest,mode='training',completed_at=completed_at)
-    store._request('object/'+store.bucket+'/index.json','PUT',json.dumps([entry]+[e for e in entries if e['id']!='training-latest'][:19]).encode())
+    # Keep exactly three distinct training replays. Historical IDs never change meaning.
+    recent=[];seen={digest}
+    for old in entries:
+        if not (old['id']=='training-latest' or old['id'].startswith('training-replay-')):continue
+        sha=old.get('sha256')
+        if not sha or sha in seen:continue
+        recent.append(dict(old,id='training-replay-'+sha[:24]));seen.add(sha)
+        if len(recent)==2:break
+    others=[e for e in entries if e['id']!='training-latest' and not e['id'].startswith('training-replay-')][:17]
+    published=[entry]+recent+others
+    store._request('object/'+store.bucket+'/index.json','PUT',json.dumps(published).encode())
     try:history=json.loads(store._request(prefix+'training-replay-retention.json'))
     except OSError:history=[]
     if previous:
         old_key=previous['replay_uri'].split(store.bucket+'/',1)[1]
         if not any(e['key']==old_key for e in history):history.append(dict(key=old_key,published_at=now))
     history=[e for e in history if e['key']!=key]+[dict(key=key,published_at=now)]
-    protected={e['key'] for e in history[-2:]}|{e['replay_uri'].split(store.bucket+'/',1)[1] for e in entries if e['id']!='training-latest' and e.get('replay_uri','').startswith('supabase://'+store.bucket+'/')};obsolete=[e['key'] for e in history if e['key'] not in protected and now-e['published_at']>=600]
+    protected={e['key'] for e in history[-3:]}|{e['replay_uri'].split(store.bucket+'/',1)[1] for e in published if e.get('replay_uri','').startswith('supabase://'+store.bucket+'/')}
+    for item in history:
+        if item['key'] in protected:item.pop('retired_at',None)
+        else:item.setdefault('retired_at',now)
+    obsolete=[e['key'] for e in history if e['key'] not in protected and now-e['retired_at']>=600]
     if obsolete:store._request('object/'+store.bucket,'DELETE',json.dumps(dict(prefixes=obsolete)).encode())
     history=[e for e in history if e['key'] not in obsolete]
     store._request('object/'+store.bucket+'/training-replay-retention.json','PUT',json.dumps(history).encode())

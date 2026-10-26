@@ -35,3 +35,6 @@ main{display:grid;grid-template-columns:260px minmax(0,1fr) 260px;min-height:0}.
 #mission-status{bottom:auto;top:36px;left:14px;max-width:calc(100% - 180px);font-size:10px;z-index:2}#selection-card:not([hidden])~#mission-status{top:88px}@media(max-width:600px){#mission-status{top:40px;left:10px;max-width:calc(100% - 20px);font-size:9px}#selection-card:not([hidden])~#mission-status{top:124px}}
 /* T15: spectator chrome contains match information only. */
 .dashboard-link{padding:8px 12px;border:1px solid var(--ink);white-space:nowrap;font-size:11px}.dashboard-link:hover{background:var(--blue)}@media(max-width:640px){.session-meta{gap:7px;flex-wrap:wrap}.dashboard-link{padding:5px 7px;font-size:10px}.session-meta #connection{display:none}}
+
+#refresh-matches{font-size:10px;white-space:nowrap;padding:5px 7px}.replay-update-status{font-size:10px;max-width:160px}@media(max-width:900px){.replay-update-status{display:none}#refresh-matches{font-size:9px;padding:4px}}
+@media(max-width:640px){.masthead{gap:8px}.masthead .wordmark{min-width:0;font-size:20px}.source-controls{min-width:0;gap:4px}.source-controls select{width:95px;max-width:95px;font-size:9px}.session-meta{flex-wrap:nowrap;gap:4px}.session-meta .mode{display:none}#refresh-matches{font-size:0;padding:4px 6px}#refresh-matches:before{content:'↻';font-size:14px}}

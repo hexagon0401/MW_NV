@@ -33,11 +33,21 @@ def test_verified_latest_and_failure_keeps_previous_pointer(store,monkeypatch):
     assert store.objects['index.json']==prior
     assert not replay_sink.publish_latest(3,None,{'completed_at':999})
 
-def test_retains_two_generations_and_ten_minute_grace(store,monkeypatch):
+def test_recent_three_slide_and_eviction_has_ten_minute_grace(store,monkeypatch):
     now=[1000];monkeypatch.setattr(replay_sink.time,'time',lambda:now[0])
     for i in (1,2,3):replay_sink.publish_latest(i,None);now[0]+=1
-    assert not store.deleted
+    entries=json.loads(store.objects['index.json']);first=entries[-1]['replay_uri'];assert [e['scores'][0] for e in entries]==[3,2,1]
+    stable=entries[1]['id'];assert stable.startswith('training-replay-')
     now[0]=1700;replay_sink.publish_latest(4,None)
-    assert len(store.deleted)==2
-    history=json.loads(store.objects['training-replay-retention.json'])
-    assert len(history)==2 and json.loads(store.objects['index.json'])[0]['replay_uri'].endswith(history[-1]['key'])
+    entries=json.loads(store.objects['index.json']);assert [e['scores'][0] for e in entries]==[4,3,2]
+    assert entries[2]['id']==stable and not store.deleted
+    now[0]=2301;replay_sink.publish_latest(5,None)
+    assert [e['scores'][0] for e in json.loads(store.objects['index.json'])]==[5,4,3]
+    assert first.split('fixture/',1)[1] in store.deleted
+    assert len(store.deleted)==1  # second replay only just retired, still in grace
+
+def test_duplicate_publication_keeps_unique_three_and_old_aliases(store,monkeypatch):
+    now=[1000];monkeypatch.setattr(replay_sink.time,'time',lambda:now[0])
+    for i in (1,2,3,3):replay_sink.publish_latest(i,None);now[0]+=1
+    entries=json.loads(store.objects['index.json']);assert len(entries)==3
+    assert entries[0]['id']=='training-latest' and len({e['sha256'] for e in entries})==3
