@@ -41,5 +41,8 @@ ADMIN_SETUP.md의 소유자 로그인 확인 후에만 제어를 연다.
 Production 실제 API5개200, 전체 완료 전적1425건, 비로그인 제어401,
 관리자 미설정 상태를 검증했다. 이전 운영 배포4c7929b0는 복구용으로 보존한다.
 
+GitHub OAuth 설정 후 브라우저 검사에서 로그인 활성화, PKCE→Supabase→GitHub
+리디렉션, Secure/HttpOnly 쿠키, 무효 코드 거부를 확인했다(auth-config.json).
+
 실제 Intel Mac 성능, 실제 GitHub 소유자 로그인, 장기 자원 추세는 미검증이다.
 환경 종료 후의 상시 학습 서버를 새로 제공하는 작업이 아니다. 사용량 UNKNOWN.

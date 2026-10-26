@@ -1,37 +1,37 @@
 {
   "passed": true,
-  "url": "https://388d2a54.mw-nv.pages.dev",
-  "deployment": "388d2a54",
+  "url": "https://mw-nv.pages.dev/dashboard/",
+  "deployment": "b9173982-e372-4060-84a9-c5ceb3601b84",
   "actual_storage_api": true,
   "api": {
     "summary": {
       "status": 200,
-      "bytes": 4968,
+      "bytes": 5401,
       "activity": {
         "running": 1,
-        "parked": 0,
-        "training": 0,
+        "parked": 2,
+        "training": 1,
         "evaluation": 0,
-        "diagnostic": 1
+        "diagnostic": 0
       }
     },
     "history": {
       "status": 200,
-      "bytes": 18179,
-      "total": 1425
+      "bytes": 18163,
+      "total": 1426
     },
     "trends": {
       "status": 200,
-      "bytes": 92995
+      "bytes": 94550
     },
     "analysis": {
       "status": 200,
-      "bytes": 3167,
+      "bytes": 3178,
       "points": 6
     },
     "resources": {
       "status": 200,
-      "bytes": 492,
+      "bytes": 538,
       "points": 1
     },
     "admin": {
@@ -47,10 +47,14 @@
   "spectator_current_match_only": true,
   "replay_paused_time_preserved": true,
   "no_dashboard_pixi_or_replay_requests": true,
-  "admin_closed_until_provider_setup": true,
+  "admin_login_configured": false,
+  "admin_control_enabled": false,
   "page_errors": [],
   "mac": "unverified",
+  "public_verification_deployment": "6dfd440c",
   "production_branch": "dev/v1.0.0",
-  "deployment_id": "388d2a54-ee41-4894-82fc-92d5b8260fe7",
-  "rollback_deployment": "4c7929b0-ffc8-4d24-b231-3bc4f20f2594"
+  "rollback_deployment": "4c7929b0-ffc8-4d24-b231-3bc4f20f2594",
+  "auth_configuration_verification": "auth-config.json",
+  "current_admin_auth_configured": true,
+  "current_admin_control_enabled": false
 }
