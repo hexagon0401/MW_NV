@@ -1,8 +1,8 @@
 # MW-NV v1.0.0 STATE
-Current:T15 terminal dashboard + owner-authenticated PPO control COMPLETE
-Read:docs/dashboard/README.md;ADMIN_SETUP.md;OPERATIONS.md
+Current:T16 spectator height hotfix validated;production deployment next
+Read:docs/spectator-layout-hotfix/README.md;docs/dashboard/OPERATIONS.md
 Site:https://mw-nv.pages.dev/dashboard/ production60cf253e;rollback4c7929b0
-Verified:JS45/build;Python21+gate5;Chromium desktop/mobile/CSP/API5x200
+Verified:T16 JS45/build;Chromium4viewport x DPR1/2=8;before reproduced/after passed
 UI:separate entry,no Pixi/replay;finite intro/Escape/reduced motion;current-match spectator
 Data:incremental ledger1425 at verification;actual activity/CPU/RSS;raw7d/hourly90d
 Control:owner82876856 PKCE/session/CSRF;PPO-only safe checkpoint;eval continues
@@ -12,5 +12,5 @@ Recovery:gen144/58games full archive remote verified;local pre-dashboard copy re
 T11:old reports in validation-before-dashboard;server-inclusive fingerprint matches gates
 Perf:collect0.076s/materialize2.587s;35s open window insufficient report boundaries
 Auth:actual owner82876856 verified via GitHub API;control enabled after verification
-Next:monitor ongoing learning/T11 validation;no remaining setup blocker
+Next:deploy CSS hotfix,verify actual latest replay at all viewport sizes
 Usage:UNKNOWN
