@@ -1,15 +1,12 @@
 # MW-NV v1.0.0 STATE
-Current: T08 objective first-capture analytics COMPLETE; T07 larger repair plan still pending
-Site: https://mw-nv.pages.dev; deployment https://aea6b716.mw-nv.pages.dev
-Recorded: first team/time, loss vs enemy retake, recovery, hold duration, opening/order, control checkpoints
-Context: score/army at first capture; north/center/south combinations; filters by mode/rules/map/policy/side
-Storage: additive objective_stats in match JSON/SQLite/export; legacy missing values remain unknown
-Verified: targeted Python14 (+training enhance suite17 earlier), JS24, build/Functions, Chromium desktop/mobile
-Remote: /api/objectives HTTP200; actual new training match collected/published; page errors0
-Evidence: docs/objective-statistics/README.md, production.json and fixture/deployed screenshots
-Training: self-play-v3 safely resumed from gen1869; observed gen1876/681games/120064steps
-Recovery: inspect PID first; .venv/bin/python -m learning.self_play --root data/self-play-v3 --seed-policy data/self-play-v3/seed.zip
-Models: cutover checkpoints pinned in ignored data/preserved; remote Release backup still unverified
-Next: implement docs/learning-repair-plan.md (archive/fair scheduling/movement/discovery); no claims completed
-Caution: first-capture win rate is association; count/draws/conditions visible; no causal claim
-Limits: no permanent external CPU; Intel Mac/performance improvement unverified; usage UNKNOWN
+Current: T09 viewer fixes validated; movement and dual PPO IN PROGRESS
+Viewer: wheel zoom/drag pan; real units >=20%; DPR1/2 screen-space labels; shot trails/origin arrows
+Verified: JS25, build, Chromium DPR1/2 zoom6/18/19/20/35/65 desktop/tablet/mobile; screenshots docs/league-transition
+Old worker: safely stopped at generation2090; preserved data/preserved/pre-league-checkpoint-00002090-d95aa585
+Actual replay: saved ignored data/league-audit/previous-latest.json; seed39 BLOCKED91 traffic-timeout10
+Movement: footprint routes/column recovery in working tree; narrow bridge mirrored tests4 pass (not yet milestone)
+Deployment: viewer upload in progress; previous production aea6b716 remains recovery
+Models: GitHub Release upload HTTP401; user asked to configure GH_TOKEN; no verified remote backup
+Next: movement regression, dual PPO/10s/paired30s NIM, archival and 200game pilot
+Learning repair/discovery: previous plan pending; do not claim progress in strategy
+Limits: actual Mac trackpad/performance unverified; no permanent external CPU; usage UNKNOWN
