@@ -20,3 +20,9 @@ I/O has separate publication/archive processes, coalesced status/replay slots,
 pinned immutable archive inputs and a2GiB/1GiB-free safety guard. The adaptive
 runner will enable these paths; the existing running worker is not hot-patched.
 Tests:8 passed (async frozen-pair routing, durable I/O failures/pinning and speed).
+
+Observation optimization: integer terrain rows are detached using list copies,
+retaining mutable-list API and world isolation.23 sensing/live/water/flight tests
+passed. Identical seed19/commands retained the exact final hash; instrumented
+workload59.98s ->45.74s (~1.31x). Concurrent host activity and profiling affect
+these numbers; they do not establish a production learning-speed improvement.

@@ -58,10 +58,15 @@ def observation(w,team):
     visible=getattr(w,'visible',{}).get(team,[])
     from .mission_observation import observed
     mission=observed(w,team)
-    return deepcopy(dict(mission=mission,rules_version=w.rules_version,catalog=dict(units=w.unit_specs,vehicles=w.vehicle_specs,weapons=w.weapon_specs),team=int(team),map_width_m=w.config.map_width_m,map_height_m=w.config.map_height_m,color='blue' if team==Team.A else 'red',tick=w.tick,
+    result=deepcopy(dict(mission=mission,rules_version=w.rules_version,catalog=dict(units=w.unit_specs,vehicles=w.vehicle_specs,weapons=w.weapon_specs),team=int(team),map_width_m=w.config.map_width_m,map_height_m=w.config.map_height_m,color='blue' if team==Team.A else 'red',tick=w.tick,
         units=[s.to_dict() for s in sorted(w.soldiers.values(),key=lambda s:s.id) if s.team==team],
         squads=[s.to_dict() for s in w.squads.values() if s.team==team],
         vehicles=[v.to_dict() for v in w.vehicles.values() if v.team==team],
         enemies=[u.to_dict() for uid in visible if (u:=w.soldiers.get(uid) or w.vehicles.get(uid)) is not None and u.alive and u.team is not None],
         failed_goals=[g for g in getattr(w,'failed_goals',[]) if g['team']==int(team) and g['until_tick']>w.tick and g['terrain_revision']==w.terrain.revision],last_seen=list(getattr(w,'last_seen',{}).get(team,{}).values()),facilities=[asdict(f) for f in w.facilities.values()],orders=orders,
-        terrain=w.terrain.cells if w.config.map_width_m>=1024 else None,resources=asdict(w.teams[team]),scores={int(t):v.score for t,v in w.teams.items()}))
+        terrain=None,resources=asdict(w.teams[team]),scores={int(t):v.score for t,v in w.teams.items()}))
+
+    # Cells are integers: copying each row detaches the same public list interface
+    # without recursively visiting every scalar on each HQ observation.
+    result['terrain']=[row.copy() for row in w.terrain.cells] if w.config.map_width_m>=1024 else None
+    return result
