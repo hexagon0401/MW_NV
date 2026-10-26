@@ -1,15 +1,16 @@
 # MW-NV v1.0.0 STATE
-Current: T11 implementation stages1-6 complete; stage7 long-run validation/pilot pending
-Contract/read: docs/multi-mode/PLAN.md and README.md; two independent PPOs across maps2/3/4
-Engine: opt-in rules5/catalog3;96inf+16vehicles;air/AA/crews;finite attrition;physical flag steal+return
-Policy: tactics3/1600x65 equivariant actor+independent critic; separate old PPO1/2 distillation
-Verified: full202Python pass; final scoped14; web31;60geometry seeds;DPR1/2 desktop/tablet/mobile
-Evidence: docs/multi-mode/{validation,browser,performance,source-archive}.json;500units≈12fps SwiftShader
-Preserved: source generation70 actors remotely SHA/load verified; live old league-v1 not replaced
-Pending gate:30full games+exact command replay,old/new map2 retention; only then192mixed pilot
-Resume: inspect data/multi-mode-v1/rollout-status.json and matching rollout.pid before starting
-Command: .venv/bin/python -m learning.mission_rollout --root data/multi-mode-v1 --legacy data/league-v1
-Backups:new10games/24updates policies;50games/120updates full;immutable Release+download checks
-Preview:t11-multi-mode.mw-nv.pages.dev;preview Storage secret absent;production retains old deployment
-No strategic improvement/transfer or Intel Mac performance claim; environment shutdown stops CPU
-Usage: UNKNOWN
+Current:T11 stages1-6 implemented/deployed;stage7 long-run validation/pilot IN PROGRESS
+Read:docs/multi-mode/{PLAN,README,STATUS}.md;do not restart or replace live workers blindly
+Engine:opt-in rules5/catalog3;96inf+16vehicles;air/AA/crews;finite attrition;physical flag missions
+Policy:tactics3/1600x65;independent PPO1/PPO2 across3modes;separate old-actor distillation
+Verified:Python full202+final scoped14+rollback2;web31;60geometry seeds;Chromium DPR1/2/mobile
+Evidence:docs/multi-mode/{validation,browser,performance,source-archive,deployment}.json
+Site:https://mw-nv.pages.dev production28e58fa5;actual replay/history/filters/Storage200 verified
+Rollback:previous productionbdd8e560;preview backend lacks secret,frontend test bridge documented
+Runtime:legacy league-v1 retained;new rollout audit running;2/30full-game hashes verified last read
+Gate:30diagnostics+map2 old/new retention before switch;then192mixed pilot+96game mode evaluations
+Resume:read data/multi-mode-v1/rollout-status.json and verify matching rollout.pid before launching
+Command:.venv/bin/python -m learning.mission_rollout --root data/multi-mode-v1 --legacy data/league-v1
+Backup:10games/24updates policies;50games/120updates full;immutable verified Releases
+No proven strategic improvement/transfer;500units≈12fps SwiftShader;Mac/permanentCPU unverified
+Usage:UNKNOWN

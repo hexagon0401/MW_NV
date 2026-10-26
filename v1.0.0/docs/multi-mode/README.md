@@ -51,7 +51,7 @@ SQLite/JSONL의 기존 `mode`는 학습/평가/실경기 구분이다. 새 `game
 
 `mission_transfer.py`는 외부 scenario_factory의 계약/통행 검증, 새 지형20000–20019의 추가 학습 전 평가와6000–6099의 동일 예산 추가 학습을 제공한다. 실제 새 지형 전이 성과는 아직 검증되지 않았다.
 
-정책/통계는10완료경기 또는24업데이트, 전체 복구는50경기 또는120업데이트마다 불변 Release 자산으로 보존한다. 기존512KiB 분할 전송·재다운로드 검증을 재사용한다. 모델·키·대형 로그는 Git에 넣지 않는다. 복구는 `learning.league_archive restore`로 빈 새 폴더에 수행하고 검증 게이트·환경·두 optimizer·교사/RNG를 이어받는다.
+정책/통계는10완료경기 또는24업데이트, 전체 복구는50경기 또는120업데이트마다 불변 Release 자산으로 보존한다. 기존512KiB 분할 전송·재다운로드 검증을 재사용한다. 모델·키·대형 로그는 Git에 넣지 않는다. 복구는 `learning.league_archive restore`로 빈 새 폴더에 수행하고 검증 게이트·환경·두 optimizer·교사/RNG를 이어받는다. 복구된 checkpoint는 `python -m learning.mission_league --root data/restored --source data/restored/baseline --pilot 192`로 직접 재개한다. 이 경우 초기 actor를 다시 만들지 않는다.
 
 ## 검증 상태
 

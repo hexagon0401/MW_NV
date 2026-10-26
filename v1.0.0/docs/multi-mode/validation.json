@@ -1,6 +1,6 @@
 {
   "static_checks_passed": true,
-  "code_sha256": "85d5a469a115f6a84efc51154d33419281c8dff7d38a927c1b0a4e29e47fd3cb",
+  "code_sha256": "50eb1ce68401dfb4c4496a0d2b928d8c9e098b93efe0e32305db91cb0705eab8",
   "geometry_complete": true,
   "geometry_seeds_per_mode": 30,
   "python_full_suite": {
@@ -42,5 +42,12 @@
     "completed": false
   },
   "mac": "unverified",
-  "strategy_improvement": "unproven"
+  "strategy_improvement": "unproven",
+  "rollout_rollback_tests": {
+    "passed": 2,
+    "legacy_pause_cancelled_on_archive_failure": true
+  },
+  "preview_report": "preview.json",
+  "production_report": "deployment.json",
+  "production_browser_report": "production-browser.json"
 }

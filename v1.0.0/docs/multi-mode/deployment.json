@@ -1,0 +1,29 @@
+{
+  "previous_production_id": "bdd8e560-6981-4749-abb0-bc6464e44479",
+  "production_branch": "dev/v1.0.0",
+  "preview": "https://t11-multi-mode.mw-nv.pages.dev",
+  "site": "https://mw-nv.pages.dev",
+  "production_id": "28e58fa5-a320-4318-ab87-8420011d3159",
+  "api_health": {
+    "/api/stats": {
+      "status": 200,
+      "total": 1315,
+      "items": 0
+    },
+    "/api/history?offset=0": {
+      "status": 200,
+      "total": 1315,
+      "items": 50
+    },
+    "/api/insights": {
+      "status": 200,
+      "total": null,
+      "items": 1
+    },
+    "/api/stats?game_mode=capture_flag&scenario_id=4": {
+      "status": 200,
+      "total": 0,
+      "items": 0
+    }
+  }
+}
