@@ -34,8 +34,9 @@ Geist Mono1.8.2는 OFL 확인·자체 호스팅, 한글은 기존 NanumSquare다
 관리자는 서버가 실제 GitHub ID82876856을 확인한다. PKCE, 1시간 HttpOnly
 서명 세션, SameSite/Origin/CSRF/길이/허용 필드, private 버전형 제어 큐를 사용한다.
 셸/PID/경로 입력은 없고 PPO 일시정지/재개만 허용한다. 평가·진단·백업은 계속된다.
-현재 GitHub 제공자 비활성으로 실제 관리자 기능은 닫혀 있다. ADMIN_SETUP.md의
-최초 앱 설정 및 소유자 실제 로그인 확인 후에만 제어를 연다.
+GitHub 제공자 활성화를 확인했고 Production 세션 비밀키·로그인을 설정했다.
+실제 소유자 로그인 확인 전까지 PPO 제어 플래그는 닫혀 있다.
+ADMIN_SETUP.md의 소유자 로그인 확인 후에만 제어를 연다.
 
 Production 실제 API5개200, 전체 완료 전적1425건, 비로그인 제어401,
 관리자 미설정 상태를 검증했다. 이전 운영 배포4c7929b0는 복구용으로 보존한다.

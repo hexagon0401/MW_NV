@@ -11,6 +11,6 @@ Agents:collect137432/publish137433/control137434;30/60/5second lanes
 Recovery:gen144/58games full archive remote verified;local pre-dashboard copy retained
 T11:old reports in validation-before-dashboard;server-inclusive fingerprint matches gates
 Perf:collect0.076s/materialize2.587s;35s open window insufficient report boundaries
-Blocker:GitHub provider disabled;real owner login unverified;admin flags remain closed
-Next:user OAuth setup per ADMIN_SETUP.md,then verify owner login before enabling control
+Auth:GitHub provider enabled;Production session secret/login configured;control closed
+Next:owner GitHub login in dashboard;verify private identity audit,then enable control
 Usage:UNKNOWN

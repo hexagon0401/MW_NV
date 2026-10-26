@@ -2,7 +2,8 @@
 
 공개 대시보드: https://mw-nv.pages.dev/dashboard/ . 관전 및 읽기 API는
 로그인 없이 사용할 수 있다. 관리자 제어는 별도 인증이며 공개 관전 옵션으로
-활성화되지 않는다. 현재 Supabase GitHub 제공자는 비활성이다.
+활성화되지 않는다. 현재 제공자 활성화와 Production 인증 설정을 마쳤다.
+다음 단계는 대시보드에서 소유자 실제 로그인 확인이다. 제어는 아직 닫혀 있다.
 
 1. GitHub의 Settings → Developer settings → OAuth Apps → New OAuth App
    (https://github.com/settings/applications/new)을 연다.
@@ -34,6 +35,8 @@ Linux 에이전트가 오프라인이면 POST를 거부한다. Pages에서 학�
 세션은 `__Host-` HttpOnly/Secure/SameSite=Strict 쿠키, CSRF는 별도 읽기 쿠키다.
 PKCE 쿠키만 외부 OAuth 복귀를 위해 Lax이며 10분 만료한다. 응답은 no-store다.
 관리 로그에는 요청 ID·액션·서버가 지정한 관리자 ID·버전·결과만 저장한다.
+최초 실제 로그인 검증은 private `control/owner-login.json`에 확인된 계정 ID와
+시각만 남긴다. OAuth 토큰·세션·CSRF 값은 이 기록에 저장하지 않는다.
 
 ## 복구
 
