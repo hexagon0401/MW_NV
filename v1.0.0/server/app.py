@@ -15,6 +15,14 @@ def create_app(store=None,live_runner=None,lifespan=None):
         data=json.loads(path.read_text())
         if not data.get('summary',{}).get('ended'):raise HTTPException(404)
         return data
+    @app.get('/api/objectives')
+    def objective_statistics(mode:str='',rules_version:str='',catalog_version:str='',map_id:str='',map_version:str='',map_family:str='',swapped:str='',policy_a:str='',policy_b:str=''):
+        from learning.objective_stats import document,report
+        from learning.results import records
+        import sqlite3
+        filters={k:v for k,v in locals().copy().items() if isinstance(v,str) and v}
+        try:return report(document(records(root/'results.sqlite',kind='match')),filters)
+        except (sqlite3.Error,ValueError,KeyError):raise HTTPException(503,'objective statistics unavailable')
     @app.get('/api/history')
     @app.get('/history')
     def history(offset:int=Query(0,ge=0)):

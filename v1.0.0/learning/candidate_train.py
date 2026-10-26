@@ -32,7 +32,7 @@ class TrainingEnv(gym.Env):
         if done[self.controlled]:self.games+=1
         if done[self.controlled] and self.stats:
             from .results import record_world
-            self.last_match_inserted=record_world(self.stats,e.engine.world,'training',{self.controlled:self.run_id,self.other:self.opponent.policy_id if self.opponent else 'algorithm'},steps=0,match_id=getattr(self,'match_id',None))
+            self.last_match_inserted=record_world(self.stats,e.engine.world,'training',{self.controlled:self.run_id,self.other:self.opponent.policy_id if self.opponent else 'algorithm'},steps=0,match_id=getattr(self,'match_id',None),initial_frame=self.initial_frame)
         if done[self.controlled] and os.environ.get('MW_NV_PUBLISH_TRAINING')=='1':
             try:
                 from .replay_sink import publish_latest

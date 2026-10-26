@@ -1,3 +1,4 @@
+import {startObjectiveStatistics} from './objective-statistics.js';
 import {entityName,currentOrder,orderState,orderTarget,orderVerb} from './command-view.js';
 import {startHistory} from './history.js';
 import {startTrainingStatus} from './training.js';
@@ -29,7 +30,7 @@ host.addEventListener('pointercancel',()=>{touchStart=null;pointer=null;if(scene
 
 function updateStats(){return refreshStats().then(()=>{lastHud="";if(currentFrame)renderHud(currentFrame,focus);});}updateStats();setInterval(updateStats,5000);
 
-startTrainingStatus();startHistory();
+startTrainingStatus();startHistory();startObjectiveStatistics();
 
 function selectedEntity(frame){const id=scene?.selected,u=frame.units.find(u=>u.id===id);if(u)return u;const s=frame.squads?.find(s=>s.id===id),members=frame.units.filter(u=>s?.member_ids.includes(u.id)&&u.alive!==false&&u.carrier_id==null);return members.length?{id,team:s.team,members:members.map(u=>u.id),x_cm:members.reduce((n,u)=>n+u.x_cm,0)/members.length,y_cm:members.reduce((n,u)=>n+u.y_cm,0)/members.length}:null;}
 let inspectorSignature='',combatSignature='';

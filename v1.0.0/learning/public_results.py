@@ -29,6 +29,9 @@ def publish(db='data/results.sqlite'):
         if key not in cache.get('current',[]):store._request('object/'+store.bucket+'/'+key,'PUT',body)
     index=dict(schema=2,total=len(rows),page_size=100,pages=paths,updated_at=doc['updated_at'],summary=doc['summary'])
     store._request('object/'+store.bucket+'/results-index.json','PUT',json.dumps(index).encode())
+    from .objective_stats import document as objective_document
+    objectives=objective_document(doc['matches']);objectives['updated_at']=doc['updated_at']
+    store._request('object/'+store.bucket+'/objective-stats.json.gz','PUT',gzip.compress(json.dumps(objectives,separators=(',',':')).encode(),mtime=0))
     obsolete=set(cache.get('previous',[]))-set(paths)-set(cache.get('current',[]))
     if obsolete:store._request('object/'+store.bucket,'DELETE',json.dumps({'prefixes':sorted(obsolete)}).encode())
     temporary=cache_path.with_suffix('.partial');temporary.write_text(json.dumps(dict(current=paths,previous=cache.get('current',[]))));temporary.replace(cache_path)

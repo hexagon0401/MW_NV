@@ -1,5 +1,5 @@
 # MW-NV v1.0.0 STATE
-Current: T07 repair plan + tactical discovery tracking documented; implementation pending
+Current: T08 first-capture statistics implemented/tested; publish/live collection verification next
 Site: https://mw-nv.pages.dev; production https://aac65376.mw-nv.pages.dev
 Verified: prior Python150+safety1; today JS22, production/Functions build
 Remote: HTML/JS hash match; stats/history/training/latest replay HTTP200; Chromium fonts/history PASS
@@ -11,5 +11,5 @@ Recovery: inspect PID first; .venv/bin/python -m learning.self_play --root data/
 Legacy: self-play-v2 rules2 checkpointgen256/games93/steps23040 preserved; never resume as rules3
 Blocker: Release uploads deferred; local recovery kept; no verified remote model backup
 Startup: v3 environment draft saved but needs user Save/Publish; no permanent external CPU
-Next: implement docs/learning-repair-plan.md; first pin recovery, then stats/archive and fair scheduling
+Next: resume current checkpoint for telemetry; verify/deploy /api/objectives; T07 repair plan still pending
 Limits: Intel Mac/performance improvement unverified; usage UNKNOWN

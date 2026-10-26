@@ -17,10 +17,12 @@ def evaluate(root,generation):
         for swapped in (False,True):
             result=ppo_evaluate(seed,policy,champion,swapped,terrain_variants=True);output.append(dict(result,mode='evaluation'))
             engine=Engine(training_scenario(seed));policies={t:HybridHQ('https://integrate.api.nvidia.com/v1',model='nvidia/nemotron-3.5-lightning-30b-a3b',timeout=30,api_key=os.environ.get('NVIDIA_API_KEY_A' if (int(t)+seed%2)%2==0 else 'NVIDIA_API_KEY_B'),policy=policy if int(t)==int(swapped) else champion) for t in Team}
+            from engine.viewer_export import frame
+            initial=frame(engine.world)
             failures=0
             while not getattr(engine.world,'ended',False):
                 issue_hq_round(engine,policies);failures+=sum(p.last_decision['source']!='llm' for p in policies.values());engine.step(30)
-            record_world('data/results.sqlite',engine.world,'hybrid',{a:policies[t].tactical.model.policy_id if policies[t].tactical.model else 'algorithm' for t,a in [(Team.A,'A'),(Team.B,'B')]})
+            record_world('data/results.sqlite',engine.world,'hybrid',{a:policies[t].tactical.model.policy_id if policies[t].tactical.model else 'algorithm' for t,a in [(Team.A,'A'),(Team.B,'B')]},initial_frame=initial)
             output.append(dict(summary(engine.world),mode='hybrid',swapped=swapped,learner_team='B' if swapped else 'A',key_rotation=seed%2,fallback_decisions=failures))
             (root/'evaluation.json').write_text(json.dumps(dict(generation=generation,results=output,complete=False)))
     (root/'evaluation.json').write_text(json.dumps(dict(generation=generation,results=output,complete=True)))

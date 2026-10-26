@@ -11,7 +11,9 @@ from engine.objectives import summary
 def evaluate(seed=10000,policy='rules',opponent='rules',swap=False,db='data/results.sqlite',terrain_variants=False):
     if not 10000<=seed<=10099:raise ValueError('held-out seed must be 10000..10099')
     from .training_maps import training_scenario
-    env=CandidateEnv(scenario_factory=training_scenario) if terrain_variants else CandidateEnv();env.reset(seed);rng=np.random.default_rng(seed)
+    env=CandidateEnv(scenario_factory=training_scenario) if terrain_variants else CandidateEnv();env.reset(seed);
+    from engine.viewer_export import frame
+    initial=frame(env.engine.world);rng=np.random.default_rng(seed)
     assigned={'A':opponent if swap else policy,'B':policy if swap else opponent}
     models={a:None if p in ('rules','random') else CandidatePolicy(p) for a,p in assigned.items()}
     names={a:m.policy_id if m else p for a,p in assigned.items() for m in [models[a]]}
@@ -21,7 +23,7 @@ def evaluate(seed=10000,policy='rules',opponent='rules',swap=False,db='data/resu
             m=models[a];actions[a]=m.predict(env.vector(a),env.mask(a)) if m else int(rng.choice(np.flatnonzero(env.mask(a)))) if p=='random' else env.heuristic(a)
         env.step(actions)
     w=env.engine.world
-    if db:record_world(db,w,'evaluation',names)
+    if db:record_world(db,w,'evaluation',names,initial_frame=initial)
     return dict(summary(w),policies=names,swapped=swap,map_family=getattr(w,'training_map_family','release'))
 
 
