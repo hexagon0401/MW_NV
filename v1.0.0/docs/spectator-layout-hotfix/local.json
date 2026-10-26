@@ -1,7 +1,6 @@
 {
   "passed": true,
   "url": "http://127.0.0.1:5173",
-  "live_replay": false,
   "sizes": [
     {
       "width": 1440,
@@ -388,5 +387,6 @@
       "rows": "54px 80px 32px 630px 48px"
     }
   ],
-  "page_errors": []
+  "page_errors": [],
+  "actual_latest_completed_replay": false
 }
