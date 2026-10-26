@@ -3,7 +3,8 @@
 공개 대시보드: https://mw-nv.pages.dev/dashboard/ . 관전 및 읽기 API는
 로그인 없이 사용할 수 있다. 관리자 제어는 별도 인증이며 공개 관전 옵션으로
 활성화되지 않는다. 현재 제공자 활성화와 Production 인증 설정을 마쳤다.
-다음 단계는 대시보드에서 소유자 실제 로그인 확인이다. 제어는 아직 닫혀 있다.
+실제 소유자 ID82876856의 로그인을 서버에서 확인해 제어도 활성화했다.
+아래 절차는 최초 설정 기록과 복구용 안내다.
 
 1. GitHub의 Settings → Developer settings → OAuth Apps → New OAuth App
    (https://github.com/settings/applications/new)을 연다.

@@ -1,5 +1,5 @@
 # MW-NV v1.0.0 STATE
-Current:T15 terminal dashboard deployed;admin code ready but setup gated
+Current:T15 terminal dashboard + owner-authenticated PPO control COMPLETE
 Read:docs/dashboard/README.md;ADMIN_SETUP.md;OPERATIONS.md
 Site:https://mw-nv.pages.dev/dashboard/ productionb9173982;rollback4c7929b0
 Verified:JS45/build;Python21+gate5;Chromium desktop/mobile/CSP/API5x200
@@ -11,6 +11,6 @@ Agents:collect137432/publish137433/control137434;30/60/5second lanes
 Recovery:gen144/58games full archive remote verified;local pre-dashboard copy retained
 T11:old reports in validation-before-dashboard;server-inclusive fingerprint matches gates
 Perf:collect0.076s/materialize2.587s;35s open window insufficient report boundaries
-Auth:PKCE/Supabase/GitHub redirect/cookie verified;owner login pending;control closed
-Next:owner GitHub login in dashboard;verify private identity audit,then enable control
+Auth:actual owner82876856 verified via GitHub API;control enabled after verification
+Next:monitor ongoing learning/T11 validation;no remaining setup blocker
 Usage:UNKNOWN

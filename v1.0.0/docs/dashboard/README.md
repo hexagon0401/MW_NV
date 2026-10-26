@@ -35,8 +35,8 @@ Geist Mono1.8.2는 OFL 확인·자체 호스팅, 한글은 기존 NanumSquare다
 서명 세션, SameSite/Origin/CSRF/길이/허용 필드, private 버전형 제어 큐를 사용한다.
 셸/PID/경로 입력은 없고 PPO 일시정지/재개만 허용한다. 평가·진단·백업은 계속된다.
 GitHub 제공자 활성화를 확인했고 Production 세션 비밀키·로그인을 설정했다.
-실제 소유자 로그인 확인 전까지 PPO 제어 플래그는 닫혀 있다.
-ADMIN_SETUP.md의 소유자 로그인 확인 후에만 제어를 연다.
+실제 GitHub 소유자82876856의 OAuth 로그인 기록을 서버에서 확인한 후
+PPO 제어를 활성화했다(owner-activation.json). 로그인한 소유자에게만 CONTROL이 보인다.
 
 Production 실제 API5개200, 전체 완료 전적1425건, 비로그인 제어401,
 관리자 미설정 상태를 검증했다. 이전 운영 배포4c7929b0는 복구용으로 보존한다.
@@ -44,5 +44,6 @@ Production 실제 API5개200, 전체 완료 전적1425건, 비로그인 제어40
 GitHub OAuth 설정 후 브라우저 검사에서 로그인 활성화, PKCE→Supabase→GitHub
 리디렉션, Secure/HttpOnly 쿠키, 무효 코드 거부를 확인했다(auth-config.json).
 
-실제 Intel Mac 성능, 실제 GitHub 소유자 로그인, 장기 자원 추세는 미검증이다.
+실제 Intel Mac 성능과 장기 자원 추세는 미검증이다. Production PPO를 임의로
+정지하지 않았으며 안전 정지·평가 지속·재개는 격리된 실제 엔진 통합 검사로 확인했다.
 환경 종료 후의 상시 학습 서버를 새로 제공하는 작업이 아니다. 사용량 UNKNOWN.

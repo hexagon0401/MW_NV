@@ -8,6 +8,6 @@
     "REPLAY_BUCKET": "mw-nv-replays",
     "REPLAY_MANIFEST": "storage",
     "MW_NV_ADMIN_AUTH_ENABLED": "true",
-    "MW_NV_ADMIN_CONTROL_ENABLED": "false"
+    "MW_NV_ADMIN_CONTROL_ENABLED": "true"
   }
 }
