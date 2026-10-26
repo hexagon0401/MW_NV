@@ -32,7 +32,7 @@ cover rolling-window speeds, phase changes, stalls/stops, exact evaluation ticks
 resumed/skipped cases, transport-independent game hash equality, network backoff,
 paired teacher recovery, Retry-After, independent PPO update and checkpoint resume.
 
-Deployment: engine worker restarted gracefully from the latest safe checkpoint (50 games).
+Deployment: engine worker PID118450 resumed generation122 / 50 games after full recovery archive verification (pending queue empty). Live status confirms the new speed basis.
 Completed frozen evaluation cases and the original checkpoint files are preserved.
 The incomplete evaluation case may be replayed; the existing coordinator resumes
 its normal update/evaluation schedule. No frontend deployment is required.

@@ -4,7 +4,7 @@ Read:docs/speed-reporting/README.md;docs/heli-interruption/README.md
 Cause:evaluation wall time grew while numerator stayed at640 training seconds
 Fix:recent60s phase speed;actual evaluation ticks;NIM network/5xx backoff60..300s
 Verified:29 focused regression tests passed;game hash unchanged;Retry-After retained
-Runtime:league-v1 safe restart from latest checkpoint/50games;history preserved
+Runtime:league-v1 PID118450 resumed generation122/50games;remote recovery verified
 Check:data/league-v1/training-status.json and runner.pid;do not duplicate worker
 T11:telemetry-only validation fingerprint refreshed;engine rules/geometry unchanged
 T11:old13 pre-flight-fix diagnostics retained in validation-before-heli

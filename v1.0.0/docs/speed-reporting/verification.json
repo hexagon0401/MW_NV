@@ -5,5 +5,16 @@
   "original_checkpoint_unchanged": true,
   "completed_evaluation_cases_preserved": 18,
   "rules_changed": false,
-  "model_reset": false
+  "model_reset": false,
+  "runtime": {
+    "resumed": true,
+    "pid": 118450,
+    "checkpoint_generation": 122,
+    "completed_games": 50,
+    "pending_archives": 0,
+    "status": "running",
+    "speed_basis": "recent_phase_wall_time",
+    "code_commit": "09c0a7c",
+    "short_startup_sample_not_benchmark": true
+  }
 }
