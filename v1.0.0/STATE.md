@@ -1,9 +1,9 @@
 # MW-NV v1.0.0 STATE
-Current:T14 stage1 baseline COMPLETE;stage2 async teacher/I/O in progress
+Current:T14 stage2 async teacher/durable I/O COMPLETE;adaptive collector in progress
 Read:docs/adaptive-acceleration/README.md;docs/speed-reporting/README.md
 Cause:evaluation wall time grew while numerator stayed at640 training seconds
 Fix:recent60s phase speed;actual evaluation ticks;NIM network/5xx backoff60..300s
-Verified:29 focused regression tests passed;game hash unchanged;Retry-After retained
+Verified:T13 regression29;T14 async/I/O/speed8passed;baseline seed19/240sim s
 Runtime:league-v1 PID118450 resumed generation122/50games;remote recovery verified
 Check:data/league-v1/training-status.json and runner.pid;do not duplicate worker
 T11:telemetry-only validation fingerprint refreshed;engine rules/geometry unchanged

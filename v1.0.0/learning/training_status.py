@@ -40,6 +40,10 @@ class Reporter:
         doc.update(sim_speed=speed,sim_speed_basis='recent_phase_wall_time',speed_phase=phase,speed_window_seconds=round(window,1),evaluation_sim_seconds=self.evaluation_sim_seconds,device='CPU',algorithm=doc.get('algorithm','MaskablePPO'),maps=doc.get('maps','4 terrain variants'),replay_speed=1,nim_in_training=doc.get('nim_in_training',False))
         tmp=self.root/'training-status.partial';tmp.write_text(json.dumps(doc));tmp.replace(self.root/'training-status.json')
         Path('data/training-status.json').write_text(json.dumps(doc))
+        if os.environ.get('MW_NV_PUBLISH_TRAINING')=='1' and os.environ.get('MW_NV_ASYNC_IO')=='1':
+            from .background_io import latest
+            latest(self.root,'status',doc)
+            return
         if os.environ.get('MW_NV_PUBLISH_TRAINING')=='1':
             try:
                 from cloud.supabase_storage import PrivateStorage

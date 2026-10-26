@@ -13,3 +13,10 @@ and final state hash are in baseline.json. No training models/results were touch
 
 Stages: baseline -> async teacher/I/O -> adaptive collector/checkpoint -> engine
 copy optimization -> viewer/latest publication -> integrated rollout.
+
+Stage2: AsyncTeacher uses one paired in-flight request and a30s wall-clock
+admission interval. It freezes observations/candidates/learner routing. Background
+I/O has separate publication/archive processes, coalesced status/replay slots,
+pinned immutable archive inputs and a2GiB/1GiB-free safety guard. The adaptive
+runner will enable these paths; the existing running worker is not hot-patched.
+Tests:8 passed (async frozen-pair routing, durable I/O failures/pinning and speed).
