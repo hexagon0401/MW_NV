@@ -1,6 +1,6 @@
 # MW-NV v1.0.0 STATE
-Current:T13 backend speed reporting fixed;T12 helicopter fix retained
-Read:docs/speed-reporting/README.md;docs/heli-interruption/README.md
+Current:T14 stage1 baseline COMPLETE;stage2 async teacher/I/O in progress
+Read:docs/adaptive-acceleration/README.md;docs/speed-reporting/README.md
 Cause:evaluation wall time grew while numerator stayed at640 training seconds
 Fix:recent60s phase speed;actual evaluation ticks;NIM network/5xx backoff60..300s
 Verified:29 focused regression tests passed;game hash unchanged;Retry-After retained
