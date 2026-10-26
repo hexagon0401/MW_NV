@@ -55,8 +55,33 @@
     }
   ],
   "teacher_live_since_activation": {
-    "paired_samples": 0,
-    "reason": "frozen_evaluation_does_not_collect_teacher",
-    "configured_max_pairs_per_minute": 2
+    "valid_pairs": 2,
+    "attempted_pairs": 4,
+    "observation_scope": "through generation125 timing-fix checkpoint",
+    "configured_max_pairs_per_minute": 2,
+    "last_observed_429_retry_seconds": 60
+  },
+  "proof_scope": "original activation snapshot; policies/world advance during subsequent training",
+  "current": {
+    "pid": 131572,
+    "generation": 127,
+    "completed_games": 53,
+    "phase": "learning",
+    "workers": 2,
+    "cpu_budget": 4,
+    "worker_sim_seconds": {
+      "0": 1470.0,
+      "1": 190.0
+    },
+    "adaptation_reason": "trial_increase",
+    "updated_at": "2026-10-26T11:23:31.079362+00:00",
+    "code_commit": "1d02076a897e40b1aab8146cc5ce24678a670bc0"
+  },
+  "timing_fix": {
+    "verified_tests": 10,
+    "restored_generation": 125,
+    "completed_games": 52,
+    "diagnostic_backup": "validation-before-timing-window",
+    "remote_verified": true
   }
 }
