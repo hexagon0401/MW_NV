@@ -1,6 +1,6 @@
 {
   "static_checks_passed": true,
-  "code_sha256": "50eb1ce68401dfb4c4496a0d2b928d8c9e098b93efe0e32305db91cb0705eab8",
+  "code_sha256": "32cae9bc6e8a5915ef0b3a6387e83ecbdce34caca176c811c5c6b2643c8cdaa2",
   "geometry_complete": true,
   "geometry_seeds_per_mode": 30,
   "python_full_suite": {
@@ -49,5 +49,9 @@
   },
   "preview_report": "preview.json",
   "production_report": "deployment.json",
-  "production_browser_report": "production-browser.json"
+  "production_browser_report": "production-browser.json",
+  "heli_interruption_regression": {
+    "passed": 40,
+    "report": "../heli-interruption/verification.json"
+  }
 }
