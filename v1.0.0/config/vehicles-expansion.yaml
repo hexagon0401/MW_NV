@@ -1,0 +1,73 @@
+BH:
+  size_px: [96, 96]
+  footprint_cm: [800, 800]
+  speed_mps: 12
+  capacity: 8
+  cargo_capacity: 0
+  fuel_max: 100
+  fuel_per_100m: 4
+  cost: 300
+  grass_factor: 1
+  hp: 240
+  armor: air
+  detection_m: 120
+  weapon: null
+  ammo: 0
+  attack: null
+  role: air_transport
+  aircraft: true
+LB:
+  size_px: [60, 60]
+  footprint_cm: [500, 500]
+  speed_mps: 14
+  capacity: 0
+  cargo_capacity: 0
+  fuel_max: 100
+  fuel_per_100m: 4
+  cost: 350
+  grass_factor: 1
+  hp: 160
+  armor: air
+  detection_m: 160
+  weapon: air_mg
+  ammo: 240
+  attack: {range_m: 100, interval_ms: 500, damage: 12, hit_probability: 0.65}
+  role: air_attack
+  aircraft: true
+AA:
+  size_px: [84, 48]
+  footprint_cm: [700, 400]
+  speed_mps: 5
+  capacity: 0
+  cargo_capacity: 0
+  fuel_max: 100
+  fuel_per_100m: 4
+  cost: 300
+  grass_factor: 0.7
+  hp: 300
+  armor: light
+  detection_m: 220
+  weapon: air_cannon
+  ammo: 120
+  attack: {range_m: 180, interval_ms: 1000, damage: 30, hit_probability: 0.65}
+  role: anti_air
+  air_only: true
+AA_SITE:
+  size_px: [72, 72]
+  footprint_cm: [600, 600]
+  speed_mps: 0.001
+  capacity: 0
+  cargo_capacity: 0
+  fuel_max: 100
+  fuel_per_100m: 1
+  cost: 300
+  grass_factor: 1
+  hp: 260
+  armor: light
+  detection_m: 260
+  weapon: air_cannon
+  ammo: 180
+  attack: {range_m: 220, interval_ms: 1000, damage: 35, hit_probability: 0.65}
+  role: emplacement
+  air_only: true
+  immobile: true

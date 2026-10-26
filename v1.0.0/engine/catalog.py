@@ -67,3 +67,14 @@ def load_weapons():
 def catalog_document():
     from .version import CATALOG_VERSION
     return dict(version=CATALOG_VERSION,units=load_units(),vehicles=load_vehicles(),weapons=load_weapons())
+
+
+def expanded_catalog():
+    """Opt-in expansion; legacy config files remain untouched for live old workers."""
+    units=load_units();vehicles=load_vehicles();extra=yaml.safe_load((CONFIG_DIR/'vehicles-expansion.yaml').read_text())
+    for name,spec in extra.items():
+        if name in vehicles or spec['hp']<=0 or spec['speed_mps']<=0 or len(spec['footprint_cm'])!=2:raise ValueError('expansion vehicle')
+        if spec['attack'] and (not 0<=spec['attack']['hit_probability']<=1 or spec['ammo']<=0):raise ValueError('expansion attack')
+        vehicles[name]=spec
+    weapons=load_weapons();weapons['multipliers']['air_mg']=dict(soft=1.,light=.1,medium=0.,heavy=0.,air=.25);weapons['multipliers']['air_cannon']=dict(soft=0.,light=0.,medium=0.,heavy=0.,air=1.)
+    return units,vehicles,weapons

@@ -9,7 +9,7 @@ from .map import Terrain
 from .orders import CommandQueue,TeamMap,OrderError
 from .runtime import Engine
 
-CLASSES={c.__name__:c for c in (GameConfig,WorldState,Terrain,CommandQueue,TeamMap,types.WorldPos,types.Soldier,types.Squad,types.Vehicle,types.Facility,types.TeamState,types.Command)}
+CLASSES={c.__name__:c for c in (GameConfig,WorldState,Terrain,CommandQueue,TeamMap,types.WorldPos,types.Soldier,types.Squad,types.Vehicle,types.Emplacement,types.Facility,types.TeamState,types.Command)}
 
 
 def encode(obj):

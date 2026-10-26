@@ -4,6 +4,7 @@ from .sensing import can_see
 from .map import Tile
 from .types import WorldPos
 from .orders import OrderError
+from .capabilities import aircraft,airborne,attack_allowed
 
 
 def spec(w,u):
@@ -14,7 +15,7 @@ def entities(w):return [*w.soldiers.values(),*w.vehicles.values()]
 
 
 def armor(w,u):
-    return 'light' if u.type_id=='HEL' and u.task_state not in ('TAKEOFF','MOVING','LANDING') else spec(w,u)['armor']
+    return 'light' if aircraft(w,u) and not airborne(w,u) else spec(w,u)['armor']
 
 
 def multiplier(w,attacker,target):
@@ -29,7 +30,7 @@ def engagement_target(w,u):
     candidates=[]
     for uid in ids:
         t=w.soldiers.get(uid) or w.vehicles.get(uid)
-        if t and t.team!=u.team and can_see(w,u,t) and hypot(t.pos.x_cm-u.pos.x_cm,t.pos.y_cm-u.pos.y_cm)<=attack['range_m']*100 and multiplier(w,u,t)>0 and tank_safe(w,u,t):candidates.append(t)
+        if t and t.team is not None and t.team!=u.team and attack_allowed(w,u,t) and can_see(w,u,t) and hypot(t.pos.x_cm-u.pos.x_cm,t.pos.y_cm-u.pos.y_cm)<=attack['range_m']*100 and multiplier(w,u,t)>0 and tank_safe(w,u,t):candidates.append(t)
     preferred=next((t for t in candidates if t.id==u.target_id),None)
     return preferred or min(candidates,key=lambda t:(-attack['damage']*multiplier(w,u,t)/max(1,t.hp),hypot(t.pos.x_cm-u.pos.x_cm,t.pos.y_cm-u.pos.y_cm),t.id),default=None)
 
@@ -116,6 +117,9 @@ def update_combat(w):
     for u in sorted(entities(w),key=lambda u:u.id):
         u.cooldown_ms=max(0,u.cooldown_ms-200)
         if not u.alive:continue
+        if u.id in w.vehicles and u.task_state=='HOVERING':
+            vehicle=spec(w,u);u.fuel=max(0,u.fuel-vehicle['fuel_per_100m']*vehicle['speed_mps']*.2/100)
+            if u.fuel<=0:damage_unit(w,u,u.hp,cause='fuel_exhaustion');continue
         target=engagement_target(w,u)
         u.target_id=None if target is None else target.id
         if target is None or u.cooldown_ms or u.type_id=='MBT' and u.task_state=='MOVING':continue

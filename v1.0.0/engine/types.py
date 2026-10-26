@@ -27,6 +27,10 @@ class Op(IntEnum):
     DEPLOY = 15
     PACK_UP = 16
     REPAIR = 17
+    ENTER_BUILDING = 18
+    INTERACT_OBJECTIVE = 19
+    OPERATE_EMPLACEMENT = 20
+    LEAVE_EMPLACEMENT = 21
 
 
 def natural(value, name, minimum=0):
@@ -115,13 +119,15 @@ class Vehicle(Entity):
         # Direct constructors and purchased vehicles use the same catalog defaults.
         from .catalog import load_vehicles
         specs=load_vehicles()
+        if self.type_id not in specs:
+            from .catalog import expanded_catalog
+            specs=expanded_catalog()[1]
         if self.type_id not in specs:raise ValueError('type_id')
         spec=specs[self.type_id]
         if self.hp is None:self.hp=spec['hp']
         if self.ammo is None:self.ammo=spec['ammo']
         natural(self.hp,'hp');natural(self.ammo,'ammo')
-        if self.type_id not in ('LUV', 'APC', 'IFV', 'HEL', 'TRK', 'MBT', 'SPH'):
-            raise ValueError('type_id')
+        if self.type_id not in specs:raise ValueError('type_id')
 
 
 @dataclass
@@ -157,3 +163,18 @@ class Command:
     ttl: int = 600
     priority: int = 0
     v: int = 1
+
+
+@dataclass
+class Emplacement(Vehicle):
+    type_id: str = 'AA_SITE'
+    crew_id: int | None = None
+    capture_team: Team | None = None
+    capture_ms: int = 0
+    def __post_init__(self):
+        natural(self.id,'id',1)
+        if self.team is not None and not isinstance(self.team,Team):raise ValueError('team')
+        from .catalog import expanded_catalog
+        spec=expanded_catalog()[1][self.type_id]
+        if self.hp is None:self.hp=spec['hp']
+        if self.ammo is None:self.ammo=spec['ammo']

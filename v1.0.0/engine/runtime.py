@@ -84,6 +84,8 @@ class Engine:
             except OrderError as exc:
                 w.queue.finish(w, key, 'FAILED', str(exc))
 
+        from .emplacements import update as update_emplacements
+        update_emplacements(w)
         update_combat(w)
         update_mode_rules(w)
         regenerate(w)
@@ -101,11 +103,18 @@ class Engine:
         w = self.world
         actor=w.soldiers.get(c.unit) or w.vehicles.get(c.unit)
         if actor is not None and not actor.alive:raise OrderError('ILLEGAL_STATE')
+        if c.op in (Op.OPERATE_EMPLACEMENT,Op.LEAVE_EMPLACEMENT):
+            from .emplacements import operate
+            w.queue.status[key]='RUNNING'
+            if operate(w,key,c,c.op==Op.LEAVE_EMPLACEMENT):w.queue.finish(w,key)
+            return
         if c.op==Op.ATTACK_TARGET:
             target=w.soldiers.get(c.target) or w.vehicles.get(c.target)
             from .sensing import can_see
             if actor is None or target is None or target.team==c.team or not can_see(w,actor,target):raise OrderError('INVALID_TARGET')
-            actor.target_id=target.id;actor.task_state='HOLD';w.queue.finish(w,key);return
+            from .capabilities import airborne,attack_allowed
+            if not attack_allowed(w,actor,target):raise OrderError('INVALID_TARGET')
+            actor.target_id=target.id;actor.task_state='HOVERING' if airborne(w,actor) else 'HOLD';w.queue.finish(w,key);return
         if c.op==Op.FIRE_MISSION:
             w.queue.status[key]='RUNNING'
             if fire_mission(w,key,c):w.queue.finish(w,key)

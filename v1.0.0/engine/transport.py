@@ -4,6 +4,7 @@ from .map import Terrain,Tile
 from .orders import OrderError
 from .pathfinding import find_path
 from .types import WorldPos
+from .capabilities import aircraft,airborne
 
 
 class FootprintTerrain(Terrain):
@@ -29,7 +30,8 @@ def move_vehicle(w,key,v,destination):
     if v.type_id=='MBT':
         from .combat import engagement_target
         if engagement_target(w,v) is not None:v.task_state='ENGAGING';return False
-    if v.type_id=='HEL':
+    if spec.get('immobile'):raise OrderError('IMMOBILE')
+    if aircraft(w,v):
         return fly(w,key,v,destination)
     if v.fuel<=0:
         v.task_state='NO_FUEL';w.emit('VEHICLE_OUT_OF_FUEL',unit=v.id)
@@ -148,7 +150,7 @@ def release_transfer_locks(w):
 
 def fly(w,key,v,destination):
     if not hasattr(w,'flights'):w.flights={}
-    spec=w.vehicle_specs['HEL']
+    spec=w.vehicle_specs[v.type_id]
     landing=FootprintTerrain(w.terrain,[1000,1000])
     def clear_landing(point):
         return landing.passable(*point) and not any(o.id!=v.id and o.alive and abs(o.pos.x_cm-point[0])<(w.vehicle_specs[o.type_id]['footprint_cm'][0]+800)/2 and abs(o.pos.y_cm-point[1])<(w.vehicle_specs[o.type_id]['footprint_cm'][1]+800)/2 for o in w.vehicles.values())
@@ -163,11 +165,11 @@ def fly(w,key,v,destination):
                 if chosen:break
             if chosen is None:raise OrderError('LANDING_RESERVED')
             destination=chosen;w.emit('LANDING_DIVERTED',unit=v.id,x_cm=destination[0],y_cm=destination[1])
-        if not clear_landing(destination) or not clear_landing((v.pos.x_cm,v.pos.y_cm)):
+        if not clear_landing(destination) or not airborne(w,v) and not clear_landing((v.pos.x_cm,v.pos.y_cm)):
             raise OrderError('LANDING_INVALID')
         if v.task_state in ('WAITING_PASSENGERS','UNLOADING'):
             raise OrderError('ILLEGAL_STATE')
-        w.flights[key]=dict(stage='TAKEOFF',elapsed=0,x=float(v.pos.x_cm),y=float(v.pos.y_cm),destination=destination)
+        w.flights[key]=dict(stage='MOVING' if airborne(w,v) else 'TAKEOFF',elapsed=0,x=float(v.pos.x_cm),y=float(v.pos.y_cm),destination=destination)
     f=w.flights[key];destination=f['destination'];v.task_state=f['stage']
     if f['stage'] in ('TAKEOFF','LANDING'):
         f['elapsed']+=200

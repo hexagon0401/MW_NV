@@ -6,14 +6,16 @@ from .logistics import debit
 from .orders import OrderError
 from .transport import FootprintTerrain
 
-PURCHASE_TYPES=('INF','REC','SUP','MED','ENG','LUV','APC','IFV','HEL','TRK','AT','MBT','SPH')
+PURCHASE_TYPES=('INF','REC','SUP','MED','ENG','LUV','APC','IFV','HEL','TRK','AT','MBT','SPH','BH','LB','AA')
 
 
 def purchase(w,c):
     if not 0<=c.arg0<len(PURCHASE_TYPES):raise OrderError('INVALID_TARGET')
     hq=w.facilities.get(c.target)
     if hq is None or hq.kind!='HQ' or hq.owner!=c.team:raise OrderError('FOREIGN_UNIT')
-    kind=PURCHASE_TYPES[c.arg0];infantry=kind in w.unit_specs
+    kind=PURCHASE_TYPES[c.arg0]
+    if kind not in w.unit_specs and kind not in w.vehicle_specs:raise OrderError('UNAVAILABLE_TYPE')
+    infantry=kind in w.unit_specs
     collection=w.soldiers if infantry else w.vehicles
     active=sum(u.team==c.team and getattr(u,'alive',True) for u in collection.values())
     from .scenario_spec import rules
