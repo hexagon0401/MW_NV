@@ -1,7 +1,7 @@
 {
   "passed": true,
   "url": "https://mw-nv.pages.dev/dashboard/",
-  "deployment": "b9173982-e372-4060-84a9-c5ceb3601b84",
+  "deployment": "60cf253e-4b40-474b-a3ab-34d15270666f",
   "actual_storage_api": true,
   "api": {
     "summary": {
@@ -56,5 +56,6 @@
   "rollback_deployment": "4c7929b0-ffc8-4d24-b231-3bc4f20f2594",
   "auth_configuration_verification": "auth-config.json",
   "current_admin_auth_configured": true,
-  "current_admin_control_enabled": false
+  "current_admin_control_enabled": true,
+  "owner_activation_verification": "owner-activation.json"
 }
