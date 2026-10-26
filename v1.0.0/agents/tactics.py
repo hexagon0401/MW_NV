@@ -26,7 +26,9 @@ def candidates(obs):
         if actor.get('ammo',0)<=0 or not s['attack']:return False
         if actor['type_id']=='MBT' and any(distance(friend,target)<catalog['weapons']['tank_splash']['blast_m'] for friend in [*own,*vehicles] if friend.get('carrier_id') is None and not (friend['type_id']=='HEL' and friend['task_state'] in ('TAKEOFF','MOVING','LANDING'))):return False
         enemy_spec=(catalog['units'] if target['type_id'] in catalog['units'] else catalog['vehicles'])[target['type_id']]
-        defense='light' if target['type_id']=='HEL' and target['task_state'] not in ('MOVING','TAKEOFF','LANDING') else enemy_spec['armor']
+        flying=(enemy_spec.get('aircraft',target['type_id']=='HEL') and target['task_state'] in ('MOVING','TAKEOFF','LANDING','HOVERING'))
+        if s.get('air_only') and not flying:return False
+        defense=enemy_spec['armor'] if flying or not enemy_spec.get('aircraft',target['type_id']=='HEL') else 'light'
         if catalog['weapons']['multipliers'][s['weapon']][defense]<=0:return False
         detect=s['detection_m'];terrain=obs.get('terrain')
         if any((f['kind']=='TOWER' or f['kind']=='OBJECTIVE' and f['id']==201) and f['owner']==obs['team'] and distance(actor,f)<=f['radius_cm']/100 for f in obs['facilities']):detect*=1.2
@@ -49,7 +51,7 @@ def candidates(obs):
         analysis=dict(tactic=variant,distance_m=round(meters,1),eta_s=round(meters/max(.1,min(catalog['units'][u['type_id']]['speed_mps'] for u in troops) if troops else spec['speed_mps']),1),observed_threats=round(threat,2))
         if op==13 and goal and spec['attack']:
             enemy_spec=(catalog['units'] if goal['type_id'] in catalog['units'] else catalog['vehicles'])[goal['type_id']]
-            defense='light' if goal['type_id']=='HEL' and goal['task_state'] not in ('MOVING','TAKEOFF','LANDING') else enemy_spec['armor']
+            defense='light' if enemy_spec.get('aircraft',goal['type_id']=='HEL') and goal['task_state'] not in ('MOVING','TAKEOFF','LANDING','HOVERING') else enemy_spec['armor']
             hit=spec['attack']['hit_probability'];terrain=obs.get('terrain')
             if terrain and terrain[goal_pos['y_cm']//400][goal_pos['x_cm']//400]==2:hit*=.8
             expected=spec['attack']['damage']*catalog['weapons']['multipliers'][spec['weapon']][defense]*hit
@@ -241,7 +243,7 @@ def commands(obs,selected):
 
 def shortlist(items,limit=12):
     output=[]
-    for role in ROLES:
+    for role in (*ROLES,*sorted({c['role'] for c in items}-set(ROLES))):
         best=sorted((c for c in items if c['role']==role),key=lambda c:(-c.get('policy_score',c['score']),c['id']))
         if best:output.append(best[0])
     for c in sorted(items,key=lambda c:(-c.get('policy_score',c['score']),c['id'])):

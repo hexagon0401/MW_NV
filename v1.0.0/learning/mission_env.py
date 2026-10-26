@@ -1,0 +1,48 @@
+"""Task-conditioned environment; potential shaping only at real time boundaries."""
+import numpy as np
+from gymnasium.spaces import Box
+from .candidate_env import CandidateEnv
+from .mission_features import vector,OBS_SIZE
+from .teacher import TeacherBuffer
+from agents.mission_tactics import candidates
+from agents.tactics import compatible
+from engine.multi_scenario import create
+
+class MissionTeacher(TeacherBuffer):
+    observation_size=OBS_SIZE
+    encode=staticmethod(vector)
+
+class MissionEnv(CandidateEnv):
+    def __init__(self,scenario_factory=None,decision_seconds=10,scenario_id='2'):
+        self.scenario_id=str(scenario_id)
+        super().__init__(scenario_factory or self.create,decision_seconds)
+        self.observation_spaces={a:Box(-4,4,(OBS_SIZE,),np.float32) for a in self.possible_agents}
+    def create(self,seed,swap=False):return create(seed,swap=swap,scenario_id=self.scenario_id)
+    def _round(self):
+        self.cached_observations={a:self.raw(a) for a in self.possible_agents};self.cached_tick=self.engine.world.tick
+        self.items={a:candidates(self.cached_observations[a]) for a in self.possible_agents};self.selected={a:[] for a in self.possible_agents};self.finished={a:False for a in self.possible_agents};self.reserved_supply={a:0 for a in self.possible_agents}
+        if hasattr(self,'teacher_hook') and self.engine.world.tick%150==0 and not getattr(self.engine.world,'ended',False):self.teacher_hook(self)
+    def vector(self,a):
+        raw=self.cached_observations[a] if getattr(self,'cached_tick',None)==self.engine.world.tick else self.raw(a)
+        values=vector(raw,compatible(self.items[a],self.selected[a]));values[16]=len(self.selected[a])/4;values[17]=sum(c.get('supply_cost',0) for c in self.selected[a])/max(1,raw['resources']['supply']);return values
+    def potential(self):
+        w=self.engine.world;mode=getattr(w,'mode','conquest')
+        if getattr(w,'ended',False):return 0.
+        if mode=='conquest':return .1*(w.teams[0].score-w.teams[1].score)/w.scenario['score_limit']
+        if mode=='elimination':
+            losses=self.losses();return .1*(losses[1]-losses[0])
+        values=[0.,0.]
+        for owner,f in w.flags.items():
+            if f['status']=='carried':
+                own=w.bases[1-owner]['return_zone'];cx=(own[0]+own[2])/2;cy=(own[1]+own[3])/2
+                full=max(1,np.hypot(f['home'][0]-cx,f['home'][1]-cy));distance=np.hypot(f['x_cm']-cx,f['y_cm']-cy)
+                values[1-owner]=.5+.5*max(0,1-distance/full)
+            elif f['status']=='home':values[1-owner]=.25*f['progress_ms']/(w.scenario['steal_seconds']*1000)
+        return .1*(values[0]-values[1])
+    def step(self,actions):
+        tick=self.engine.world.tick;before=self.potential();obs,_,done,truncated,infos=super().step(actions);w=self.engine.world
+        value=0.
+        if w.tick!=tick or not self.agents:
+            value=.99**((w.tick-tick)*.2/30)*self.potential()-before
+            if getattr(w,'ended',False) and w.winner is not None:value+=1 if w.winner==0 else -1
+        return obs,{'A':float(value),'B':float(-value)},done,truncated,infos

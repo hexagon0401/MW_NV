@@ -12,8 +12,9 @@ def create(seed=0,swap=False,scenario_id='3',geometry_attempt=0):
     config=specification(scenario_id)
     if str(scenario_id)=='2':
         from .scenario import create_release_match
-        return attach(create_release_match(seed,swap),2)
+        w=attach(create_release_match(seed,swap),2);w.rules_version='combined-arms-5';w.catalog_version='combined-arms-3';return w
     w=WorldState(seed,GameConfig(config['width_m'],config['height_m'],.2));attach(w,scenario_id);w.swapped=swap
+    w.rules_version='combined-arms-5';w.catalog_version='combined-arms-3'
     w.unit_specs,w.vehicle_specs,w.weapon_specs=expanded_catalog();w.soldiers={};w.squads={};w.vehicles={};w.facilities={};w.bases={}
     width,height=config['width_m'],config['height_m'];rng=random.Random(seed^0x7A551^(geometry_attempt*0x171))
     # Clustered irregular woods and industrial blocks instead of a repeated grid.
@@ -62,6 +63,8 @@ def create(seed=0,swap=False,scenario_id='3',geometry_attempt=0):
         for cx in range(min(x,width//2)//4,max(x,width//2)//4+1):
             for cy in range(y//4-2,y//4+3):w.terrain.cells[cy][cx]=int(Tile.ROAD)
         station=Emplacement(900000+i,None,WorldPos(x*100,y*100));w.vehicles[station.id]=station
+    from collections import Counter
+    w.desired_roster=dict(Counter(s.type_id for s in w.soldiers.values() if s.team==0)+Counter(v.type_id for v in w.vehicles.values() if v.team==0))
     w.terrain.revision+=1;w.terrain.cache.clear()
     if config['mode']=='capture_flag':w.flags={t:dict(owner=t,home=(w.facilities[101+t].pos.x_cm,w.facilities[101+t].pos.y_cm),status='home',carrier=None,x_cm=w.facilities[101+t].pos.x_cm,y_cm=w.facilities[101+t].pos.y_cm,progress_ms=0,return_ms=0) for t in (0,1)}
     w.emit('SCENARIO_STARTED',scenario_id=str(scenario_id),mode=config['mode'],seed=seed,swapped=swap)

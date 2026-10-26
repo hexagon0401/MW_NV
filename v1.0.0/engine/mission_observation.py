@@ -11,6 +11,8 @@ def observed(w,team):
     def seen(x,y):
         target=SimpleNamespace(pos=WorldPos(x,y),alive=True,carrier_id=None)
         return any(can_see(w,u,target) for u in own)
+    result['desired_roster']=getattr(w,'desired_roster',{})
+    result['limits']={k:w.scenario[k] for k in ('infantry_limit','vehicle_limit','credits','tickets','supply','time_limit_s')}
     result['emplacements']=[]
     for v in w.vehicles.values():
         if v.type_id!='AA_SITE':continue

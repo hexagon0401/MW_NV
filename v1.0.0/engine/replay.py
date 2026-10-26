@@ -57,7 +57,7 @@ class RecordingEngine(Engine):
 
 
 def replay(document):
-    if document.get('version')!=2 or document.get('rules_version')!=RULES_VERSION or document.get('catalog_version')!=CATALOG_VERSION:raise ValueError('incompatible replay rules/catalog version')
+    if document.get('version')!=2 or (document.get('rules_version'),document.get('catalog_version')) not in ((RULES_VERSION,CATALOG_VERSION),('combined-arms-5','combined-arms-3')):raise ValueError('incompatible replay rules/catalog version')
     engine=Engine(decode(document['initial']))
     for action in document['journal']:
         if action['kind']=='submit':

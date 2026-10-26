@@ -26,5 +26,7 @@ def update(w):
         if station.type_id!='AA_SITE' or station.crew_id is None:continue
         soldier=w.soldiers.get(station.crew_id)
         if not station.alive or soldier is None or not soldier.alive or soldier.carrier_id!=station.id:
-            station.crew_id=None;station.team=None;station.passenger_ids=[];station.passenger_ids=[];station.target_id=None
+            station.crew_id=None
+            if station.alive:station.team=None
+            station.passenger_ids=[];station.target_id=None
             w.emit('EMPLACEMENT_INACTIVE',unit=station.id)

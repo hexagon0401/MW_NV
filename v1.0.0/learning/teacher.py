@@ -9,13 +9,15 @@ from agents.tactics import shortlist,compatible
 from .candidate_policy import vector
 
 class TeacherBuffer:
+    observation_size=1056
+    encode=staticmethod(vector)
     def __init__(self):self.rows=deque(maxlen=10000);self.stats=dict(paired=0,skipped=0,requests=0);self.cooldown=0
     def save(self,path):
         rows=list(self.rows)
-        np.savez_compressed(path,cooldown_until=np.array(time.time()+max(0,self.cooldown-time.monotonic())),x=np.array([r[0] for r in rows],dtype=np.float32).reshape(-1,1056),mask=np.array([r[1] for r in rows],dtype=bool).reshape(-1,65),action=np.array([r[2] for r in rows],dtype=np.int64),team=np.array([r[3] for r in rows],dtype=np.int8))
+        np.savez_compressed(path,cooldown_until=np.array(time.time()+max(0,self.cooldown-time.monotonic())),x=np.array([r[0] for r in rows],dtype=np.float32).reshape(-1,self.observation_size),mask=np.array([r[1] for r in rows],dtype=bool).reshape(-1,65),action=np.array([r[2] for r in rows],dtype=np.int64),team=np.array([r[3] for r in rows],dtype=np.int8))
     def load(self,path):
         with np.load(path,allow_pickle=False) as d:
-            if d['x'].shape!=(len(d['action']),1056) or d['mask'].shape!=(len(d['action']),65) or not np.isfinite(d['x']).all():raise ValueError('teacher buffer contract')
+            if d['x'].shape!=(len(d['action']),self.observation_size) or d['mask'].shape!=(len(d['action']),65) or not np.isfinite(d['x']).all():raise ValueError('teacher buffer contract')
             self.cooldown=time.monotonic()+max(0,float(d['cooldown_until'])-time.time()) if 'cooldown_until' in d else 0
             for row in zip(d['x'],d['mask'],d['action'],d['team']):self.rows.append(row)
     def collect(self,env,clients=None):
@@ -33,7 +35,7 @@ class TeacherBuffer:
                     available=compatible(env.items[a],selected);mask=np.zeros(65,dtype=bool);mask[64]=True
                     for c in available:mask[c['id']]=True
                     if not mask[action]:raise ValueError('teacher mask')
-                    values=vector(obs,available);values[16]=len(selected)/4;values[17]=sum(c.get('supply_cost',0) for c in selected)/2000
+                    values=self.encode(obs,available);values[16]=len(selected)/4;values[17]=sum(c.get('supply_cost',0) for c in selected)/2000
                     staged.append((values,mask,action,team))
                     if action!=64:selected.append(next(c for c in available if c['id']==action))
             self.rows.extend(staged);self.stats['paired']+=1

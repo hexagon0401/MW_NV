@@ -27,6 +27,9 @@ def canonical_offer(obs,items):
             else:plans.append((sum(c['score'] for c in selected),list(ids)))
     plans=[ids for _,ids in sorted(plans,key=lambda p:(-p[0],p[1]))[:12]] or [[]]
     compact=dict(valid_plans=plans,tick=obs['tick'],scores={'SELF':obs['scores'][obs['team']],'OPPONENT':obs['scores'][1-obs['team']]},resources=obs['resources'],candidates=output)
+    mission=obs.get('mission',{})
+    if mission:
+        compact['mission']=dict(mode=mission.get('mode','conquest'),flags=[dict(owner='SELF' if f['owner']==obs['team'] else 'OPPONENT',status=f['status'],position_known=f['position_known'],position=position(f['pos']) if f['position_known'] else None) for f in mission.get('flags',[])],emplacements=[dict(position=position(s['pos']),observed=s['observed'],ownership='UNKNOWN' if not s['owner_known'] else 'NEUTRAL' if s['owner'] is None else 'SELF' if s['owner']==obs['team'] else 'OPPONENT') for s in mission.get('emplacements',[])])
     return compact,{i:c for i,c in enumerate(offered)}
 
 def choose(hq,obs,items):

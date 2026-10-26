@@ -1,0 +1,12 @@
+{
+  "source_sha256": "5bad2159817ddb05185354e3e137ed3a79fa84b6cb07b1bcb841224fde3c0d51",
+  "contract": "tactics-3",
+  "source_contract": "tactics-2",
+  "training_seeds_only": true,
+  "rounds": 64,
+  "matched": 7034,
+  "kl_initial": 0.8265183661133051,
+  "kl_final": 0.7329217158257961,
+  "critic_fresh": true,
+  "optimizer_fresh": true
+}

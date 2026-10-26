@@ -23,7 +23,7 @@ def frame(w):
         for u in collection.values():
             soldier=u.id in w.soldiers
             spec=(w.unit_specs if soldier else w.vehicle_specs)[u.type_id]
-            units.append(dict(id=u.id,team=int(u.team),type_id=u.type_id,x_cm=u.pos.x_cm,y_cm=u.pos.y_cm,
+            units.append(dict(id=u.id,team=None if u.team is None else int(u.team),type_id=u.type_id,x_cm=u.pos.x_cm,y_cm=u.pos.y_cm,
                 size_px=list(spec['size_px']),alive=getattr(u,'alive',True),carrier_id=getattr(u,'carrier_id',None),
                 task_state=u.task_state,activity='FIRING' if u.id in attacks and getattr(u,'alive',True) and getattr(u,'carrier_id',None) is None else None,activity_until_tick=attacks.get(u.id),squad_id=getattr(u,'squad_id',None),hp=getattr(u,'hp',None),
                 armor=spec['armor'],weapon=spec['weapon'],role=spec['role'],cooldown_ms=u.cooldown_ms,deployment=getattr(u,'deployment',None),deployment_ms=getattr(u,'deployment_ms',None),turret_heading=getattr(u,'turret_heading',None),max_ammo=spec['ammo'],min_range_m=100 if u.type_id=='SPH' else 0,passenger_count=len(getattr(u,'passenger_ids',[])),max_hp=spec.get('hp'),target_id=getattr(u,'target_id',None),range_m=(spec.get('attack') or {}).get('range_m'),ammo=getattr(u,'ammo',None),fuel=getattr(u,'fuel',None)))
@@ -40,7 +40,7 @@ def frame(w):
             for c in commands:
                 orders.append(dict(team=int(team),cmd_id=c.cmd_id,op=int(c.op),unit=c.unit,arg0=c.arg0,arg1=c.arg1,
                     target=c.target,accepted_tick=c.tick,status=w.queue.status[f'{int(team)}:{c.cmd_id}']))
-    return dict(presentation_version=3,decisions=decisions,rules_version=w.rules_version,projectiles=deepcopy(w.projectiles),impacts=impacts,damage=damage,shots=shots,tick=w.tick,units=units,squads=[asdict(s) for s in w.squads.values()],orders=orders,
+    return dict(mission=dict(mode=getattr(w,'mode','conquest'),scenario_id=getattr(w,'scenario_id','2'),flags=deepcopy(getattr(w,'flags',{})),bases=deepcopy(getattr(w,'bases',{}))),presentation_version=3,decisions=decisions,rules_version=w.rules_version,projectiles=deepcopy(w.projectiles),impacts=impacts,damage=damage,shots=shots,tick=w.tick,units=units,squads=[asdict(s) for s in w.squads.values()],orders=orders,
         scores={int(t):s.score for t,s in w.teams.items()},facilities=[dict(id=f.id,kind=f.kind,
         x_cm=f.pos.x_cm,y_cm=f.pos.y_cm,owner=None if f.owner is None else int(f.owner),
         radius_cm=f.radius_cm,capturing=None if f.capturing is None else int(f.capturing),progress_ms=f.progress_ms)
@@ -60,7 +60,7 @@ def export_view(engine,initial):
             c=w.queue.commands.get(f"{p['team']}:{p['cmd_id']}")
             if c is not None:p.update(op=int(c.op),unit=c.unit,arg0=c.arg0,arg1=c.arg1,target=c.target)
     initial=deepcopy(initial)
-    return dict(version=1,presentation_version=4,map_id=getattr(w,'map_id',None),map_version=getattr(w,'map_version',None),rules_version=w.rules_version,catalog=dict(version=w.catalog_version,units=deepcopy(w.unit_specs),vehicles=deepcopy(w.vehicle_specs),weapons=deepcopy(w.weapon_specs)),width_m=w.config.map_width_m,height_m=w.config.map_height_m,
+    return dict(mode=getattr(w,'mode','conquest'),scenario_id=getattr(w,'scenario_id','2'),version=1,presentation_version=4,map_id=getattr(w,'map_id',None),map_version=getattr(w,'map_version',None),rules_version=w.rules_version,catalog=dict(version=w.catalog_version,units=deepcopy(w.unit_specs),vehicles=deepcopy(w.vehicle_specs),weapons=deepcopy(w.weapon_specs)),width_m=w.config.map_width_m,height_m=w.config.map_height_m,
         terrain=deepcopy(w.terrain.cells),units=initial['units'],initial=initial,final=frame(w),events=events,summary=summary(w))
 
 
