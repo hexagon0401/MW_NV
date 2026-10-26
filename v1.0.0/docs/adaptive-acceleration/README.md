@@ -81,3 +81,15 @@ Remaining costs include combat/visibility, path search, synchronous atomic local
 checkpoint serialization and ordered frozen evaluations. PPO worker adaptation
 begins after the preserved evaluation; T11 mixed-mode promotion still requires its
 engine/migration gates. CPU benchmark speedups do not prove strategic improvement.
+
+
+Follow-up timing fix: evaluations and initialization now reset the adaptive
+throughput measurement window before learning resumes. A two-hour evaluation
+cannot dilute the baseline or falsely approve a worker increase. This timing
+change and adaptive-runner rollback detection passed10 tests (108.52s), including
+multi-process updates, checkpoint restore and phase-window isolation. Models and
+the completed diagnostic were retained; T11's new code pin starts a fresh audit.
+The fixed50-game evaluation completed; the learner reached generation125 and52
+completed training games before its safe timing-fix restart. New NIM supervision
+returned2valid pairs out of4attempts; HTTP429 obeyed its60s delay without stopping
+PPO. These are small operational observations, not learning-quality claims.

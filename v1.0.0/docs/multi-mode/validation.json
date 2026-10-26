@@ -1,6 +1,6 @@
 {
   "static_checks_passed": true,
-  "code_sha256": "bf363d73b718fa0a95915bca045d260cdf7bd119917585a4a51d228dac0d8f46",
+  "code_sha256": "acbcf6a4c100d633dbefdede107ee70b744ae32272ad2562d6bccdf4e7eb68a2",
   "geometry_complete": true,
   "geometry_seeds_per_mode": 30,
   "python_full_suite": {
@@ -68,5 +68,10 @@
     "report": "../adaptive-acceleration/README.md",
     "engine_hash_unchanged": true,
     "production_report": "../adaptive-acceleration/production.json"
+  },
+  "adaptive_timing_fix": {
+    "passed": 10,
+    "seconds": 108.52,
+    "engine_rules_unchanged": true
   }
 }
