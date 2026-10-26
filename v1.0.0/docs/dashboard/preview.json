@@ -1,0 +1,11 @@
+{
+  "url": "https://t11-multi-mode.mw-nv.pages.dev",
+  "passed": true,
+  "preview_storage_bridge": "real local sanitized aggregates; preview has no Storage credential",
+  "strict_csp": true,
+  "all_six_menus": true,
+  "mobile_menu": true,
+  "no_replay_or_pixi": true,
+  "page_errors": [],
+  "console_errors": []
+}

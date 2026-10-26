@@ -1,6 +1,6 @@
 {
   "static_checks_passed": true,
-  "code_sha256": "acbcf6a4c100d633dbefdede107ee70b744ae32272ad2562d6bccdf4e7eb68a2",
+  "code_sha256": "ae0c7077a89e36ddc4b3ee32d46054fd16294acfe73ad3b718e6a4d3e64951a7",
   "geometry_complete": true,
   "geometry_seeds_per_mode": 30,
   "python_full_suite": {
@@ -73,5 +73,12 @@
     "passed": 10,
     "seconds": 108.52,
     "engine_rules_unchanged": true
+  },
+  "terminal_dashboard": {
+    "focused_backend_tests": 21,
+    "seconds": 164.48,
+    "gate_tests": 5,
+    "engine_rules_unchanged": true,
+    "dashboard_report": "../dashboard/README.md"
   }
 }
