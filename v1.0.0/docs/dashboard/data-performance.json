@@ -6,5 +6,5 @@
   "raw_retention_days": 7,
   "hourly_retention_days": 90,
   "max_chart_points": 240,
-  "learning_throughput_delta": "not established; benchmark pending runtime restart"
+  "learning_throughput_delta": "Unresolved: observed35-second windows had no fresh reporter boundary during the open window; overhead.json. No improvement or slowdown attributed to the dashboard."
 }

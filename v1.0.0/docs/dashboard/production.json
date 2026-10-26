@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "url": "https://388d2a54.mw-nv.pages.dev",
+  "deployment": "388d2a54",
+  "actual_storage_api": true,
+  "api": {
+    "summary": {
+      "status": 200,
+      "bytes": 4968,
+      "activity": {
+        "running": 1,
+        "parked": 0,
+        "training": 0,
+        "evaluation": 0,
+        "diagnostic": 1
+      }
+    },
+    "history": {
+      "status": 200,
+      "bytes": 18179,
+      "total": 1425
+    },
+    "trends": {
+      "status": 200,
+      "bytes": 92995
+    },
+    "analysis": {
+      "status": 200,
+      "bytes": 3167,
+      "points": 6
+    },
+    "resources": {
+      "status": 200,
+      "bytes": 492,
+      "points": 1
+    },
+    "admin": {
+      "configured": false,
+      "authenticated": false,
+      "control_enabled": false,
+      "login": null
+    },
+    "control": 401
+  },
+  "desktop": "1440x900",
+  "mobile": "390x844",
+  "spectator_current_match_only": true,
+  "replay_paused_time_preserved": true,
+  "no_dashboard_pixi_or_replay_requests": true,
+  "admin_closed_until_provider_setup": true,
+  "page_errors": [],
+  "mac": "unverified",
+  "production_branch": "dev/v1.0.0",
+  "deployment_id": "388d2a54-ee41-4894-82fc-92d5b8260fe7",
+  "rollback_deployment": "4c7929b0-ffc8-4d24-b231-3bc4f20f2594"
+}

@@ -8,8 +8,8 @@
   "visibility": "public-completed-matches",
   "storage_provider": "supabase-private",
   "site_url": "https://mw-nv.pages.dev",
-  "deployment_url": "https://4c7929b0.mw-nv.pages.dev",
-  "cloudflare_deploy_status": "success; adaptive throughput UI, immutable latest replay, production APIs/Chromium verified",
+  "deployment_url": "https://388d2a54.mw-nv.pages.dev",
+  "cloudflare_deploy_status": "success; terminal dashboard and actual Storage APIs/Chromium verified; admin closed pending GitHub setup",
   "production_branch": "dev/v1.0.0",
-  "rollback_deployment": "28e58fa5-a320-4318-ab87-8420011d3159"
+  "rollback_deployment": "4c7929b0-ffc8-4d24-b231-3bc4f20f2594"
 }

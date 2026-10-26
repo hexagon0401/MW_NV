@@ -1,15 +1,16 @@
 # MW-NV v1.0.0 STATE
-Current:T15 UI/telemetry/auth/control code COMPLETE;production verification next
-Read:docs/dashboard/README.md;OPERATIONS.md;ADMIN_SETUP.md
-UI:independent dark /dashboard/;spectator retains current-match controls
-Verified:JS45/build;Python21(164.48s);preview Chromium six menus/mobile/CSP
-Data:incremental SQLite;CPU/RSS/activity30s;raw7d/hourly90d;charts<=240
-Control:typed pause/resume,version/TTL/idempotency;safe checkpoint;eval continues
-Runtime:legacy adaptive PID139645 resumed gen144/58games;T11 PID139646
-Recovery:pre-dashboard gen144 preserved;full archive queued;never delete unverified
-Agents:dashboard collect/publish/control active;Storage aggregates published
-T11:engine_audit active;old reports preserved;new fingerprint includes server
-Site:production4c7929b0;previewf99be5b0 verified with real sanitized data bridge
-Blocker:Supabase GitHub provider disabled;admin flags closed;setup requested
-Next:production deploy and Chromium/API verification;owner OAuth setup pending
+Current:T15 terminal dashboard deployed;admin code ready but setup gated
+Read:docs/dashboard/README.md;ADMIN_SETUP.md;OPERATIONS.md
+Site:https://mw-nv.pages.dev/dashboard/ production388d2a54;rollback4c7929b0
+Verified:JS45/build;Python21+gate5;Chromium desktop/mobile/CSP/API5x200
+UI:separate entry,no Pixi/replay;finite intro/Escape/reduced motion;current-match spectator
+Data:incremental ledger1425 at verification;actual activity/CPU/RSS;raw7d/hourly90d
+Control:owner82876856 PKCE/session/CSRF;PPO-only safe checkpoint;eval continues
+Runtime:legacy adaptive PID139645 resumed;59games;T11 validator PID139646 engine_audit
+Agents:collect137432/publish137433/control137434;30/60/5second lanes
+Recovery:gen144/58games full archive remote verified;local pre-dashboard copy retained
+T11:old reports in validation-before-dashboard;server-inclusive fingerprint matches gates
+Perf:collect0.076s/materialize2.587s;35s open window insufficient report boundaries
+Blocker:GitHub provider disabled;real owner login unverified;admin flags remain closed
+Next:user OAuth setup per ADMIN_SETUP.md,then verify owner login before enabling control
 Usage:UNKNOWN
