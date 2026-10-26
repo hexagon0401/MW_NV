@@ -16,9 +16,9 @@ def create_app(store=None,live_runner=None,lifespan=None):
         if not data.get('summary',{}).get('ended'):raise HTTPException(404)
         return data
     @app.get('/api/insights')
-    def learning_insights():
+    def learning_insights(game_mode:str='',scenario_id:str=''):
         from learning.league_metrics import document
-        return document(root/'results.sqlite')
+        return document(root/'results.sqlite',game_mode or None,scenario_id or None)
     @app.get('/api/objectives')
     def objective_statistics(mode:str='',rules_version:str='',catalog_version:str='',map_id:str='',map_version:str='',map_family:str='',swapped:str='',policy_a:str='',policy_b:str=''):
         from learning.objective_stats import document,report
@@ -29,9 +29,9 @@ def create_app(store=None,live_runner=None,lifespan=None):
         except (sqlite3.Error,ValueError,KeyError):raise HTTPException(503,'objective statistics unavailable')
     @app.get('/api/history')
     @app.get('/history')
-    def history(offset:int=Query(0,ge=0)):
+    def history(offset:int=Query(0,ge=0),game_mode:str='',scenario_id:str=''):
         from learning.public_results import document
-        d=document(root/'results.sqlite');rows=d['matches'];return dict(total=len(rows),items=rows[offset:offset+50],next=offset+50 if offset+50<len(rows) else None,updated_at=d['updated_at'])
+        d=document(root/'results.sqlite',game_mode or None,scenario_id or None);rows=d['matches'];return dict(total=len(rows),items=rows[offset:offset+50],next=offset+50 if offset+50<len(rows) else None,updated_at=d['updated_at'])
     @app.get('/api/training')
     @app.get('/training')
     def training():
@@ -41,10 +41,14 @@ def create_app(store=None,live_runner=None,lifespan=None):
         return json.loads(path.read_text())
     @app.get('/api/stats')
     @app.get('/stats')
-    def stats():
+    def stats(game_mode:str='',scenario_id:str=''):
         from learning.results import aggregate
         import sqlite3
-        try:return aggregate(root/'results.sqlite')
+        try:
+            if game_mode or scenario_id:
+                from learning.public_results import document
+                return document(root/'results.sqlite',game_mode or None,scenario_id or None)['summary']
+            return aggregate(root/'results.sqlite')
         except (sqlite3.Error,ValueError,KeyError):raise HTTPException(503,'results unavailable')
     @app.get('/api/matches')
     @app.get('/matches')

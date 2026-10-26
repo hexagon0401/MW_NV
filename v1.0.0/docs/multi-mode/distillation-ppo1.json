@@ -3,10 +3,12 @@
   "contract": "tactics-3",
   "source_contract": "tactics-2",
   "training_seeds_only": true,
+  "samples": 512,
+  "prefix_masks": true,
   "rounds": 64,
-  "matched": 7034,
-  "kl_initial": 0.8265183661133051,
-  "kl_final": 0.7329217158257961,
+  "matched": 22502,
+  "kl_initial": 0.6856484594172798,
+  "kl_final": 0.46706219206680544,
   "critic_fresh": true,
   "optimizer_fresh": true
 }

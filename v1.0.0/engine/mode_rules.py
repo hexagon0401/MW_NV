@@ -13,5 +13,5 @@ def update(world):
 
 def end(world,winner,reason):
     if getattr(world,'ended',False):return
-    world.ended=True;world.winner=winner
+    world.ended=True;world.winner=winner;world.termination_reason=reason
     world.emit('MATCH_ENDED',winner=None if winner is None else int(winner),reason=reason,mode=rules(world)['mode'])

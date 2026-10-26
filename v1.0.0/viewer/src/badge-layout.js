@@ -19,7 +19,7 @@ export function combatRegions(frame){
 const shortMaps=new WeakMap();
 export function shortId(frame,u){
  if(u.is_group)return String(u.name??'').replace(' 분대','');
- const codes={HEL:'H',MBT:'T',SPH:'G',IFV:'I',APC:'P',TRK:'S',LUV:'L'};
+ const codes={BH:'BH',LB:'LB',AA:'AA',AA_SITE:'AA',HEL:'H',MBT:'T',SPH:'G',IFV:'I',APC:'P',TRK:'S',LUV:'L'};
  if(!shortMaps.has(frame)){const map=new Map(),counts=new Map();for(const v of [...frame.units].sort((a,b)=>a.id-b.id)){const key=v.team+':'+v.type_id,n=(counts.get(key)??0)+1;counts.set(key,n);map.set(v.id,n);}shortMaps.set(frame,map);}const n=shortMaps.get(frame).get(u.id)??1;
- return `${u.team===0?'A':'B'}-${codes[u.type_id]??'F'}${n}`;
+ return `${u.team==null?'N':u.team===0?'A':'B'}-${codes[u.type_id]??'F'}${n}`;
 }

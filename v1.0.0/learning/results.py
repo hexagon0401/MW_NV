@@ -41,11 +41,11 @@ def record_world(db,w,mode,policies,match_id=None,steps=0,initial_frame=None,met
             if conn.execute('SELECT 1 FROM records WHERE id=?',(match_id,)).fetchone():return False
     from .objective_stats import collect
     objectives=collect(w,initial_frame)
-    return insert(db,dict(**(metadata or {}),objective_stats=objectives,map_family=getattr(w,'training_map_family',None),kind='match',id=match_id or uuid.uuid4().hex,rules_version=w.rules_version,catalog_version=w.catalog_version,map_id=getattr(w,'map_id',None),map_version=getattr(w,'map_version',None),mode=mode,policies=policies,seed=w.seed,swapped=getattr(w,'swapped',False),winner=None if w.winner is None else int(w.winner),scores=[w.teams[t].score for t in (0,1)],ended=True,ticks=w.tick,created_at=datetime.now(timezone.utc).isoformat()))
+    return insert(db,dict(**(metadata or {}),objective_stats=objectives,terrain_seed=getattr(w,'geometry_seed',None),scenario_setup={k:v for k,v in getattr(w,'scenario',{}).items() if k in ('infantry_limit','vehicle_limit','credits','tickets','supply','width_m','height_m','time_limit_s')},initial_roster=getattr(w,'desired_roster',None),game_mode=getattr(w,'mode',None),scenario_id=getattr(w,'scenario_id',None),termination_reason=getattr(w,'termination_reason',None),mission_stats=__import__('learning.mission_statistics',fromlist=['collect']).collect(w,initial_frame),map_family=getattr(w,'training_map_family',None),kind='match',id=match_id or uuid.uuid4().hex,rules_version=w.rules_version,catalog_version=w.catalog_version,map_id=getattr(w,'map_id',None),map_version=getattr(w,'map_version',None),mode=mode,policies=policies,seed=w.seed,swapped=getattr(w,'swapped',False),winner=None if w.winner is None else int(w.winner),scores=[w.teams[t].score for t in (0,1)],ended=True,ticks=w.tick,created_at=datetime.now(timezone.utc).isoformat()))
 
 
-def record_training(db,policy,steps,opponent='algorithm',run_id=None,training_run=None,metadata=None):
-    return insert(db,dict(**(metadata or {}),kind='training',id=run_id or uuid.uuid4().hex,rules_version=RULES_VERSION,policies={'A':policy,'B':opponent},steps=int(steps),training_run=training_run))
+def record_training(db,policy,steps,opponent='algorithm',run_id=None,training_run=None,metadata=None,rules_version=None):
+    return insert(db,dict(**(metadata or {}),kind='training',id=run_id or uuid.uuid4().hex,rules_version=rules_version or RULES_VERSION,policies={'A':policy,'B':opponent},steps=int(steps),training_run=training_run))
 
 
 def records(db,kind=None):

@@ -16,13 +16,15 @@ def create(seed=0,swap=False,scenario_id='3',geometry_attempt=0):
     w=WorldState(seed,GameConfig(config['width_m'],config['height_m'],.2));attach(w,scenario_id);w.swapped=swap
     w.rules_version='combined-arms-5';w.catalog_version='combined-arms-3'
     w.unit_specs,w.vehicle_specs,w.weapon_specs=expanded_catalog();w.soldiers={};w.squads={};w.vehicles={};w.facilities={};w.bases={}
-    width,height=config['width_m'],config['height_m'];rng=random.Random(seed^0x7A551^(geometry_attempt*0x171))
+    width,height=config['width_m'],config['height_m'];w.geometry_seed=0 if geometry_attempt==8 else seed;rng=random.Random(0x7A551 if geometry_attempt==8 else seed^0x7A551^(geometry_attempt*0x171))
     # Clustered irregular woods and industrial blocks instead of a repeated grid.
     for _ in range(0 if geometry_attempt==8 else 150):
         cx=rng.randrange(60,width-60)//4;cy=rng.randrange(60,height-60)//4;rx=rng.randrange(3,12);ry=rng.randrange(3,10);forest=rng.random()<.65
         for y in range(max(0,cy-ry),min(w.terrain.rows,cy+ry+1)):
             for x in range(max(0,cx-rx),min(w.terrain.cols,cx+rx+1)):
-                if ((x-cx)/rx)**2+((y-cy)/ry)**2<=1+rng.uniform(-.15,.15):w.terrain.cells[y][x]=int(Tile.FOREST if forest else Tile.WALL)
+                if forest:
+                    if ((x-cx)/rx)**2+((y-cy)/ry)**2<=1+rng.uniform(-.15,.15):w.terrain.cells[y][x]=int(Tile.FOREST)
+                elif abs(x-cx)<rx and abs(y-cy)<ry and not (x>cx+rx//3 and y>cy+ry//3):w.terrain.cells[y][x]=int(Tile.BUILDING_INTERIOR)
     # Three connected wide axes, with slight bends and joining vertical bypasses.
     for base_y in (height//4,height//2,height*3//4):
         bend=rng.randrange(-24,25)//4
@@ -64,6 +66,7 @@ def create(seed=0,swap=False,scenario_id='3',geometry_attempt=0):
             for cy in range(y//4-2,y//4+3):w.terrain.cells[cy][cx]=int(Tile.ROAD)
         station=Emplacement(900000+i,None,WorldPos(x*100,y*100));w.vehicles[station.id]=station
     from collections import Counter
+    w.squad_templates={g.id:[w.soldiers[i].type_id for i in g.member_ids] for g in w.squads.values()}
     w.desired_roster=dict(Counter(s.type_id for s in w.soldiers.values() if s.team==0)+Counter(v.type_id for v in w.vehicles.values() if v.team==0))
     w.terrain.revision+=1;w.terrain.cache.clear()
     if config['mode']=='capture_flag':w.flags={t:dict(owner=t,home=(w.facilities[101+t].pos.x_cm,w.facilities[101+t].pos.y_cm),status='home',carrier=None,x_cm=w.facilities[101+t].pos.x_cm,y_cm=w.facilities[101+t].pos.y_cm,progress_ms=0,return_ms=0) for t in (0,1)}
@@ -108,8 +111,20 @@ def validate(w):
             for door in base['doors']:find_path(w.terrain,door,(hq.pos.x_cm,hq.pos.y_cm))
     ratio=max(sum(lengths[0]),sum(lengths[1]))/max(1,min(sum(lengths[0]),sum(lengths[1])))
     if ratio>1.25:raise ValueError('unbalanced main approaches')
+    aa_lengths=[]
+    for start in starts:
+        values=[]
+        for station in w.vehicles.values():
+            if station.type_id=='AA_SITE':
+                p=find_path(w.terrain,start,(station.pos.x_cm+400,station.pos.y_cm));values.append(sum(hypot(b[0]-a[0],b[1]-a[1]) for a,b in zip([start,*p],p))/100)
+        aa_lengths.append(values)
+    cover=[]
+    for start in starts:
+        cx,cy=start[0]//400,start[1]//400;cells=[w.terrain.cells[y][x] for y in range(max(0,cy-25),min(w.terrain.rows,cy+26)) for x in range(max(0,cx-25),min(w.terrain.cols,cx+26))];cover.append(sum(t in (2,3,4) for t in cells)/max(1,len(cells)))
+    aa_ratio=max(map(sum,aa_lengths))/max(1,min(map(sum,aa_lengths))) if aa_lengths[0] else 1
+    if aa_ratio>1.35:raise ValueError('unbalanced neutral AA approaches')
     w.terrain.cache.clear()
-    return dict(valid=True,approaches=3,vehicle_width_m=16,team_route_m=lengths,route_ratio=max(sum(lengths[0]),sum(lengths[1]))/max(1,min(sum(lengths[0]),sum(lengths[1]))))
+    return dict(neutral_aa_route_m=aa_lengths,neutral_aa_route_ratio=aa_ratio,spawn_cover_fraction=cover,valid=True,approaches=3,vehicle_width_m=16,team_route_m=lengths,route_ratio=max(sum(lengths[0]),sum(lengths[1]))/max(1,min(sum(lengths[0]),sum(lengths[1]))))
 
 
 _build=create

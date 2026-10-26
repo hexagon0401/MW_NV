@@ -8,7 +8,7 @@ def canonical_offer(obs,items):
     def position(pos):
         x=pos['x_cm']/(obs['map_width_m']*100);y=pos['y_cm']/(obs['map_height_m']*100)
         return [round(1-x if mirror else x,4),round(y,4)]
-    entities={u['id']:u for u in [*obs['units'],*obs['vehicles'],*obs['squads'],*obs['facilities'],*obs['enemies']]}
+    entities={u['id']:u for u in [*obs['units'],*obs['vehicles'],*obs['squads'],*obs['facilities'],*obs['enemies'],*obs.get('mission',{}).get('emplacements',[]) ]}
     actors={u:i for i,u in enumerate(sorted({c['command']['unit'] for c in items}))}
     offered=list(items);random.Random(obs['tick']^0x51DE).shuffle(offered)
     locks={lock:i for i,lock in enumerate(sorted({lock for c in items for lock in c.get('locks',[])}))}
@@ -29,7 +29,7 @@ def canonical_offer(obs,items):
     compact=dict(valid_plans=plans,tick=obs['tick'],scores={'SELF':obs['scores'][obs['team']],'OPPONENT':obs['scores'][1-obs['team']]},resources=obs['resources'],candidates=output)
     mission=obs.get('mission',{})
     if mission:
-        compact['mission']=dict(mode=mission.get('mode','conquest'),flags=[dict(owner='SELF' if f['owner']==obs['team'] else 'OPPONENT',status=f['status'],position_known=f['position_known'],position=position(f['pos']) if f['position_known'] else None) for f in mission.get('flags',[])],emplacements=[dict(position=position(s['pos']),observed=s['observed'],ownership='UNKNOWN' if not s['owner_known'] else 'NEUTRAL' if s['owner'] is None else 'SELF' if s['owner']==obs['team'] else 'OPPONENT') for s in mission.get('emplacements',[])])
+        compact['mission']=dict(victory={'conquest':'Capture and hold objectives to reach target score.','elimination':'Exhaust enemy armed forces and affordable combat reinforcements; keep finite logistics alive.','capture_flag':'Enter enemy flag room via doors with3 dismounted troops for15s, carry the flag home (air/ground transport allowed), dismount and return for5s while own flag is home. Protect or recover own flag.'}.get(mission.get('mode','conquest')),mode=mission.get('mode','conquest'),flags=[dict(owner='SELF' if f['owner']==obs['team'] else 'OPPONENT',status=f['status'],position_known=f['position_known'],position=position(f['pos']) if f['position_known'] else None) for f in mission.get('flags',[])],emplacements=[dict(position=position(s['pos']),observed=s['observed'],ownership='UNKNOWN' if not s['owner_known'] else 'NEUTRAL' if s['owner'] is None else 'SELF' if s['owner']==obs['team'] else 'OPPONENT') for s in mission.get('emplacements',[])])
     return compact,{i:c for i,c in enumerate(offered)}
 
 def choose(hq,obs,items):

@@ -38,6 +38,7 @@ class CandidateEnv(ParallelEnv):
     def heuristic(self,a):
         available=[c for c in self.items[a] if self.mask(a)[c['id']]]
         return max(available,key=lambda c:(c['score'],-c['id']))['id'] if available else 64
+    def command_batch(self,a):return commands(self.raw(a),self.selected[a])
     def step(self,actions):
         if not self.agents:return {},{},{},{},{}
         infos={a:{} for a in self.agents};reward={a:0. for a in self.agents};w=self.engine.world
@@ -52,7 +53,7 @@ class CandidateEnv(ParallelEnv):
         if all(self.finished.values()):
             before=[w.teams[t].score for t in (0,1)];loss_before=self.losses()
             for a in self.possible_agents:
-                batch=commands(self.raw(a),self.selected[a])
+                batch=self.command_batch(a)
                 self.engine.record_presentation('HQ_DECISION',team=self.possible_agents.index(a),commands=batch,metadata=dict(source=getattr(self,'decision_sources',{}).get(a,'정책 선택'),reasons=[dict(unit=c['command']['unit'],reason=c['reason'],score=c['score']) for c in self.selected[a]]))
                 for c in batch:
                     try:self.engine.submit_for(self.possible_agents.index(a),c)

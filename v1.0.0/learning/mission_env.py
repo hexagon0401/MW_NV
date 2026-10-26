@@ -25,6 +25,15 @@ class MissionEnv(CandidateEnv):
     def vector(self,a):
         raw=self.cached_observations[a] if getattr(self,'cached_tick',None)==self.engine.world.tick else self.raw(a)
         values=vector(raw,compatible(self.items[a],self.selected[a]));values[16]=len(self.selected[a])/4;values[17]=sum(c.get('supply_cost',0) for c in self.selected[a])/max(1,raw['resources']['supply']);return values
+    def command_batch(self,a):
+        from agents.mission_tactics import commands
+        return commands(self.raw(a),self.selected[a])
+    def losses(self):
+        w=self.engine.world
+        return [sum((w.unit_specs if u.id in w.soldiers else w.vehicle_specs)[u.type_id]['cost'] for u in [*w.soldiers.values(),*w.vehicles.values()] if u.team==t and not u.alive and u.type_id!='AA_SITE')/self.initial_costs[t] for t in (0,1)]
+    def initial_value(self,t):
+        w=self.engine.world
+        return max(1,sum((w.unit_specs if u.id in w.soldiers else w.vehicle_specs)[u.type_id]['cost'] for u in [*w.soldiers.values(),*w.vehicles.values()] if u.team==t and u.type_id!='AA_SITE'))
     def potential(self):
         w=self.engine.world;mode=getattr(w,'mode','conquest')
         if getattr(w,'ended',False):return 0.

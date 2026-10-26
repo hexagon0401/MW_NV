@@ -17,7 +17,7 @@ def purchase(w,c):
     if kind not in w.unit_specs and kind not in w.vehicle_specs:raise OrderError('UNAVAILABLE_TYPE')
     infantry=kind in w.unit_specs
     collection=w.soldiers if infantry else w.vehicles
-    active=sum(u.team==c.team and getattr(u,'alive',True) for u in collection.values())
+    active=sum(u.team==c.team and getattr(u,'alive',True) and u.type_id!='AA_SITE' for u in collection.values())
     from .scenario_spec import rules
     limits=rules(w)
     if active>=limits['infantry_limit' if infantry else 'vehicle_limit']:raise OrderError('NO_CAPACITY')
@@ -39,9 +39,10 @@ def purchase(w,c):
     collection[id]=unit
     if infantry:
         groups=sorted((g for g in w.squads.values() if g.team==c.team and any(w.soldiers[i].type_id==kind for i in g.member_ids)),key=lambda g:g.id)
-        destination=next((g for g in groups if sum(w.soldiers[i].alive for i in g.member_ids)<8),None)
+        destination=next((g for g in groups if sum(w.soldiers[i].alive for i in g.member_ids)<8 and (not hasattr(w,'squad_templates') or sum(w.soldiers[i].alive and w.soldiers[i].type_id==kind for i in g.member_ids)<w.squad_templates.get(g.id,[]).count(kind))),None)
         if destination is None:
             gid=id+1;destination=Squad(gid,c.team,position,[id]);w.squads[gid]=destination
+            if hasattr(w,'squad_templates'):w.squad_templates[gid]=next((list(roles) for _,roles in sorted(w.squad_templates.items()) if kind in roles),[kind]*8)
         else:
             destination.member_ids=[i for i in destination.member_ids if w.soldiers[i].alive]+[id]
         unit.squad_id=destination.id

@@ -49,7 +49,7 @@ class TeacherBuffer:
                     try:delay=parsedate_to_datetime(exc.headers['Retry-After']).timestamp()-time.time()
                     except (ValueError,TypeError,KeyError):delay=60
                 self.cooldown=time.monotonic()+max(1,delay)
-            self.stats['last_error']=type(exc).__name__
+            self.stats['last_error']=type(exc).__name__;self.stats['last_error_code']=getattr(exc,'code',None)
     def imitate(self,model):
         import torch
         groups=[[r for r in self.rows if r[3]==t] for t in (0,1)]

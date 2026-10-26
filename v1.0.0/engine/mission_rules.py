@@ -10,7 +10,7 @@ def combat_possible(w,team):
     if any(u.alive and u.team==team and (w.unit_specs if u.id in w.soldiers else w.vehicle_specs)[u.type_id]['attack'] and enabled(w,u) for u in [*w.soldiers.values(),*w.vehicles.values()]):return True
     state=w.teams[team];spec=rules(w)
     for catalog,cap in ((w.unit_specs,spec['infantry_limit']),(w.vehicle_specs,spec['vehicle_limit'])):
-        infantry=catalog is w.unit_specs;living=sum(u.alive and u.team==team for u in (w.soldiers.values() if infantry else w.vehicles.values()))
+        infantry=catalog is w.unit_specs;living=sum(u.alive and u.team==team and u.type_id!='AA_SITE' for u in (w.soldiers.values() if infantry else w.vehicles.values()))
         if living>=cap:continue
         if any(s['attack'] and not s.get('immobile') and s['cost']<=state.credits and (not infantry or state.tickets>0) for s in catalog.values()):return True
     return any(u.alive and u.team==team and u.carrier_id is None for u in w.soldiers.values()) and any(v.alive and v.type_id=='AA_SITE' and v.team is None and v.ammo>0 for v in w.vehicles.values())
@@ -26,7 +26,8 @@ def reset_flag(w,flag,reason):
 
 
 def flags_update(w):
-    config=rules(w);scored=[]
+    telemetry(w)
+    config=rules(w);scored=[];home_at_start={owner:flag['status']=='home' for owner,flag in w.flags.items()}
     for owner in (0,1):
         flag=w.flags[owner];enemy=1-owner;home=w.bases[owner]
         if flag['status']=='carried':
@@ -38,7 +39,7 @@ def flags_update(w):
             else:
                 flag.update(x_cm=carrier.pos.x_cm,y_cm=carrier.pos.y_cm)
                 own_flag=w.flags[enemy]
-                returned=carrier.carrier_id is None and inside(carrier.pos,w.bases[enemy]['return_zone']) and own_flag['status']=='home'
+                returned=carrier.carrier_id is None and inside(carrier.pos,w.bases[enemy]['return_zone']) and home_at_start[enemy]
                 flag['return_ms']=flag.get('return_ms',0)+200 if returned else 0
                 if flag['return_ms']>=config['return_seconds']*1000:scored.append(Team(enemy))
         elif flag['status']=='dropped':
@@ -79,3 +80,21 @@ def update(w):
             winner=next((t for t in Team if alive[t]),None);end(w,winner,'COMBAT_EXHAUSTED' if winner is not None else 'SIMULTANEOUS_EXHAUSTION');return
     elif config['mode']=='capture_flag':flags_update(w)
     if not getattr(w,'ended',False) and (w.tick+1)*.2>=config['time_limit_s']:end(w,None,'TIME_LIMIT_DRAW')
+
+
+def telemetry(w):
+    if not hasattr(w,'mission_room_presence'):w.mission_room_presence={}
+    for owner,base in w.bases.items():
+        people=eligible(w,1-owner,base['room']);present={u.id for u in people};old=set(w.mission_room_presence.get(owner,[]))
+        for u in people:
+            if u.id not in old:
+                door=min(range(len(base['doors'])),key=lambda i:hypot(u.pos.x_cm-base['doors'][i][0],u.pos.y_cm-base['doors'][i][1]));w.emit('BUILDING_ENTERED',unit=u.id,team=int(u.team),owner=owner,door=door,x_cm=u.pos.x_cm,y_cm=u.pos.y_cm)
+        w.mission_room_presence[owner]=sorted(present)
+    if w.tick%5:return
+    if not hasattr(w,'flag_tracks'):w.flag_tracks={}
+    for owner,flag in w.flags.items():
+        carrier=w.soldiers.get(flag['carrier']) if flag['carrier'] is not None else None
+        if flag['status']!='carried' or carrier is None or not carrier.alive:w.flag_tracks.pop(owner,None);continue
+        prior=w.flag_tracks.get(owner);distance=round(hypot(carrier.pos.x_cm-prior[1],carrier.pos.y_cm-prior[2])) if prior and prior[0]==carrier.id else 0
+        w.flag_tracks[owner]=(carrier.id,carrier.pos.x_cm,carrier.pos.y_cm)
+        if distance:w.emit('FLAG_MOVED',owner=owner,carrier=carrier.id,team=int(carrier.team),x_cm=carrier.pos.x_cm,y_cm=carrier.pos.y_cm,distance_cm=distance,transport=carrier.carrier_id)

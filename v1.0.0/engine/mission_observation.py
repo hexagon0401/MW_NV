@@ -6,13 +6,14 @@ from .types import WorldPos
 
 def observed(w,team):
     mode=getattr(w,'mode','conquest');result=dict(scenario_id=getattr(w,'scenario_id','2'),mode=mode)
+    from .scenario_spec import rules
+    config=rules(w);result['limits']={k:config[k] for k in ('infantry_limit','vehicle_limit','credits','tickets','supply','time_limit_s')};result['limits']['score_limit']=config.get('score_limit',1)
     if mode=='conquest':return result
     own=[u for u in [*w.soldiers.values(),*w.vehicles.values()] if u.team==team and u.alive and getattr(u,'carrier_id',None) is None]
     def seen(x,y):
         target=SimpleNamespace(pos=WorldPos(x,y),alive=True,carrier_id=None)
         return any(can_see(w,u,target) for u in own)
     result['desired_roster']=getattr(w,'desired_roster',{})
-    result['limits']={k:w.scenario[k] for k in ('infantry_limit','vehicle_limit','credits','tickets','supply','time_limit_s')}
     result['emplacements']=[]
     for v in w.vehicles.values():
         if v.type_id!='AA_SITE':continue

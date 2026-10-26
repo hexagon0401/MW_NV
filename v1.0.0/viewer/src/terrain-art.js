@@ -10,18 +10,19 @@ function tree(c,x,y,size,seed){
  for(let j=0;j<4;j++){const dx=((seed>>j*3)%13-6)*rad/11,dy=((seed>>j*4)%11-5)*rad/12;oval(j%2?'#7d9663':'#a0b17e',x+rad-3+dx,y+rad-4+dy,rad*.22,rad*.16);}
 }
 export function terrainAtlas(){
- const canvas=document.createElement('canvas');canvas.width=24*16;canvas.height=24*10;const c=canvas.getContext('2d');
+ const canvas=document.createElement('canvas');canvas.width=24*16;canvas.height=24*11;const c=canvas.getContext('2d');
  const r=(color,x,y,w=1,h=1)=>{c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),w,h);};
- for(let type=0;type<10;type++)for(let v=0;v<16;v++){c.save();c.translate(v*24,type*24);r([P.ground,P.road,P.shade,P.wall,P.roof,P.water,P.deep,'#9d9c83',P.ground,'#8c947d'][type],0,0,24,24);
+ for(let type=0;type<11;type++)for(let v=0;v<16;v++){c.save();c.translate(v*24,type*24);r([P.ground,P.road,P.shade,P.wall,P.roof,P.water,P.deep,'#9d9c83',P.ground,'#8c947d','#b4b9a2'][type],0,0,24,24);
   if([0,2,8].includes(type)){r(P.ground,0,0,24,24);}
   if(type===1){r('#929c95',1,5,20,1);if(v%4===0)r('#84918b',9,15,10,1);}
   if(type===5||type===6){for(let k=0;k<3;k++)r(k===0?'#9fbab0':'#81a7a4',(v*3+k*7)%17,(k*8+v)%23,5,1);}
+  if(type===10){r('#a3ad99',0,0,1,24);r('#c8cbb6',0,0,24,1);if(v%4===0){r('#9aa994',6,6,12,12);r('#c4c8b1',7,7,10,10);}}
   if(type===3){r('#aeb4a2',0,0,24,3);for(let y=5;y<24;y+=6)r('#536651',0,y,24,1);}
   if(type===7){r('#7c8b7a',0,1,24,2);r('#7c8b7a',0,21,24,2);for(let x=0;x<24;x+=4)r('#b6b69c',x,4,3,16);}
   if(type===9){r('#697c69',5,8,16,12);r('#a5a489',4,5,14,12);r('#c0b89b',4,5,14,2);r('#7d866f',10,7,1,10);}
   c.restore();
  }
- const base=Texture.from(canvas);base.source.scaleMode='nearest';const frames=new Map();for(let t=0;t<10;t++)for(let v=0;v<16;v++)frames.set(`${t}:${v}`,new Texture({source:base.source,frame:new Rectangle(v*24,t*24,24,24),orig:new Rectangle(0,0,48,48)}));
+ const base=Texture.from(canvas);base.source.scaleMode='nearest';const frames=new Map();for(let t=0;t<11;t++)for(let v=0;v<16;v++)frames.set(`${t}:${v}`,new Texture({source:base.source,frame:new Rectangle(v*24,t*24,24,24),orig:new Rectangle(0,0,48,48)}));
  function tile(ctx,data,x,y,size){const cells=data.terrain??[],get=(a,b)=>cells[b]?.[a]??0,t=get(x,y),h=hash(x,y),v=h%16;ctx.drawImage(canvas,v*24,t*24,24,24,0,0,size,size);const q=size/24,rect=(color,a,b,w,hh)=>{ctx.fillStyle=color;ctx.fillRect(a*q,b*q,w*q,hh*q);};
   if(t===2&&size<=12){rect('#82966d',0,0,24,24);for(const [dx,dy,rx,ry,rw,rh] of [[0,-1,0,0,24,3],[1,0,21,0,3,24],[0,1,0,21,24,3],[-1,0,0,0,3,24]])if(get(x+dx,y+dy)!==2)rect(dx+dy<0?'#9cac7d':'#6b865f',rx,ry,rw,rh);}
   const edges=[[0,-1,0,0,24,2],[1,0,22,0,2,24],[0,1,0,22,24,2],[-1,0,0,0,2,24]];

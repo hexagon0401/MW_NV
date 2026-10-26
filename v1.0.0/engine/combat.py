@@ -30,7 +30,7 @@ def engagement_target(w,u):
     candidates=[]
     for uid in ids:
         t=w.soldiers.get(uid) or w.vehicles.get(uid)
-        if t and t.team is not None and t.team!=u.team and attack_allowed(w,u,t) and can_see(w,u,t) and hypot(t.pos.x_cm-u.pos.x_cm,t.pos.y_cm-u.pos.y_cm)<=attack['range_m']*100 and multiplier(w,u,t)>0 and tank_safe(w,u,t):candidates.append(t)
+        if t and (t.team is not None or t.type_id=='AA_SITE' and t.id==u.target_id) and t.team!=u.team and attack_allowed(w,u,t) and can_see(w,u,t) and hypot(t.pos.x_cm-u.pos.x_cm,t.pos.y_cm-u.pos.y_cm)<=attack['range_m']*100 and multiplier(w,u,t)>0 and tank_safe(w,u,t):candidates.append(t)
     preferred=next((t for t in candidates if t.id==u.target_id),None)
     return preferred or min(candidates,key=lambda t:(-attack['damage']*multiplier(w,u,t)/max(1,t.hp),hypot(t.pos.x_cm-u.pos.x_cm,t.pos.y_cm-u.pos.y_cm),t.id),default=None)
 

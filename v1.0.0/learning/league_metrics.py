@@ -33,8 +33,9 @@ def finish(metrics,world,initial=None):
         metrics[team]['commands']=rows[:3]+rows[-3:] if len(rows)>6 else rows
     return dict(teams=metrics,events=dict(counts),failures=dict(failures),friendly_damage=sum(e['payload'].get('damage',0) for e in world.events if e['event_kind']=='UNIT_DAMAGED' and e['payload'].get('friendly_fire')),sequences=patterns,detector_version='league-fingerprint-1')
 
-def document(db='data/results.sqlite'):
+def document(db='data/results.sqlite',game_mode=None,scenario_id=None):
     all_rows=records(db)
+    if game_mode is not None or scenario_id is not None:all_rows=[r for r in all_rows if r['kind']=='match' and (game_mode is None or r.get('game_mode')==game_mode) and (scenario_id is None or r.get('scenario_id')==scenario_id)]
     rows=sorted([r for r in all_rows if r['kind']=='match' and r.get('league')],key=lambda r:(r.get('created_at',''),r['id']))
     runs={}
     for row in rows:
@@ -45,7 +46,7 @@ def document(db='data/results.sqlite'):
             if learner not in ('PPO1','PPO2'):continue
             values=run['learners'].setdefault(learner,dict(games=0,wins=0,losses=0,draws=0,opportunities={},selected={},role_outcomes={},recent=[]));values['games']+=1
             outcome='draws' if row['winner'] is None else 'wins' if row['winner']==('A','B').index(team) else 'losses';values[outcome]+=1
-            values['recent'].append(dict(match=row['id'],outcome=outcome,score=row['scores'],team=team,swapped=row['swapped'],policies=row['policies'],objectives=row.get('objective_stats'),fingerprint=league.get('metrics',{}).get('teams',{}).get(team)))
+            values['recent'].append(dict(game_mode=row.get('game_mode'),scenario_id=row.get('scenario_id'),mission_stats=row.get('mission_stats'),match=row['id'],outcome=outcome,score=row['scores'],team=team,swapped=row['swapped'],policies=row['policies'],objectives=row.get('objective_stats'),fingerprint=league.get('metrics',{}).get('teams',{}).get(team)))
             for role,outcomes in league.get('metrics',{}).get('teams',{}).get(team,{}).get('role_outcomes',{}).items():
                 target=values['role_outcomes'].setdefault(role,{})
                 for kind,count in outcomes.items():target[kind]=target.get(kind,0)+count

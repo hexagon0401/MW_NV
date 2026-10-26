@@ -16,7 +16,7 @@ def spool(root,checkpoint,state,full=False):
             if p.is_file() and (full or p.name in ('ppo1.npz','ppo2.npz','PPO1.json','PPO2.json','state.json')):tar.add(p,arcname=p.name)
         if full:
             for p in sorted((root/'opponents').glob('*.npz')):tar.add(p,arcname='opponents/'+p.name)
-            for p in sorted((root/'baseline').glob('*.npz')):tar.add(p,arcname='baseline/'+p.name)
+            for p in sorted((root/'baseline').glob('*')):tar.add(p,arcname='baseline/'+p.name)
         initial_report=root/'evaluations'/'games-00000000'/'report.json'
         if full and initial_report.exists():tar.add(initial_report,arcname='initial-evaluation.json')
         from .results import records
@@ -45,11 +45,15 @@ def verify(path,digest,full):
             if any(not e.isfile() or Path(e.name).is_absolute() or '..' in Path(e.name).parts or len(Path(e.name).parts)>2 for e in entries):raise ValueError('archive path')
             tar.extractall(tmp,filter='data')
         p=Path(tmp);state=json.loads((p/'state.json').read_text())
-        if state['rules_version']!=RULES_VERSION or state['contract']!='tactics-2':raise ValueError('archive contract')
+        if (state['rules_version'],state['contract']) not in (('combined-arms-4','tactics-2'),('combined-arms-5','tactics-3')):raise ValueError('archive contract')
+        if state['contract']=='tactics-3':
+            if state.get('catalog_version')!='combined-arms-3':raise ValueError('archive catalog')
+            from .mission_numpy import NumpyPolicy as CandidatePolicy
+        size=1600 if state['contract']=='tactics-3' else 1056
         for i in (1,2):
             policy=CandidatePolicy(p/f'ppo{i}.npz')
             if full:
-                model=MaskablePPO.load(p/f'ppo{i}.zip',device='cpu');obs=np.zeros(1056,dtype=np.float32);mask=np.ones(65,dtype=bool)
+                model=MaskablePPO.load(p/f'ppo{i}.zip',device='cpu');obs=np.zeros(size,dtype=np.float32);mask=np.ones(65,dtype=bool)
                 if int(model.predict(obs,deterministic=True,action_masks=mask)[0])!=policy.predict(obs,mask):raise ValueError('archive inference mismatch')
         if full:
             with gzip.open(p/'environment.json.gz','rt') as f:doc=json.load(f)
@@ -145,6 +149,7 @@ def restore_bundle(path,destination,digest):
         else:(root/name).mkdir()
     if (checkpoint/'initial-evaluation.json').exists():
         report=root/'evaluations'/'games-00000000';report.mkdir(parents=True,exist_ok=True);shutil.copyfile(checkpoint/'initial-evaluation.json',report/'report.json')
+    if (checkpoint/'validation-gates.json').exists():shutil.copyfile(checkpoint/'validation-gates.json',root/'validation-gates.json')
     if (checkpoint/'results.sqlite').exists():shutil.copyfile(checkpoint/'results.sqlite',root/'results.sqlite')
     atomic_json(root/'current.json',dict(path='checkpoints/restored'));shutil.copyfile(checkpoint/'state.json',root/'state.json')
     return root

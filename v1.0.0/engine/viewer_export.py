@@ -40,7 +40,7 @@ def frame(w):
             for c in commands:
                 orders.append(dict(team=int(team),cmd_id=c.cmd_id,op=int(c.op),unit=c.unit,arg0=c.arg0,arg1=c.arg1,
                     target=c.target,accepted_tick=c.tick,status=w.queue.status[f'{int(team)}:{c.cmd_id}']))
-    return dict(mission=dict(mode=getattr(w,'mode','conquest'),scenario_id=getattr(w,'scenario_id','2'),flags=deepcopy(getattr(w,'flags',{})),bases=deepcopy(getattr(w,'bases',{}))),presentation_version=3,decisions=decisions,rules_version=w.rules_version,projectiles=deepcopy(w.projectiles),impacts=impacts,damage=damage,shots=shots,tick=w.tick,units=units,squads=[asdict(s) for s in w.squads.values()],orders=orders,
+    return dict(mission=dict(mode=getattr(w,'mode','conquest'),scenario_id=getattr(w,'scenario_id','2'),teams={int(t):dict(credits=s.credits,tickets=s.tickets,supply=s.supply) for t,s in w.teams.items()},flags=deepcopy(getattr(w,'flags',{})),bases=deepcopy(getattr(w,'bases',{}))),presentation_version=3,decisions=decisions,rules_version=w.rules_version,projectiles=deepcopy(w.projectiles),impacts=impacts,damage=damage,shots=shots,tick=w.tick,units=units,squads=[asdict(s) for s in w.squads.values()],orders=orders,
         scores={int(t):s.score for t,s in w.teams.items()},facilities=[dict(id=f.id,kind=f.kind,
         x_cm=f.pos.x_cm,y_cm=f.pos.y_cm,owner=None if f.owner is None else int(f.owner),
         radius_cm=f.radius_cm,capturing=None if f.capturing is None else int(f.capturing),progress_ms=f.progress_ms)

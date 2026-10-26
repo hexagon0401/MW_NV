@@ -1,0 +1,46 @@
+{
+  "static_checks_passed": true,
+  "code_sha256": "85d5a469a115f6a84efc51154d33419281c8dff7d38a927c1b0a4e29e47fd3cb",
+  "geometry_complete": true,
+  "geometry_seeds_per_mode": 30,
+  "python_full_suite": {
+    "passed": 202,
+    "seconds": 335.73,
+    "scope": "full suite before final scoped contract/display corrections"
+  },
+  "python_final_contract_scope": {
+    "passed": 14
+  },
+  "javascript": {
+    "passed": 31
+  },
+  "browser": {
+    "scene_infantry": 192,
+    "scene_mobile_vehicles": 32,
+    "neutral_emplacements": [
+      4,
+      2
+    ],
+    "dpr": [
+      1,
+      2
+    ],
+    "sizes": [
+      "1440x900",
+      "1024x768",
+      "390x844"
+    ],
+    "report": "browser.json",
+    "synthetic": true
+  },
+  "performance_report": "performance.json",
+  "old_source_archive": "source-archive.json",
+  "long_running_gates": {
+    "engine_games": 30,
+    "migration_retention": "pending",
+    "mixed_pilot": 192,
+    "completed": false
+  },
+  "mac": "unverified",
+  "strategy_improvement": "unproven"
+}

@@ -7,7 +7,7 @@ import numpy as np
 import torch
 from sb3_contrib import MaskablePPO
 from stable_baselines3.common.logger import configure
-from agents.tactics import candidates as old_candidates,commands
+from agents.tactics import candidates as old_candidates,commands,compatible
 from .candidate_policy import vector as old_vector
 from .mission_features import vector,OBS_SIZE
 from .mission_policy import MissionPolicy,export
@@ -34,9 +34,18 @@ def distill(source,output,seed=0,rounds=64,epochs=10):
     model=initialize(seed);env=MissionEnv();env.reset(seed%1000);dataset=[];matched=0
     for n in range(rounds):
         for a in ('A','B'):
-            obs=env.raw(a);old=old_candidates(obs);new=env.items[a];lookup={identity(c):c['id'] for c in new};pairs=[(c['id'],lookup[identity(c)]) for c in old if identity(c) in lookup]+[(64,64)]
-            x=old_vector(obs,old);z=np.tanh(x@weights['w0'].T+weights['b0']);z=np.tanh(z@weights['w1'].T+weights['b1']);logits=z@weights['wo'].T+weights['bo'];old_ids,new_ids=map(list,zip(*pairs));target=torch.softmax(torch.tensor(logits[old_ids]),0)
-            dataset.append((torch.tensor(vector(obs,new)[None]),torch.tensor(new_ids),target));matched+=len(pairs)-1
+            obs=env.raw(a);old=old_candidates(obs);new=env.items[a];old_selected=[];new_selected=[]
+            for prefix in range(4):
+                old_available=compatible(old,old_selected);new_available=compatible(new,new_selected);lookup={identity(c):c['id'] for c in new_available};pairs=[(c['id'],lookup[identity(c)]) for c in old_available if identity(c) in lookup]+[(64,64)]
+                x=old_vector(obs,old_available);x[16]=prefix/4;x[17]=sum(c.get('supply_cost',0) for c in old_selected)/2000
+                z=np.tanh(x@weights['w0'].T+weights['b0']);z=np.tanh(z@weights['w1'].T+weights['b1']);logits=z@weights['wo'].T+weights['bo'];old_ids,new_ids=map(list,zip(*pairs));target=torch.softmax(torch.tensor(logits[old_ids]),0)
+                values=vector(obs,new_available);values[16]=prefix/4;values[17]=sum(c.get('supply_cost',0) for c in new_selected)/max(1,obs['resources']['supply'])
+                dataset.append((torch.tensor(values[None]),torch.tensor(new_ids),target));matched+=len(pairs)-1
+                choice=max([c['id'] for c in old_available]+[64],key=lambda i:(logits[i],-i))
+                if choice==64:break
+                chosen=next(c for c in old_available if c['id']==choice);key=identity(chosen)
+                if key not in lookup:break
+                old_selected.append(chosen);new_selected.append(next(c for c in new_available if c['id']==lookup[key]))
         before=env.engine.world.tick
         while env.agents and env.engine.world.tick==before:env.step({a:env.heuristic(a) for a in env.agents})
         if not env.agents:env.reset((seed+n+1)%1000)
@@ -49,9 +58,9 @@ def distill(source,output,seed=0,rounds=64,epochs=10):
         if initial is None:initial=mean
     # Distillation optimizer is deliberately discarded; PPO optimizer remains empty.
     path=Path(output);path.parent.mkdir(parents=True,exist_ok=True);model.save(path);export(model,path.with_suffix('.npz'))
-    report=dict(source_sha256=hashlib.sha256(Path(source).read_bytes()).hexdigest(),contract='tactics-3',source_contract='tactics-2',training_seeds_only=True,rounds=rounds,matched=matched,kl_initial=initial,kl_final=mean if epochs else None,critic_fresh=True,optimizer_fresh=not bool(model.policy.optimizer.state))
+    report=dict(source_sha256=hashlib.sha256(Path(source).read_bytes()).hexdigest(),contract='tactics-3',source_contract='tactics-2',training_seeds_only=True,samples=len(dataset),prefix_masks=True,rounds=rounds,matched=matched,kl_initial=initial,kl_final=mean if epochs else None,critic_fresh=True,optimizer_fresh=not bool(model.policy.optimizer.state))
     path.with_suffix('.json').write_text(json.dumps(report,indent=2)+'\n');return model,report
 
 if __name__=='__main__':
     import argparse
-    p=argparse.ArgumentParser();p.add_argument('source');p.add_argument('output');p.add_argument('--seed',type=int,default=0);p.add_argument('--rounds',type=int,default=64);a=p.parse_args();_,r=distill(a.source,a.output,a.seed,a.rounds);print(json.dumps(r))
+    p=argparse.ArgumentParser();p.add_argument('source');p.add_argument('output');p.add_argument('--seed',type=int,default=0);p.add_argument('--rounds',type=int,default=64);p.add_argument('--epochs',type=int,default=20);a=p.parse_args();_,r=distill(a.source,a.output,a.seed,a.rounds,a.epochs);print(json.dumps(r))
