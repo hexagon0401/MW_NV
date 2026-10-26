@@ -14,6 +14,7 @@ class Tile(IntEnum):
     BRIDGE=7
     OBJECTIVE=8
     OBSTACLE=9
+    HQ_FLOOR=10
 
 
 class Terrain:
@@ -42,7 +43,7 @@ class Terrain:
     def passable(self, x, y, vehicle=False):
         if not self.inside(x,y):
             return False
-        allowed = (0,1,7,8) if vehicle else (0,1,2,4,5,7,8)
+        allowed = (0,1,7,8) if vehicle else (0,1,2,4,5,7,8,10)
         return self.tile(x,y) in allowed
 
     def segment_clear(self, start, end, vehicle=False):
