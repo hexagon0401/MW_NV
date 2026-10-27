@@ -57,15 +57,13 @@ def update(model,rows,last_value,teacher):
     # A minibatch of one makes SB3 advantage std undefined. Use whole batches if needed.
     model.batch_size=next((n for n in range(min(32,len(rows)),1,-1) if len(rows)%n!=1),len(rows))
     if len(rows)<2:model.normalize_advantage=False
+    model.target_kl=.02
     model.train();model.normalize_advantage=True
-    loss=None
-    if len(teacher.rows)>=32:
-        batch=random.sample(list(teacher.rows),32);obs=torch.as_tensor(np.stack([r[0] for r in batch]));actions=torch.tensor([r[2] for r in batch]);masks=np.stack([r[1] for r in batch])
-        _,logp,_=model.policy.evaluate_actions(obs,actions,action_masks=masks)
-        objective=-.05*logp.mean();model.policy.optimizer.zero_grad();objective.backward();torch.nn.utils.clip_grad_norm_(model.policy.parameters(),.5);model.policy.optimizer.step();loss=float(objective.detach())
-        teacher.stats['imitation_updates']=teacher.stats.get('imitation_updates',0)+1
+    model.target_kl = .02
+    loss = teacher.imitate(model)
+    diagnostics = {k.removeprefix('train/'): float(v) for k,v in model.logger.name_to_value.items() if k.startswith('train/') and np.isscalar(v) and np.isfinite(v)}
     if any(not torch.isfinite(p).all() for p in model.policy.parameters()):raise ValueError('nonfinite policy')
-    return dict(steps=len(rows),imitation=loss)
+    return dict(steps=len(rows),imitation=loss,diagnostics=diagnostics,teacher=dict(teacher.stats))
 
 
 def schedule(block,seed=4701):

@@ -28,15 +28,16 @@ def play(seed,scenario_id,policies=None,swap=False,progress=None,limit=None,reco
             # Both observations fixed before either team submits; no enemy command leakage.
             observations={t:e.observe(t) for t in (0,1)};batches={}
             for t in (0,1):
-                o=observations[t];o['recent_summary']=history[t];policy=policies.get(t);old=isinstance(policy,LegacyPolicy);items=(legacy_candidates if old else candidates)(o);selected=[]
+                o=observations[t];o['recent_summary']=[];policy=policies.get(t);old=isinstance(policy,LegacyPolicy);items=(legacy_candidates if old else candidates)(o);selected=[]
                 for _ in range(4):
                     available=compatible(items,selected);mask=np.zeros(65,dtype=bool);mask[64]=True
                     for c in available:mask[c['id']]=True
-                    x=(legacy_vector if old else vector)(o,available);x[16]=len(selected)/4;x[17]=sum(c.get('supply_cost',0) for c in selected)/2000
+                    from .decision_inputs import encode
+                    x=encode(o,available,selected,mission=not old)
                     action=policy.predict(x,mask) if policy else max(available,key=lambda c:(c['score'],-c['id']))['id'] if available else 64
                     if action==64:break
                     selected.append(next(c for c in available if c['id']==action))
-                batches[t]=commands(o,selected);history[t]=x[:7].tolist()+history[t][:7]
+                batches[t]=commands(o,selected)
             for t in (0,1):
                 for command in batches[t]:
                     try:e.submit_for(t,command)

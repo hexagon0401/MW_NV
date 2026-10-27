@@ -1,3 +1,4 @@
+from learning.decision_inputs import REVISION
 import json
 import numpy as np
 from learning.mission_env import MissionTeacher
@@ -5,7 +6,7 @@ from learning.nim_budget import PairLease
 from learning.mission_coach import MissionCoach
 
 def row(i,mode,stage='supply'):
-    return (np.full(1600,i,dtype=np.float32),np.ones(65,dtype=bool),64,i%2,dict(mode=mode,stage=stage,tick=i,prefix=0))
+    return (np.full(1600,i,dtype=np.float32),np.ones(65,dtype=bool),64,i%2,dict(input_revision=REVISION,mode=mode,stage=stage,tick=i,prefix=0))
 
 def test_mode_and_stage_balancing_unique_and_restore(tmp_path):
     b=MissionTeacher()

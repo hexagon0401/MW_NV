@@ -1,3 +1,4 @@
+from learning.decision_inputs import REVISION
 import json
 from collections import deque
 from types import SimpleNamespace
@@ -10,7 +11,7 @@ import numpy as np
 def test_checkpoint_cursor_rewinds_and_reimports_completed_labels_once(tmp_path,monkeypatch):
     monkeypatch.chdir(tmp_path);root=tmp_path/'run';coach=MissionCoach(root);coach.schedule(10)
     folder=coach.root/coach.state['jobs'][0];b=MissionTeacher()
-    for team in (0,1):b.rows.append((np.zeros(1600),np.ones(65,dtype=bool),64,team,dict(tick=10,prefix=0)))
+    for team in (0,1):b.rows.append((np.zeros(1600),np.ones(65,dtype=bool),64,team,dict(input_revision=REVISION,tick=10,prefix=0)))
     b.save(folder/'samples.npz');coach.state['imported'][folder.name]=[10,1,0];coach.state['jobs']=[];coach._save()
     saved=root/'checkpoints/c/coaching';saved.mkdir(parents=True);(saved/'state.json').write_text('{"imported":{}}');(root/'current.json').write_text('{"path":"checkpoints/c"}')
     restored=MissionCoach(root);buffers=[MissionTeacher(),MissionTeacher()]
@@ -19,7 +20,7 @@ def test_checkpoint_cursor_rewinds_and_reimports_completed_labels_once(tmp_path,
 
 
 def test_resumed_outcomes_accumulate_without_updating_old_labels():
-    old=(None,None,None,None,dict(tick=0));current=(None,None,None,None,dict(tick=150))
+    old=(None,None,None,None,dict(input_revision=REVISION,tick=0));current=(None,None,None,None,dict(input_revision=REVISION,tick=150))
     teacher=SimpleNamespace(rows=deque([old,current]));totals={}
     first=record_outcomes(teacher,[dict(event_kind='DISEMBARK_DONE')],150,totals)
     result=record_outcomes(teacher,[dict(event_kind='BUILDING_ENTERED')],150,totals,first)
@@ -50,7 +51,7 @@ def test_terminal_resume_records_outcomes_without_querying_nim(tmp_path,monkeypa
     w=create(0,scenario_id='3');w.tick=149;w.scenario['time_limit_s']=30
     (folder/'world.json.gz').write_bytes(gzip.compress(json.dumps(encode(w)).encode()))
     (folder/'progress.json').write_text(json.dumps(dict(decision_tick=0,last_outcome=dict(DISEMBARK_DONE=1),stage_events=dict(DISEMBARK_DONE=1))))
-    b=MissionTeacher();b.rows.append((np.zeros(1600),np.ones(65,dtype=bool),64,0,dict(tick=0,prefix=0)));b.save(folder/'samples.npz')
+    b=MissionTeacher();b.rows.append((np.zeros(1600),np.ones(65,dtype=bool),64,0,dict(input_revision=REVISION,tick=0,prefix=0)));b.save(folder/'samples.npz')
     original=demo.Engine.step
     def step(engine,dt):
         value=original(engine,dt);engine.world.emit('UNIT_RESUPPLIED',unit=1,ammo=30);return value

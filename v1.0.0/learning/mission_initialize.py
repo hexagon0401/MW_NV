@@ -21,7 +21,7 @@ class ShapeEnv(gym.Env):
     def action_masks(self):return np.ones(65,dtype=bool)
 
 def initialize(seed=0):
-    model=MaskablePPO(MissionPolicy,ShapeEnv(),n_steps=64,batch_size=32,n_epochs=2,gamma=.99**(1/3),gae_lambda=.95**(1/3),seed=seed,device='cpu',verbose=0)
+    model=MaskablePPO(MissionPolicy,ShapeEnv(),n_steps=64,batch_size=32,n_epochs=2,target_kl=.02,gamma=.99**(1/3),gae_lambda=.95**(1/3),seed=seed,device='cpu',verbose=0)
     model.set_logger(configure(folder=None,format_strings=[]));return model
 
 def identity(c):return tuple(c['command'][k] for k in ('op','unit','target','arg0','arg1'))
@@ -39,7 +39,8 @@ def distill(source,output,seed=0,rounds=64,epochs=10):
                 old_available=compatible(old,old_selected);new_available=compatible(new,new_selected);lookup={identity(c):c['id'] for c in new_available};pairs=[(c['id'],lookup[identity(c)]) for c in old_available if identity(c) in lookup]+[(64,64)]
                 x=old_vector(obs,old_available);x[16]=prefix/4;x[17]=sum(c.get('supply_cost',0) for c in old_selected)/2000
                 z=np.tanh(x@weights['w0'].T+weights['b0']);z=np.tanh(z@weights['w1'].T+weights['b1']);logits=z@weights['wo'].T+weights['bo'];old_ids,new_ids=map(list,zip(*pairs));target=torch.softmax(torch.tensor(logits[old_ids]),0)
-                values=vector(obs,new_available);values[16]=prefix/4;values[17]=sum(c.get('supply_cost',0) for c in new_selected)/max(1,obs['resources']['supply'])
+                from .decision_inputs import encode
+                values=encode(obs,new_available,new_selected,mission=True)
                 dataset.append((torch.tensor(values[None]),torch.tensor(new_ids),target));matched+=len(pairs)-1
                 choice=max([c['id'] for c in old_available]+[64],key=lambda i:(logits[i],-i))
                 if choice==64:break

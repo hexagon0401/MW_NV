@@ -11,6 +11,12 @@ from engine.multi_scenario import create
 class MissionTeacher(TeacherBuffer):
     observation_size=OBS_SIZE
     encode=staticmethod(vector)
+    def load(self,path):
+        from .decision_inputs import REVISION
+        super().load(path)
+        valid=[r for r in self.rows if len(r)>4 and r[4].get('input_revision')==REVISION]
+        self.stats['excluded_legacy_inputs']=len(self.rows)-len(valid)
+        self.rows.clear();self.rows.extend(valid)
     def sample_rows(self):
         import os
         if os.environ.get('MW_NV_MISSION_TEACHER_BASELINE')=='1':return super().sample_rows()
@@ -45,7 +51,8 @@ class MissionEnv(CandidateEnv):
         if hasattr(self,'teacher_hook') and self.engine.world.tick%150==0 and not getattr(self.engine.world,'ended',False):self.teacher_hook(self)
     def vector(self,a):
         raw=self.cached_observations[a] if getattr(self,'cached_tick',None)==self.engine.world.tick else self.raw(a)
-        values=vector(raw,compatible(self.items[a],self.selected[a]));values[16]=len(self.selected[a])/4;values[17]=sum(c.get('supply_cost',0) for c in self.selected[a])/max(1,raw['resources']['supply']);return values
+        from .decision_inputs import encode
+        return encode(raw,compatible(self.items[a],self.selected[a]),self.selected[a],mission=True)
     def command_batch(self,a):
         from agents.mission_tactics import commands
         return commands(self.raw(a),self.selected[a])

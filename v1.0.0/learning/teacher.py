@@ -39,9 +39,10 @@ class TeacherBuffer:
                     available=compatible(env.items[a],selected);mask=np.zeros(65,dtype=bool);mask[64]=True
                     for c in available:mask[c['id']]=True
                     if not mask[action]:raise ValueError('teacher mask')
-                    values=self.encode(obs,available);values[16]=len(selected)/4;values[17]=sum(c.get('supply_cost',0) for c in selected)/2000
+                    from .decision_inputs import encode,REVISION
+                    values=encode(obs,available,selected,mission=self.observation_size==1600)
                     chosen=next((c for c in available if c['id']==action),None)
-                    staged.append((values,mask,action,team,dict(mode=obs.get('mission',{}).get('mode','conquest'),stage=chosen['role'] if chosen else 'end',prefix=len(selected),source=getattr(env,'teacher_source','ordinary'),tick=obs.get('tick',0))))
+                    staged.append((values,mask,action,team,dict(input_revision=REVISION,mode=obs.get('mission',{}).get('mode','conquest'),stage=chosen['role'] if chosen else 'end',prefix=len(selected),source=getattr(env,'teacher_source','ordinary'),tick=obs.get('tick',0))))
                     if action!=64:selected.append(next(c for c in available if c['id']==action))
             self.rows.extend(staged);self.last_batches=batches;self.stats['paired']+=1
             self.stats.update(consecutive_network_failures=0,last_error=None,last_error_code=None)
@@ -69,13 +70,8 @@ class TeacherBuffer:
         if min(map(len,groups))<16:return []
         return random.sample(groups[0],16)+random.sample(groups[1],16)
     def imitate(self,model):
-        import torch
-        rows=self.sample_rows()
-        if not rows:return None
-        obs=torch.as_tensor(np.stack([r[0] for r in rows]),device=model.device)
-        actions=torch.as_tensor([r[2] for r in rows],device=model.device)
-        masks=np.stack([r[1] for r in rows]);_,log_prob,_=model.policy.evaluate_actions(obs,actions,action_masks=masks)
-        loss=-.05*log_prob.mean();model.policy.optimizer.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(model.policy.parameters(),.5);model.policy.optimizer.step();return float(loss.detach().cpu())
+        from .update_safety import imitate
+        return imitate(model,self.sample_rows(),self.stats)
 
 from sb3_contrib import MaskablePPO
 class TeacherPPO(MaskablePPO):
@@ -85,4 +81,4 @@ class TeacherPPO(MaskablePPO):
         if getattr(self,'teacher_buffer',None) is not None:
             loss=self.teacher_buffer.imitate(self)
             if loss is not None:
-                self.logger.record('train/teacher_loss',loss);self.teacher_buffer.stats['imitation_updates']=self.teacher_buffer.stats.get('imitation_updates',0)+1;self.teacher_buffer.stats['last_imitation_loss']=loss
+                self.logger.record('train/teacher_loss',loss);self.teacher_buffer.stats['last_imitation_loss']=loss
