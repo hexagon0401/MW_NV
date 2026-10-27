@@ -24,7 +24,7 @@ def multiplier(w,attacker,target):
 
 def engagement_target(w,u):
     attack=spec(w,u)['attack']
-    if not u.alive or getattr(u,'carrier_id',None) is not None or not attack or u.ammo<=0 or u.type_id=='SPH':return None
+    if u.task_state=='RESUPPLYING' or not u.alive or getattr(u,'carrier_id',None) is not None or not attack or u.ammo<=0 or u.type_id=='SPH':return None
     # Sensing is shared by team, but direct fire still requires this actor's LOS/range.
     ids=getattr(w,'visible',{}).get(u.team,[])
     candidates=[]
@@ -97,7 +97,7 @@ def fire_mission(w,key,c):
     iy=max(0,min(w.config.map_height_m*100-1,round(y+sin(angle)*radius)))
     projectile=dict(unit=u.id,team=int(u.team),fired_tick=w.tick,origin=dict(x_cm=u.pos.x_cm,y_cm=u.pos.y_cm),x_cm=ix,y_cm=iy,impact_tick=w.tick+settings['flight_ticks'],damage=spec(w,u)['attack']['damage'])
     w.projectiles.append(projectile);u.ammo-=1;u.cooldown_ms=spec(w,u)['attack']['interval_ms'];u.turret_heading=atan2(y-u.pos.y_cm,x-u.pos.x_cm)
-    w.emit('ARTILLERY_FIRED',**projectile,blast_m=settings['blast_m']);return True
+    w.emit('ARTILLERY_FIRED',**projectile,blast_m=settings['blast_m'],ammo=u.ammo);return True
 
 
 def deployment(w,u,pack=False):
@@ -134,7 +134,7 @@ def update_combat(w):
         if u.type_id=='MBT' and hit:
             w.emit('TANK_IMPACT',unit=u.id,target=target.id,**impact,blast_m=splash['blast_m'])
             for other,amount in plan:damage_unit(w,other,amount,u.id,'tank_splash')
-        w.emit('ABSTRACT_ATTACK',unit=u.id,target=target.id,damage=damage,hit=hit,weapon=spec(w,u)['weapon'],origin=dict(x_cm=u.pos.x_cm,y_cm=u.pos.y_cm),destination=dict(x_cm=target.pos.x_cm,y_cm=target.pos.y_cm),range_m=attack['range_m'],distance_m=round(hypot(target.pos.x_cm-u.pos.x_cm,target.pos.y_cm-u.pos.y_cm)/100,2),hit_probability=chance,target_hp=target.hp)
+        w.emit('ABSTRACT_ATTACK',unit=u.id,ammo=u.ammo,target=target.id,damage=damage,hit=hit,weapon=spec(w,u)['weapon'],origin=dict(x_cm=u.pos.x_cm,y_cm=u.pos.y_cm),destination=dict(x_cm=target.pos.x_cm,y_cm=target.pos.y_cm),range_m=attack['range_m'],distance_m=round(hypot(target.pos.x_cm-u.pos.x_cm,target.pos.y_cm-u.pos.y_cm)/100,2),hit_probability=chance,target_hp=target.hp)
     remaining=[]
     for shot in w.projectiles:
         if w.tick<shot['impact_tick']:remaining.append(shot);continue

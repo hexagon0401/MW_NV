@@ -33,6 +33,7 @@ def transfer_cargo(w,truck_id,amount):
     if amount>=0:debit(w,truck.team,supply=amount)
     else:w.teams[truck.team].supply-=amount
     truck.cargo_supply+=amount
+    w.emit('SUPPLY_CHANGED',vehicle=truck.id,cargo_supply=truck.cargo_supply)
 
 
 def resupply(w,key,c):
@@ -47,24 +48,31 @@ def resupply(w,key,c):
         raise OrderError('ILLEGAL_STATE')
     if not hasattr(w,'supply_timers'):w.supply_timers={}
     w.supply_timers[key]=w.supply_timers.get(key,0)+200
-    changes=[];cost=0
-    for u in units:
-        if u.id in w.soldiers:
-            spec=w.unit_specs[u.type_id]
-            fields={'ammo':spec['ammo'],'heal_pool':spec['heal_pool'],'repair_pool':spec['repair_pool']}
-            cost+=ceil(max(0,fields['ammo']-u.ammo)/10)*2+ceil(max(0,fields['heal_pool']-u.heal_pool)/10)+ceil(max(0,fields['repair_pool']-u.repair_pool)/10)
-        else:
-            fields={'fuel':w.vehicle_specs[u.type_id]['fuel_max'],'ammo':w.vehicle_specs[u.type_id]['ammo']}
-            cost+=ceil(max(0,fields['fuel']-u.fuel)/10)*3+ceil(max(0,fields['ammo']-u.ammo)/10)*2
-        changes.append((u,fields))
     stock=node.cargo_supply if c.target in w.vehicles else w.teams[c.team].supply
-    if stock<cost:raise OrderError('INSUFFICIENT_SUPPLY')
+    if stock<=0:raise OrderError('INSUFFICIENT_SUPPLY')
     if w.supply_timers[key]<4000:return False
+    # Allocate finite stock in stable ID/field order; never create negative resources.
+    remaining=stock;changes=[]
+    for u in sorted(units,key=lambda u:u.id):
+        spec=(w.unit_specs if u.id in w.soldiers else w.vehicle_specs)[u.type_id]
+        fields=(('ammo',spec['ammo'],2),('heal_pool',spec['heal_pool'],1),('repair_pool',spec['repair_pool'],1)) if u.id in w.soldiers else (('ammo',spec['ammo'],2),('fuel',spec['fuel_max'],3))
+        if u.type_id=='TRK' and c.target in w.facilities:fields=fields+(('cargo_supply',spec['cargo_capacity'],1),)
+        values={}
+        for name,maximum,price in fields:
+            current=getattr(u,name);missing=max(0,maximum-current)
+            batch=1 if name=='cargo_supply' else 10
+            amount=min(missing,(remaining//price)*batch)
+            if amount:
+                remaining-=ceil(amount/batch)*price;values[name]=current+amount
+        changes.append((u,values))
+    cost=stock-remaining
+    if not cost:raise OrderError('INSUFFICIENT_SUPPLY')
     if c.target in w.vehicles:
-        node.cargo_supply-=cost;w.emit('SUPPLY_CHANGED',vehicle=node.id,cost=cost)
+        node.cargo_supply-=cost;w.emit('SUPPLY_CHANGED',vehicle=node.id,cost=cost,cargo_supply=node.cargo_supply)
     else:debit(w,c.team,supply=cost)
-    for u,fields in changes:
-        for name,value in fields.items():setattr(u,name,value)
+    for u,values in changes:
+        for name,value in values.items():setattr(u,name,value)
+        w.emit('UNIT_RESUPPLIED',unit=u.id,node=c.target,**values)
     return True
 
 

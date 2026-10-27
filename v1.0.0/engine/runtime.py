@@ -86,6 +86,11 @@ class Engine:
 
         from .emplacements import update as update_emplacements
         update_emplacements(w)
+        active_supply=set()
+        for key,c in w.queue.commands.items():
+            if c.op==Op.RESUPPLY and w.queue.status[key]=='RUNNING':active_supply.update(w.squads[c.unit].member_ids if c.unit in w.squads else [c.unit])
+        for u in [*w.soldiers.values(),*w.vehicles.values()]:
+            if u.task_state=='RESUPPLYING' and u.id not in active_supply:u.task_state='IDLE'
         update_combat(w)
         update_mode_rules(w)
         regenerate(w)
@@ -136,7 +141,14 @@ class Engine:
             purchase(w,c);w.queue.finish(w,key);return
         if c.op in (Op.RESUPPLY,Op.HEAL,Op.REPAIR):
             w.queue.status[key]="RUNNING"
-            if ({Op.RESUPPLY:resupply,Op.HEAL:heal,Op.REPAIR:repair}[c.op])(w,key,c):w.queue.finish(w,key)
+            if c.op==Op.RESUPPLY:
+                ids=w.squads[c.unit].member_ids if c.unit in w.squads else [c.unit]
+                units=[w.soldiers.get(i) or w.vehicles.get(i) for i in ids]
+                complete=resupply(w,key,c)
+                for u in units:
+                    if u and u.alive:u.task_state='IDLE' if complete else 'RESUPPLYING'
+                if complete:w.queue.finish(w,key)
+            elif ({Op.HEAL:heal,Op.REPAIR:repair}[c.op])(w,key,c):w.queue.finish(w,key)
             return
         if c.op==Op.DISEMBARK:
             w.queue.status[key]="RUNNING"

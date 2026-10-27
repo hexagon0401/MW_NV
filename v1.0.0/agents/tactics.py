@@ -5,7 +5,7 @@ from collections import defaultdict
 
 CONTRACT='tactics-2'
 ROLES=('capture','defend','recon','anti_armor','fire','transport','supply','repair','retreat')
-BUSY=('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS','UNLOADING','DEPLOYING','PACKING','WAITING_TRAFFIC')
+BUSY=('MOVING','TAKEOFF','LANDING','WAITING_PASSENGERS','UNLOADING','DEPLOYING','PACKING','WAITING_TRAFFIC','RESUPPLYING')
 
 
 def distance(a,b):return hypot(a['pos']['x_cm']-b['pos']['x_cm'],a['pos']['y_cm']-b['pos']['y_cm'])/100
@@ -114,11 +114,11 @@ def candidates(obs):
         if any(u['type_id']=='REC' for u in troops) and objectives:
             f=objectives[(g['id']+obs['tick']//150)%len(objectives)];goto(g,'recon',f,70-distance(actor,f)*.1,'거점 접근 정찰')
         if hp<.35 and depots:goto(g,'retreat',min(depots,key=lambda d:distance(actor,d)),115,'분대 체력 부족',10)
-        low=any(catalog['units'][u['type_id']]['ammo'] and u['ammo']<max(1,catalog['units'][u['type_id']]['ammo']*.2) for u in troops)
+        low=any(catalog['units'][u['type_id']]['ammo'] and u['ammo']<max(1,catalog['units'][u['type_id']]['ammo']*.25) for u in troops)
         if low and depots:
             depot=min(depots,key=lambda d:distance(actor,d))
-            if all(distance(u,depot)<=3 for u in troops):add(g,'supply',125,'탄약 부족·재보급',8,target=depot['id'])
-            else:goto(g,'supply',depot,110-distance(actor,depot)*.1,'탄약 부족·보급 이동')
+            if all(distance(u,depot)<=3 for u in troops):add(g,'supply',185,'탄약 부족·재보급',8,target=depot['id'])
+            else:goto(g,'supply',depot,180 if any(u['ammo']==0 and catalog['units'][u['type_id']]['ammo'] for u in troops) else 145,'탄약 부족·보급 이동')
         if objectives:
             objective=min((f for f in objectives if f['owner']!=obs['team']),key=lambda f:distance(actor,f),default=objectives[0])
             if distance(actor,objective)>150:
@@ -144,12 +144,12 @@ def candidates(obs):
     for v in sorted(vehicles,key=lambda v:v['id']):
         vs=catalog['vehicles'][v['type_id']]
         if v['task_state'] in BUSY:continue
-        if v['fuel']<20 or vs['ammo'] and v['ammo']<max(1,vs['ammo']*.2):
+        if v['fuel']<20 or vs['ammo'] and v['ammo']<max(1,vs['ammo']*.25):
             if depots:
                 depot=min((d for d in depots if d['id']!=v['id']),key=lambda d:distance(v,d),default=None)
                 if depot:
                     if distance(v,depot)<=3:add(v,'supply',140,'차량 연료·탄약 보급',8,target=depot['id'])
-                    elif v['deployment']=='PACKED' and v['fuel']>0:goto(v,'supply',depot,130,'차량 보급 이동',7)
+                    elif v['deployment']=='PACKED' and v['fuel']>0:goto(v,'supply',depot,180 if vs['ammo'] and v['ammo']==0 else 145,'차량 보급 이동',7)
                     elif v['deployment']!='PACKED':add(v,'supply',130,'보급 이동 전 철수',16)
             continue
         from engine.traffic import arrival_slot
