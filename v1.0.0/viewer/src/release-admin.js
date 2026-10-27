@@ -8,7 +8,7 @@ export async function releaseAdmin(req,env,session,helpers,fetcher){
  const keys=['request_id','release_id','content_digest','action','enabled'];
  if(!body||Array.isArray(body)||Object.keys(body).length!==keys.length||keys.some(k=>!Object.hasOwn(body,k))||!['apply','set_auto','rollback'].includes(body.action)||!/^[a-z0-9][a-z0-9-]{0,63}$/.test(body.release_id??'')||!/^[a-f0-9]{64}$/.test(body.content_digest??'')||!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(body.request_id??'')||(body.action==='set_auto'?typeof body.enabled!=='boolean':body.enabled!==null))return response({error:'invalid_release_command'},400);
  try{
-  const index=await store(env,'releases/index.json','GET',undefined,fetcher),item=index.items?.find(r=>r.id===body.release_id),online=Date.now()/1000-index.last_seen<45;
+  const index=await store(env,'releases/index.json','GET',undefined,fetcher),item=index.items?.find(r=>r.id===body.release_id),online=Date.now()/1000-index.last_seen<45&&Date.now()/1000>=index.last_seen-60;
   if(!item||item.content_digest!==body.content_digest)return response({error:'stale_release'},409);
   const old=await maybeStore(env,'releases/acks/'+body.request_id+'.json',fetcher);
   if(old){if(keys.some(k=>old.request_fields?.[k]!==body[k]))return response({error:'id_conflict'},409);return response(old,202);}

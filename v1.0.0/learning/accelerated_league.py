@@ -25,7 +25,7 @@ def trajectory_rows(model,paths,packets):
     return rows
 
 
-def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,fixed_workers=None,collection_rounds=64):
+def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,fixed_workers=None,collection_rounds=64,stop_after_pilot=False):
     root=Path(root);root.mkdir(parents=True,exist_ok=True);torch.set_num_threads(1)
     if os.environ.get('MW_NV_EXPERIMENT_SEED'):
         experiment_seed=int(os.environ['MW_NV_EXPERIMENT_SEED']);random.seed(experiment_seed);np.random.seed(experiment_seed);torch.manual_seed(experiment_seed)
@@ -42,6 +42,10 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
     os.environ['MW_NV_ASYNC_IO']='1'
     backend=importlib.import_module('.mission_league' if kind=='mission' else '.league',__package__)
     evaluation=importlib.import_module('.mission_evaluate' if kind=='mission' else '.league_evaluate',__package__)
+    if kind=='mission' and os.environ.get('MW_NV_PUBLISH_TRAINING')=='1':
+        active_path=Path(os.environ.get('MW_NV_INSTALLATION_BASE',Path(__file__).resolve().parents[1]))/'data/releases/active.json'
+        active=json.loads(active_path.read_text()) if active_path.exists() else {}
+        if active.get('root')!=str(root.resolve()):raise ValueError('operational mission requires release Apply authorization')
     if kind=='mission' and not max_updates:
         gate=root/'validation-gates.json'
         if not gate.exists() or not json.loads(gate.read_text()).get('approved_for_pilot'):raise ValueError('T11 validation gates required')
@@ -180,13 +184,17 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             milestone=state['completed_games']//evaluation_step*evaluation_step
             evaluation_games=milestone if (root/'evaluations'/f'games-{milestone:08d}'/'report.json').exists() else state['completed_games']
             report('evaluation',True);evaluation.evaluate(root,models,dict(state,completed_games=evaluation_games),report);state['last_evaluation']=milestone;checkpoint()
-        if not max_updates:evaluation.ensure_initial_worker(root,state)
+        if not max_updates:
+            evaluation.ensure_initial_worker(root,state)
+            if os.environ.get('MW_NV_SERIAL_INITIAL_EVALUATION')=='1':
+                while not evaluation.initial_complete(root) and not stopped():report('evaluation',True);time.sleep(1)
         adaptive.resume_measurement()
+        def resource_paused():return os.environ.get('MW_NV_RELEASE_PILOT')=='1' and (root/'resource-pause.json').exists()
         while not stopped() and (not max_updates or updates<max_updates):
-            if control.paused():
+            if control.paused() or resource_paused():
                 if coach:coach.poll(buffers,[os.getpid()],True)
                 checkpoint();report('paused',True)
-                while control.paused() and not stopped():
+                while (control.paused() or resource_paused()) and not stopped():
                     teacher.drain();report('paused');time.sleep(1)
                 adaptive.resume_measurement()
                 if stopped():break
@@ -197,7 +205,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             if coach and coach.running():active=min(active,max(1,int(resources()['cpu_budget'])-2))
             while len(slots)<active:add_slot()
             for index,slot in enumerate(slots):slot['worker'].call('mark','RUNNING' if index<active else 'WAITING')
-            while total_rounds<collection_rounds and not stopped() and not control.paused():
+            while total_rounds<collection_rounds and not stopped() and not control.paused() and not resource_paused():
                 ids=list(range(min(active,collection_rounds-total_rounds)))
                 for index in ids:
                     if not slots[index]['info']['active']:begin(index)
@@ -262,8 +270,9 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
                     index=min(eligible,key=lambda i:(i-origin)%len(slots));slot=slots[index]
                     frozen=slot['worker'].call('teacher');teacher.offer(frozen,slot['info']['assignments'],index,state['generation'])
                 teacher.drain();report()
+                if stop_after_pilot and state['completed_games']>=pilot:break
             if not total_rounds:
-                if control.paused() and not stopped():continue
+                if (control.paused() or resource_paused()) and not stopped():continue
                 break
             # Each trajectory gets its own terminal/bootstrap GAE before flattening.
             teacher.drain()
@@ -277,7 +286,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             state['generation']+=1;updates+=1
             if not fixed_workers:
                 reserve=int(not max_updates and not evaluation.initial_complete(root))
-                adaptive.observe(batch_sim,reserved=reserve)
+                adaptive.observe(batch_sim,reserved=reserve+__import__('learning.adaptive_resources',fromlist=['release_reservation']).release_reservation())
             else:adaptive.workers=fixed_workers;adaptive.reason='verification_fixed_workers'
             pinned={s['info'].get('fixed_opponent') for s in slots};fixed_cache={k:v for k,v in fixed_cache.items() if k in pinned}
             # Counters and all environments become durable before remote enqueue.
@@ -307,6 +316,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             else:commit_metadata(root,state)
             report('checkpoint_saved',True)
             if evaluated:adaptive.resume_measurement()
+            if stop_after_pilot and state['completed_games']>=pilot and state.get('pilot_report'):break
     except InterruptedError:pass
     except RuntimeError as exc:
         if str(exc)!='ARCHIVE_DISK_LIMIT':raise
@@ -324,8 +334,8 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
 
 if __name__=='__main__':
     import fcntl
-    p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--source',required=True);p.add_argument('--kind',choices=['legacy','mission'],default='legacy');p.add_argument('--pilot',type=int,default=200);p.add_argument('--updates',type=int,default=0);p.add_argument('--no-teacher',action='store_true');p.add_argument('--workers',type=int,choices=(1,2,3));a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--source',required=True);p.add_argument('--kind',choices=['legacy','mission'],default='legacy');p.add_argument('--pilot',type=int,default=200);p.add_argument('--updates',type=int,default=0);p.add_argument('--no-teacher',action='store_true');p.add_argument('--workers',type=int,choices=(1,2,3));p.add_argument('--stop-after-pilot',action='store_true');a=p.parse_args()
     root=Path(a.root);root.mkdir(parents=True,exist_ok=True);lock=(root/'runner.lock').open('a')
     try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     except BlockingIOError:raise SystemExit('league worker already running')
-    (root/'runner.pid').write_text(str(os.getpid()));run(root,a.source,a.kind,a.pilot,a.updates,not a.no_teacher,fixed_workers=a.workers)
+    (root/'runner.pid').write_text(str(os.getpid()));run(root,a.source,a.kind,a.pilot,a.updates,not a.no_teacher,fixed_workers=a.workers,stop_after_pilot=a.stop_after_pilot)

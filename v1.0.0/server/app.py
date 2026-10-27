@@ -15,6 +15,26 @@ def create_app(store=None,live_runner=None,lifespan=None):
         data=json.loads(path.read_text())
         if not data.get('summary',{}).get('ended'):raise HTTPException(404)
         return data
+    def release_registry():
+        from server.releases import Registry
+        folder=root/'releases'
+        if not (folder/'registry.sqlite').exists():raise HTTPException(503,'release registry unavailable')
+        return Registry(folder)
+    @app.get('/api/releases')
+    def releases():
+        from server.release_observations import read
+        import time
+        registry=release_registry();snapshot=read(root/'releases/snapshot.json');online=time.time()-snapshot.get('last_seen',0)<45
+        return dict(schema=1,items=registry.all(),updated_at=snapshot.get('updated_at'),online=online)
+    @app.get('/api/releases/{id}')
+    def release(id:str):
+        try:return release_registry().get(id)
+        except (KeyError,ValueError):raise HTTPException(404,'release not found')
+    @app.get('/api/releases/{id}/events')
+    def release_events(id:str,after:int|None=Query(None,ge=0),before:int|None=Query(None,ge=0)):
+        if after is not None and before is not None:raise HTTPException(400,'invalid cursor')
+        try:return dict(items=release_registry().events(id,after,before))
+        except ValueError:raise HTTPException(400,'invalid release query')
     @app.get('/api/insights')
     def learning_insights(game_mode:str='',scenario_id:str='',learner:str='',generation:int|None=None,execution_kind:str='',evidence:str=''):
         from learning.league_metrics import document

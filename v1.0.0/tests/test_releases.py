@@ -48,3 +48,33 @@ def test_terminal_events_paginate_without_exposing_journal(tmp_path):
     rows=r.events('test');assert len(rows)==200 and rows==sorted(rows,key=lambda r:r['seq'])
     older=r.events('test',before=rows[0]['seq']);assert older[-1]['seq']<rows[0]['seq']
     assert r.events('test',after=rows[-1]['seq'])==[]
+
+
+def test_declared_required_checks_cannot_be_missing_or_made_optional(tmp_path):
+    r=Registry(tmp_path);s=spec();s['validation_plan']=['engine','pilot'];d=r.register(s)
+    r.observe('test',dict(steps=[dict(id='engine',state='PASS')],evidence_digest=d));assert r.get('test')['status']!='READY'
+    r.observe('test',dict(steps=[dict(id='engine',state='PASS'),dict(id='pilot',state='FAIL',required=False)],evidence_digest=d));assert r.get('test')['status']!='READY'
+
+
+def test_retry_after_request_expiration_keeps_original_ack(tmp_path):
+    r=Registry(tmp_path);d=ready(r);payload=cmd(d);result=r.command(payload)
+    assert r.command(payload,now=payload['expires_at']+1000)==result
+
+
+def test_remote_automatic_intent_can_restore_after_local_registry_loss(tmp_path):
+    from server.release_service import restore_authorizations
+    original=Registry(tmp_path/'old');d=ready(original);payload=cmd(d,'set_auto',True);original.command(payload)
+    restored=Registry(tmp_path/'new');ready(restored)
+    class Store:
+        bucket='private'
+        def _request(self,*args):
+            import json
+            return json.dumps(payload).encode()
+    restore_authorizations(restored,Store());assert restored.get('test')['auto_apply']
+
+
+def test_changed_artifacts_clear_auto_without_erasing_history(tmp_path):
+    r=Registry(tmp_path);d=ready(r);r.command(cmd(d,'set_auto',True))
+    r.observe('test',dict(steps=[dict(id='engine',state='WAIT')],evidence_digest=None,invalidated=True))
+    assert not r.get('test')['auto_apply']
+    assert any(e['code']=='AUTO_INVALIDATED' for e in r.events('test'))

@@ -80,6 +80,9 @@ def resume_if_needed(root,base):
     root=Path(root);s=state(root)
     if s['desired']!='running':return
     spec=json.loads((root/'run.json').read_text());base=Path(base).resolve();allowed={base/'data/league-v1',base/'data/multi-mode-v1'};run_root=Path(spec['root']).resolve();source=Path(spec['source']).resolve()
+    active_path=base/'data/releases/active.json'
+    active=json.loads(active_path.read_text()) if active_path.exists() else {}
+    if active.get('root') and Path(active['root']).resolve().is_relative_to(base/'data/releases/production'):allowed.add(Path(active['root']).resolve())
     if run_root not in allowed or not source.is_relative_to(base/'data') or spec['kind'] not in ('legacy','mission') or type(spec['pilot'])is not int or not 1<=spec['pilot']<=100000:raise ValueError('unregistered runner')
     if process_start(spec['pid'])==spec.get('process_start') and spec.get('process_start') is not None:return
     try:
@@ -88,5 +91,9 @@ def resume_if_needed(root,base):
     except (OSError,ValueError):pass
     if (run_root/'STOP').exists():raise ValueError('runner blocked by validation/stop marker')
     if not (run_root/'current.json').exists():raise ValueError('local recovery required')
+    legacy_runtime_path=base/'data/releases/legacy-runtime.json'
+    legacy_runtime=json.loads(legacy_runtime_path.read_text()) if legacy_runtime_path.exists() else {}
+    runtime=Path(active['runtime']) if active.get('root')==str(run_root) else Path(legacy_runtime['runtime']) if legacy_runtime.get('root')==str(run_root) else base
+    if runtime!=base and not runtime.resolve().is_relative_to(base/'data/releases/artifacts'):raise ValueError('unregistered runtime')
     with (run_root/'adaptive.log').open('ab') as log:
-        subprocess.Popen([sys.executable,'-u','-m','learning.accelerated_league','--kind',spec['kind'],'--root',str(run_root),'--source',str(source),'--pilot',str(spec['pilot'])],cwd=base,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
+        subprocess.Popen([sys.executable,'-u','-m','learning.accelerated_league','--kind',spec['kind'],'--root',str(run_root),'--source',str(source),'--pilot',str(spec['pilot'])],cwd=runtime,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)

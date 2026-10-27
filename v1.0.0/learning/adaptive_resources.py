@@ -45,3 +45,13 @@ class Adaptive:
             self.reason=reason;self.since=now;self.sim=0.;self.blocks=0
             if reason!='steady':self.next_trial=now+120
         return dict(workers=self.workers,cpu_budget=r['cpu_budget'],reason=self.reason,resource=r)
+
+
+def release_reservation():
+    import json
+    from server.telemetry import process_start
+    try:
+        r=json.loads(Path('data/releases/reservation.json').read_text())
+        if process_start(r['pid'])==r['start'] and time.time()-r['updated_at']<90:return min(2,max(0,int(r['cores'])))
+    except (OSError,ValueError,KeyError):pass
+    return 0

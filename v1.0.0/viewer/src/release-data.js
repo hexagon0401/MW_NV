@@ -1,7 +1,7 @@
 import {cloudRequest} from './cloud-data.js';
 const idPattern=/^[a-z0-9][a-z0-9-]{0,63}$/;
 export async function releaseData(env,url,path,fetcher=fetch){
- const base='/storage/v1/object/authenticated/'+(env.REPLAY_BUCKET??'mw-nv-replays')+'/',index=await cloudRequest(env,base+'releases/index.json',fetcher),online=Number.isFinite(index.last_seen)&&Date.now()/1000-index.last_seen<45;
+ const base='/storage/v1/object/authenticated/'+(env.REPLAY_BUCKET??'mw-nv-replays')+'/',index=await cloudRequest(env,base+'releases/index.json',fetcher),online=Number.isFinite(index.last_seen)&&Date.now()/1000-index.last_seen<45&&Date.now()/1000>=index.last_seen-60;
  const parts=path.split('/').filter(Boolean);if(parts.length===0)return {...index,online,items:index.items.map(({event_pages,...r})=>r)};
  const [id,section]=parts;if(!idPattern.test(id)||parts.length>2)throw Error('invalid_release');const row=index.items.find(r=>r.id===id);if(!row)throw Error('not_found');
  if(!section){const {event_pages,...item}=row;return {...item,online,last_seen:index.last_seen};}

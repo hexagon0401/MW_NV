@@ -12,7 +12,7 @@ def fingerprint(base):
 def ready(base,audit):
     try:
         report=json.loads((audit/'engine-audit.json').read_text());pin=json.loads((audit/'validation-code.json').read_text())
-        return report.get('complete') is True and len(report.get('results',[]))==30 and Counter(r.get('scenario_id') for r in report['results'])=={'2':10,'3':10,'4':10} and all(r.get('replay_hash_verified') for r in report['results']) and pin.get('sha256')==fingerprint(base)
+        return report.get('complete') is True and len(report.get('results',[]))==30 and Counter(r.get('scenario_id') for r in report['results'])=={'2':10,'3':10,'4':10} and all(r.get('replay_hash_verified') for r in report['results']) and pin.get('sha256')==fingerprint(Path(json.loads((audit/'release-staging.json').read_text())['runtime']) if (audit/'release-staging.json').exists() else base)
     except (OSError,ValueError,KeyError):return False
 
 
@@ -28,7 +28,7 @@ def run(base,audit,root,updates=128):
     def status(phase,**extra):
         p=root/'status.json';temp=p.with_suffix('.partial');temp.write_text(json.dumps(dict(phase=phase,pid=os.getpid(),updated_at=time.time(),updates=updates,**extra)));temp.replace(p)
     os.nice(15)
-    while not ready(base,audit) or not pilot_ready(audit):status('WAITING_MIXED_PILOT');time.sleep(30)
+    while not ready(base,audit) or not pilot_ready(Path(json.loads((audit/'release-staging.json').read_text())['pilot']) if (audit/'release-staging.json').exists() else audit):status('WAITING_MIXED_PILOT');time.sleep(30)
     source=audit/'migrated';status('RUNNING_COMPARISON')
     env=dict(os.environ,OMP_NUM_THREADS='1',OPENBLAS_NUM_THREADS='1',MKL_NUM_THREADS='1',MW_NV_TORCH_THREADS='1',MPLCONFIGDIR='/tmp/mw-mpl',MW_NV_ACTIVITY_ROOT=str(root/'activity'),MW_NV_PUBLISH_TRAINING='0')
     result=subprocess.run([sys.executable,'-u','-m','learning.teacher_comparison','--root',str(root),'--source',str(source),'--updates',str(updates)],cwd=base,env=env)

@@ -26,13 +26,15 @@ def mixed(spec,paths,content_digest):
         failed=any(r.get('complete') and r.get('replay_hash_verified') is False for r in cases)
         state='FAIL' if failed else 'PASS' if passed==10 else 'RUN' if status.get('stage')=='engine_audit' and status.get('status')=='running' else 'WAIT'
         steps.append(step('engine-'+mode,'맵 '+mode+' '+name+' 엔진 진단',state,passed,10))
-    retention=read(root/'migration-retention.json');steps.append(step('retention','기존 맵 2 정책 유지 평가','PASS' if retention.get('complete') and retention.get('retained') else 'FAIL' if retention.get('complete') else 'RUN' if status.get('stage','').startswith('migration_retention') and status.get('status')=='running' else 'WAIT',len(retention.get('results',[])),None))
+    retention=read(root/'migration-retention.json');retention_total=400 if status.get('stage')=='migration_retention_confirmation' or len({r['seed'] for r in retention.get('results',[])})>5 else 80
+    retention_done=retention.get('complete') and len(retention.get('results',[]))==retention_total
+    steps.append(step('retention','기존 맵 2 정책 유지 평가','PASS' if retention_done and retention.get('retained') else 'FAIL' if retention_done else 'RUN' if status.get('stage','').startswith('migration_retention') and status.get('status')=='running' else 'WAIT',len(retention.get('results',[])),retention_total))
     state=read(pilot/'state.json');games=state.get('completed_games',0)
     steps.append(step('pilot','격리 혼합 학습 파일럿','PASS' if games>=192 else 'RUN' if state.get('run') else 'WAIT',min(192,games),192))
     latest=read(pilot/'evaluations'/f'games-{games:08d}'/'report.json');initial=read(pilot/'evaluations/games-00000000/report.json');verdict=state.get('pilot_report',{});confirmation=read(pilot/'confirmation-report.json')
     needs_confirmation=any(v.get('mean',0)>0 for v in verdict.get('modes',{}).values())
     fixed_ready=games>=192 and initial.get('complete') and latest.get('complete') and verdict and not verdict.get('pause',True) and (not needs_confirmation or confirmation and not confirmation.get('pause',True))
-    steps.append(step('evaluation','模드별 필수 고정·확인 평가'.replace('模','모'),'PASS' if fixed_ready else 'FAIL' if verdict.get('pause') else 'RUN' if latest and not latest.get('complete') else 'WAIT',len(latest.get('results',[])),240))
+    steps.append(step('evaluation','모드별 필수 고정·확인 평가','PASS' if fixed_ready else 'FAIL' if verdict.get('pause') else 'RUN' if latest and not latest.get('complete') else 'WAIT',len(latest.get('results',[])),240))
     current=read(pilot/'current.json');folder=pilot/current.get('path','__missing__');verified=False
     if state and current:
         import hashlib
@@ -40,18 +42,29 @@ def mixed(spec,paths,content_digest):
         verified=len(policies)==2 and any((m:=read(p)).get('status')=='verified' and m.get('full') and m.get('generation')==state.get('generation') and m.get('policies')==policies for p in (pilot/'archive-verified').glob('*.json'))
     steps.append(step('recovery','후보 전체 복구본·다운로드·로딩 검증','PASS' if verified else 'WAIT'))
     static=read(root/'validation.json');expected=spec['artifact'].get('runtime_digest');valid=bool(expected and static.get('code_sha256')==expected and static.get('static_checks_passed') and static.get('geometry_complete'))
+    import hashlib
+    source_checks=spec['artifact'].get('policy_sources',{})
+    assets_valid=bool(source_checks) and all((root/name).is_file() and hashlib.sha256((root/name).read_bytes()).hexdigest()==sha for name,sha in source_checks.items())
+    valid=valid and assets_valid
     steps.append(step('build','코드·지형·필수 결함 검증','PASS' if valid else 'WAIT'))
     blockers=[]
+    if source_checks and not assets_valid:blockers.append('SOURCE_ARTIFACT_CHANGED')
     if status.get('status')=='paused':blockers.append('VALIDATION_PAUSED')
     if state.get('pause_reason'):blockers.append('PILOT_PAUSED')
     current_case=read(root/'audit-current.json');activity=None
+    if current_case.get('state')!='RUNNING':current_case={}
     if not current_case:
         for p in Path(paths.get('activity','data/activity')).glob('*.json'):
             item=read(p)
             if item.get('role')=='diagnostic' and item.get('run_id')=='T11' and item.get('process_start')==process_start(item.get('pid',0)) and item.get('state')=='RUNNING' and time.time()-item.get('updated_at',0)<90:
                 activity=item;break
         if activity:current_case=dict(phase='simulation',case=activity.get('match_id'),scenario_id=activity.get('scenario_id'),sim_seconds=activity.get('sim_seconds'),updated_at=activity.get('updated_at'))
-    return dict(steps=steps,blockers=blockers,current=current_case or None,evidence_digest=content_digest if valid else None,connection='online')
+    if state.get('run') and games<192:
+        training=read(pilot/'training-status.json');current_case=dict(phase='pilot_evaluation' if training.get('phase')=='evaluation' else 'pilot',case=state.get('episode'),completed_games=games,updated_at=training.get('updated_at'))
+    pilot_status=read(pilot/'pilot-status.json')
+    if pilot_status.get('status')=='WAITING_RESOURCES' or (pilot/'resource-pause.json').exists():current_case=dict(phase='resource_wait',state='WAITING_RESOURCES')
+    current_case={k:v for k,v in current_case.items() if k in ('phase','case','scenario_id','seed','swapped','sim_seconds','time_limit_seconds','state','journal_completed','journal_total','completed_games','updated_at')}
+    return dict(steps=steps,blockers=blockers,current=current_case or None,evidence_digest=content_digest if valid else None,connection='online',invalidated=bool(source_checks and not assets_valid))
 
 
 def pages(spec,paths,content_digest):

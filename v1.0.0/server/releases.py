@@ -29,10 +29,12 @@ class Registry:
         allowed={'id','revision','title','description','targets','dependencies','handler','artifact','validation_plan','planned'}
         if set(spec)-allowed or not ID.fullmatch(spec.get('id','')) or type(spec.get('revision')) is not int or spec['revision']<1 or spec.get('handler') not in HANDLERS:raise ValueError('invalid release manifest')
         if not all(k in spec for k in ('title','description','targets','dependencies','artifact','validation_plan')):raise ValueError('incomplete release manifest')
+        if not isinstance(spec['validation_plan'],list) or not spec['validation_plan'] or any(not ID.fullmatch(k) for k in spec['validation_plan']):raise ValueError('required validation plan missing')
         checksum=digest(spec)
         with self.db() as c:
             row=c.execute('SELECT * FROM releases WHERE id=?',(spec['id'],)).fetchone()
             if row and row['digest']==checksum:return checksum
+            if row and json.loads(row['spec'])['revision']>=spec['revision']:raise ValueError('content changes require a newer revision')
             if row and json.loads(row['state']).get('status')=='APPLYING':raise ValueError('release currently applying')
             state=dict(status='PLANNED' if spec.get('planned') else 'VALIDATING',steps=[],blockers=[],connection='unknown')
             c.execute('INSERT OR REPLACE INTO releases VALUES(?,?,?,?,?,?)',(spec['id'],json.dumps(spec),checksum,json.dumps(state),0,time.time()))
@@ -43,7 +45,7 @@ class Registry:
         with self.db() as c:
             r=c.execute('SELECT * FROM releases WHERE id=?',(id,)).fetchone()
             if not r:raise KeyError(id)
-            spec=json.loads(r['spec']);state=json.loads(r['state']);attempts=c.execute('SELECT id,action,phase,updated FROM attempts WHERE release_id=? ORDER BY updated DESC LIMIT 10',(id,)).fetchall()
+            spec=json.loads(r['spec']);state=json.loads(r['state']);attempts=c.execute('SELECT id,digest,action,phase,updated FROM attempts WHERE release_id=? ORDER BY updated DESC LIMIT 10',(id,)).fetchall()
         public={k:spec[k] for k in ('id','revision','title','description','targets','dependencies','handler')}
         result=dict(**public,content_digest=r['digest'],auto_apply=bool(r['auto']),updated_at=r['updated'],**state,attempts=[dict(a) for a in attempts])
         if private:result['spec']=spec
@@ -55,17 +57,21 @@ class Registry:
         with self.db() as c:
             c.execute('BEGIN IMMEDIATE');r=c.execute('SELECT * FROM releases WHERE id=?',(id,)).fetchone();spec=json.loads(r['spec']);previous=json.loads(r['state']);steps=observation.get('steps',[])
             dependencies=[self._dependency(c,d) for d in spec['dependencies']]
-            ready=bool(steps) and set(spec['validation_plan']).issubset({s['id'] for s in steps}) and all(s['state']=='PASS' for s in steps if s.get('required',True)) and all(dependencies) and observation.get('evidence_digest')==r['digest']
-            failed=any(s['state']=='FAIL' for s in steps if s.get('required',True))
+            ready=bool(steps) and set(spec['validation_plan']).issubset({s['id'] for s in steps}) and all(s['state']=='PASS' for s in steps if s.get('required',True) or s['id'] in spec['validation_plan']) and all(dependencies) and observation.get('evidence_digest')==r['digest']
+            failed=any(s['state']=='FAIL' for s in steps if s.get('required',True) or s['id'] in spec['validation_plan'])
             blockers=list(observation.get('blockers',[]))
             if not all(dependencies):blockers.append('DEPENDENCY_NOT_APPLIED')
             status='PLANNED' if spec.get('planned') else 'READY' if ready and not blockers else 'BLOCKED' if failed or blockers else 'VALIDATING'
             if previous.get('status') in ('APPLYING','APPLIED','ROLLED_BACK'):status=previous['status']
+            recovery=c.execute("SELECT 1 FROM attempts WHERE release_id=? AND phase='RECOVERY_REQUIRED'",(id,)).fetchone()
+            if recovery:status='BLOCKED';blockers.append('RECOVERY_REQUIRED')
             state=dict(observation,status=status,blockers=blockers)
             if previous.get('status')!=status:self.event(c,id,'STATE_CHANGED',state=status)
             for step in steps:
                 old=next((x for x in previous.get('steps',[]) if x['id']==step['id']),{})
                 if old.get('state')!=step['state'] or old.get('completed')!=step.get('completed'):self.event(c,id,'CHECK_PROGRESS',step=step['id'],state=step['state'],completed=step.get('completed'),total=step.get('total'))
+            if observation.get('invalidated') and r['auto']:
+                c.execute('UPDATE releases SET auto=0 WHERE id=?',(id,));self.event(c,id,'AUTO_INVALIDATED')
             c.execute('UPDATE releases SET state=?,updated=? WHERE id=?',(json.dumps(state),time.time(),id))
     def _dependency(self,c,d):
         r=c.execute('SELECT spec,state FROM releases WHERE id=?',(d['id'],)).fetchone()
@@ -76,6 +82,11 @@ class Registry:
         if set(payload)!=keys or payload['actor_id']!='82876856' or payload['action'] not in ACTIONS:raise ValueError('invalid release command')
         try:assert str(uuid.UUID(payload['request_id']))==payload['request_id']
         except (AssertionError,ValueError,TypeError):raise ValueError('invalid request id')
+        with self.db() as c:
+            old=c.execute('SELECT payload,result FROM commands WHERE id=?',(payload['request_id'],)).fetchone()
+            if old:
+                if json.loads(old['payload'])!=payload:raise ValueError('request id conflict')
+                return json.loads(old['result'])
         if type(payload['created_at']) not in (int,float) or payload['created_at']>now+60:raise ValueError('invalid command time')
         if payload['action']=='set_auto':
             if type(payload['enabled']) is not bool or payload['expires_at'] is not None:raise ValueError('invalid automatic intent')
@@ -89,6 +100,7 @@ class Registry:
             if not r or r['digest']!=payload['content_digest']:raise ValueError('stale release revision')
             state=json.loads(r['state']);action=payload['action'];result=dict(request_id=payload['request_id'],status='accepted')
             if action=='set_auto':
+                if payload['enabled'] and state['status'] in ('APPLYING','APPLIED','ROLLED_BACK'):raise ValueError('release no longer reservable')
                 prior=c.execute('SELECT at,id FROM intents WHERE release_id=?',(r['id'],)).fetchone()
                 if prior and (prior['at'],prior['id'])>(payload['created_at'],payload['request_id']):raise ValueError('stale authorization intent')
                 c.execute('INSERT OR REPLACE INTO intents VALUES(?,?,?)',(r['id'],payload['created_at'],payload['request_id']))
