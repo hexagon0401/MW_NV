@@ -1,0 +1,67 @@
+{
+  "origin": "https://mw-nv.pages.dev",
+  "checked_at": 1793101845.8430166,
+  "results": {
+    "/dashboard/": {
+      "status": 200
+    },
+    "/api/releases": {
+      "status": 200,
+      "items": [
+        {
+          "id": "mixed-maps",
+          "revision": 1,
+          "status": "VALIDATING",
+          "auto_apply": false
+        },
+        {
+          "id": "map-5",
+          "revision": 1,
+          "status": "PLANNED",
+          "auto_apply": false
+        },
+        {
+          "id": "tactics-5",
+          "revision": 1,
+          "status": "PLANNED",
+          "auto_apply": false
+        }
+      ],
+      "summary": {
+        "preparing": 3,
+        "ready": 0,
+        "attention": 0
+      }
+    },
+    "/api/releases/mixed-maps": {
+      "status": 200,
+      "completed_diagnostics": 22,
+      "current": {
+        "case": "4:2:0",
+        "scenario_id": "4",
+        "seed": 2,
+        "swapped": false,
+        "phase": "simulation",
+        "state": "RUNNING",
+        "sim_seconds": 190,
+        "time_limit_seconds": 3600,
+        "updated_at": 1793101835.526069
+      }
+    },
+    "/api/releases/mixed-maps/events": {
+      "status": 200,
+      "rows": 13
+    },
+    "/api/admin/session": {
+      "status": 200,
+      "configured": true,
+      "authenticated": false
+    },
+    "/api/training": {
+      "status": 200
+    },
+    "unauthenticated_post": {
+      "status": 401
+    }
+  }
+}
