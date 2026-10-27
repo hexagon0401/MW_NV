@@ -29,7 +29,8 @@
 
 동일 초기 모델/고정1작업자/동일 업데이트의 교사 비교:
 `MW_NV_TORCH_THREADS=1 .venv/bin/python -m learning.teacher_comparison --root data/teacher-ablation-v2 --source data/mission-normalization-v2/migrated --updates 128`
-비교 실행은 결과를 자동 승격하지 않는다. 평가 중 NIM/표본 수집/업데이트는 하지 않는다.
+30경기 진단 완료를 기다리는 단발 비교 작업: `.venv/bin/python scripts/mission_teacher_study.py` (낮은 CPU 우선순위,128업데이트/분기). 이는 반복 일정이 아니며 상태는 data/teacher-ablation-v2/status.json에 기록한다.
+비교 실행은 결과를 자동 승격하지 않는다. 실험의 상태/제어/전적은 별도 작업 디렉터리에 두고 NIM 예산과 시범 작업자 잠금만 운영 실행과 공유한다. 완료한 업데이트는 재시작 시 다시 수행하지 않는다. 평가 중 NIM/표본 수집/업데이트는 하지 않는다.
 
 ## 검증 상태
 실제 통과 수·배포·실행 진행은 validation.json/runtime.json에 기록한다. 통제 장면의 성공은 전체 경기 승리나 전략 향상을 입증하지 않는다. 실제 Intel Mac 성능은 미검증.

@@ -1,5 +1,5 @@
 """CPU-bounded NIM-only demonstrations, isolated from PPO trajectories and counters."""
-import argparse,gzip,json,os,signal,time
+import argparse,gzip,json,os,signal,time,fcntl
 from pathlib import Path
 from types import SimpleNamespace
 from engine.replay import encode,decode
@@ -15,7 +15,12 @@ from .self_play import atomic_json
 
 
 def run(directory,cpu_seconds=10,clients=None,budget_root='data/nim-budget'):
-    directory=Path(directory);job=json.loads((directory/'job.json').read_text());checkpoint=directory/'world.json.gz'
+    directory=Path(directory)
+    broker=Path(budget_root);broker.mkdir(parents=True,exist_ok=True);guard=(broker/'demonstration-worker.lock').open('a')
+    try:fcntl.flock(guard,fcntl.LOCK_EX|fcntl.LOCK_NB)
+    except BlockingIOError:
+        guard.close();atomic_json(directory/'slice.json',dict(cpu_seconds=time.process_time(),ended=False,blocked=True));return None
+    job=json.loads((directory/'job.json').read_text());checkpoint=directory/'world.json.gz'
     w=decode(json.loads(gzip.decompress(checkpoint.read_bytes()))) if checkpoint.exists() else create(job['seed'],swap=job['swap'],scenario_id=job['scenario_id'])
     if w.rules_version!='combined-arms-6':raise ValueError('incompatible demonstration checkpoint')
     if 10000<=w.seed<10100 or 20000<=w.seed<20100:raise ValueError('held-out seed cannot be coached')
@@ -87,6 +92,7 @@ def run(directory,cpu_seconds=10,clients=None,budget_root='data/nim-budget'):
             from .results import record_world
             record_world('data/results.sqlite',w,job['kind'],{'A':'NIM-teacher-with-algorithm-fallback','B':'NIM-teacher-with-algorithm-fallback'},match_id=job.get('run_id','coach')+'-'+job['id'],initial_frame=initial,metadata=dict(coaching=job))
         atomic_json(directory/'slice.json',dict(cpu_seconds=time.process_time(),tick=w.tick,ended=bool(getattr(w,'ended',False)),paired=teacher.stats['paired'],samples=len(teacher.rows)))
+        guard.close()
         activity.close('COMPLETED' if getattr(w,'ended',False) else 'IDLE')
         for sig,handler in old.items():signal.signal(sig,handler)
     return w

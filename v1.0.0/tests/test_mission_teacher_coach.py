@@ -69,3 +69,29 @@ def test_comparison_training_isolates_status_control_and_ledger(tmp_path,monkeyp
     call=seen[0];assert call['cwd']==(tmp_path/'study/baseline').resolve()
     assert call['env']['MW_NV_CONTROL_ROOT']==str((tmp_path/'study/baseline/control').resolve())
     assert call['env']['MW_NV_PUBLISH_TRAINING']=='0'
+
+def test_only_one_demonstration_worker_globally(tmp_path):
+    import fcntl
+    from learning.demonstrations import run
+    broker=tmp_path/'broker';broker.mkdir();folder=tmp_path/'job';folder.mkdir()
+    with (broker/'demonstration-worker.lock').open('a') as lock:
+        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        assert run(folder,budget_root=broker) is None
+    assert json.loads((folder/'slice.json').read_text())['blocked']
+
+def test_completed_comparison_trial_does_not_train_extra_updates(tmp_path,monkeypatch):
+    import learning.teacher_comparison as experiment
+    import learning.mission_env as environments
+    import learning.mission_state as states
+    import learning.mission_evaluate as evaluation
+    root=tmp_path/'study'
+    for lane in ('baseline','enhanced'):
+        folder=root/lane;folder.mkdir(parents=True);(folder/'state.json').write_text('{"generation":1}')
+    class Env:
+        def reset(self,*args):pass
+    monkeypatch.setattr(environments,'MissionEnv',Env)
+    monkeypatch.setattr(states,'load',lambda *args:([],dict(generation=1,completed_games=0)))
+    monkeypatch.setattr(evaluation,'evaluate',lambda *args,**kwargs:dict(complete=True,results=[]))
+    monkeypatch.setattr(experiment.subprocess,'run',lambda *args,**kwargs:(_ for _ in ()).throw(AssertionError('extra training')))
+    result=experiment.run(root,tmp_path/'models',1)
+    assert all(r['last_invocation_updates']==0 for r in result['trials'].values())
