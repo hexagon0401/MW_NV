@@ -16,7 +16,7 @@ def definitions(registry,base=BASE):
     for row in blueprint['releases']:
         path=folder/(row['id']+'.json');saved=read(path)
         # Keep the artifact immutable across unrelated repository/UI changes.
-        if saved and saved['spec']['revision']==row['revision']:
+        if saved and saved['spec']['revision']>=row['revision']:
             registry.register(saved['spec']);continue
         spec=dict(row);paths={}
         if row['id']=='mixed-maps':

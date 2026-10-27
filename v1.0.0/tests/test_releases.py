@@ -78,3 +78,14 @@ def test_changed_artifacts_clear_auto_without_erasing_history(tmp_path):
     r.observe('test',dict(steps=[dict(id='engine',state='WAIT')],evidence_digest=None,invalidated=True))
     assert not r.get('test')['auto_apply']
     assert any(e['code']=='AUTO_INVALIDATED' for e in r.events('test'))
+
+
+def test_agent_bootstrap_does_not_downgrade_registered_future_revision(tmp_path):
+    from server.release_service import definitions
+    import yaml,json
+    root=tmp_path/'registry';registry=Registry(root);base=tmp_path/'base';(base/'config').mkdir(parents=True)
+    old=spec();new=spec();new['revision']=2;registry.register(new)
+    (base/'config/releases.yaml').write_text(yaml.safe_dump(dict(releases=[old])))
+    (root/'definitions').mkdir();path=root/'definitions/test.json';path.write_text(json.dumps(dict(spec=new,paths={})))
+    definitions(registry,base)
+    assert registry.get('test')['revision']==2 and json.loads(path.read_text())['spec']==new
