@@ -53,4 +53,4 @@ def test_elimination_affordable_armed_reinforcement_and_unarmed_defeat():
     w=create(2,scenario_id='3')
     for u in [*w.soldiers.values(),*w.vehicles.values()]:u.alive=False
     w.teams[0].credits=1000;w.teams[0].tickets=1;w.teams[1].credits=0;w.teams[1].tickets=0
-    assert combat_possible(w,0);update(w);assert w.ended and w.winner==0
+    assert combat_possible(w,0);update(w);assert w.ended and w.winner is None  # both initial combat-ticket budgets exhausted

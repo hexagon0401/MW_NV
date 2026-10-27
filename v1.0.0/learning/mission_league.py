@@ -3,7 +3,7 @@ import argparse,json,os,random,signal,time,uuid,hashlib,shutil
 from pathlib import Path
 import numpy as np
 import torch
-RULES_VERSION='combined-arms-5'
+RULES_VERSION='combined-arms-6'
 CATALOG_VERSION='combined-arms-3'
 from engine.viewer_export import frame
 from .mission_env import MissionEnv as CandidateEnv

@@ -1,5 +1,6 @@
 """Bounded mission candidates from permitted observations, never global enemy state."""
 from collections import defaultdict,Counter
+from .mission_support import staging,logistics,search_goals
 from math import hypot
 from .tactics import candidates as legacy_candidates,compatible,BUSY
 from engine.economy import PURCHASE_TYPES
@@ -19,13 +20,13 @@ def candidates(obs):
         candidate=dict(role=role,score=score,reason=reason,command=command,features=features,locks=sorted(set([actor['id'],*actor.get('member_ids',[]),*locks])),supply_cost=0,supply_budget=obs['resources']['supply'],credits=0,tickets=0,credit_budget=obs['resources']['credits'],ticket_budget=obs['resources']['tickets'],analysis=dict(tactic=role,distance_m=distance,eta_s=distance/max(.1,spec['speed_mps'])))
         items.append(candidate);return candidate
     carrier_ids={f['carrier'] for f in mission.get('flags',[]) if f['status']=='carried' and f.get('carrier') is not None}
-    squads=[s for s in obs['squads'] if not carrier_ids.intersection(s['member_ids']) and any(i in by_id for i in s['member_ids']) and all(i in by_id for i in s['member_ids'] if any(u['id']==i and u['alive'] for u in obs['units']))]
+    squads=[s for s in obs['squads'] if not carrier_ids.intersection(s['member_ids']) and any(i in by_id for i in s['member_ids']) and all(i in by_id or any(v['type_id']=='AA_SITE' and i in v.get('passenger_ids',[]) for v in vehicles) for i in s['member_ids'] if any(u['id']==i and u['alive'] for u in obs['units']))]
     goals=[]
     if mode=='elimination':
         goals=[e['pos'] for e in obs['enemies']]+[dict(x_cm=e['x_cm'],y_cm=e['y_cm']) for e in obs.get('last_seen',[]) if obs['tick']-e['seen_at_tick']<=50]
         if not goals:goals=[dict(x_cm=round(obs['map_width_m']*100*f),y_cm=round(obs['map_height_m']*100*g)) for f,g in ((.5,.25),(.5,.5),(.5,.75),(.75 if not mirror else .25,.5))]
         for squad in squads:
-            for goal in goals[:4]:add(squad,'recon' if not obs['enemies'] else 'attack',2,goal,85,reason='전투 지역 정찰' if not obs['enemies'] else '관측 전투 구역 접근')
+            for goal in (goals[:4] if obs['enemies'] or obs.get('last_seen') else search_goals(obs,squad)):add(squad,'recon' if not obs['enemies'] else 'attack',2,goal,85,reason='전투 지역 정찰' if not obs['enemies'] else '관측 전투 구역 접근')
     if mode=='capture_flag':
         enemy_hq=next(f for f in facilities if f['kind']=='HQ' and f['owner']!=obs['team']);own_flag=next(f for f in mission['flags'] if f['owner']==obs['team']);enemy_flag=next(f for f in mission['flags'] if f['owner']!=obs['team'])
         goals=[enemy_hq['pos']]
@@ -51,7 +52,7 @@ def candidates(obs):
             transport=next((v for v in vehicles if enemy_flag['carrier'] in v['passenger_ids']),None)
             if transport:
                 from engine.traffic import arrival_slot
-                slot=arrival_slot(obs,transport,hq['pos'])
+                slot=arrival_slot(obs,transport,staging(obs,hq['pos']))
                 if hypot(transport['pos']['x_cm']-hq['pos']['x_cm'],transport['pos']['y_cm']-hq['pos']['y_cm'])<=10000:add(transport,'return',6,transport['pos'],175,reason='본진 도착·운반자 하차')
                 elif slot:add(transport,'return',7,dict(x_cm=slot[0]*100,y_cm=slot[1]*100),165,reason='깃발 운반 차량 본진 귀환')
     if mode!='conquest':
@@ -59,6 +60,7 @@ def candidates(obs):
         for squad in squads:
             members=[by_id[i] for i in squad['member_ids'] if i in by_id]
             for vehicle in vehicles:
+                if not goals or min(hypot(members[0]['pos']['x_cm']-g['x_cm'],members[0]['pos']['y_cm']-g['y_cm']) for g in goals)<15000:continue
                 spec=catalog['vehicles'][vehicle['type_id']]
                 if spec['capacity']>=len(members) and not vehicle['passenger_ids'] and vehicle['task_state'] not in BUSY and hypot(vehicle['pos']['x_cm']-members[0]['pos']['x_cm'],vehicle['pos']['y_cm']-members[0]['pos']['y_cm'])<10000:
                     add(squad,'transport',5,vehicle['pos'],105,target=vehicle['id'],reason='임무 지역으로 분대 수송',locks=[vehicle['id']]);break
@@ -66,17 +68,18 @@ def candidates(obs):
             spec=catalog['vehicles'][vehicle['type_id']]
             if carrier_ids.intersection(vehicle['passenger_ids']) or spec.get('immobile') or vehicle['task_state'] in BUSY or vehicle['fuel']<=0:continue
             for goal in goals[:3]:
-                if vehicle['passenger_ids'] and hypot(vehicle['pos']['x_cm']-goal['x_cm'],vehicle['pos']['y_cm']-goal['y_cm'])<10000:
+                goal=staging(obs,goal)
+                if vehicle['passenger_ids'] and hypot(vehicle['pos']['x_cm']-goal['x_cm'],vehicle['pos']['y_cm']-goal['y_cm'])<4000:
                     add(vehicle,'transport',6,vehicle['pos'],150,reason='임무 구역 도착·하차');continue
                 if vehicle.get('deployment')!='PACKED':continue
                 slot=arrival_slot(obs,vehicle,goal)
                 if slot:add(vehicle,'transport' if vehicle['passenger_ids'] else 'anti_air' if spec.get('air_only') else 'fire' if vehicle['type_id']=='SPH' else 'attack',7,dict(x_cm=slot[0]*100,y_cm=slot[1]*100),95 if vehicle['passenger_ids'] else 70,reason='임무 지원 위치 확보')
         for vehicle in vehicles:
-            if vehicle['type_id']=='AA_SITE' and not any(e['type_id'] in catalog['vehicles'] and catalog['vehicles'][e['type_id']].get('aircraft',e['type_id']=='HEL') for e in obs['enemies']):
+            if vehicle['type_id']=='AA_SITE' and obs['tick']-vehicle.get('occupied_tick',obs['tick'])>=300 and not any(e['type_id'] in catalog['vehicles'] and catalog['vehicles'][e['type_id']].get('aircraft',e['type_id']=='HEL') for e in obs['enemies']):
                 crew=next((u for u in obs['units'] if u['carrier_id']==vehicle['id']),None)
                 if crew:add(crew,'recon',21,vehicle['pos'],35,target=vehicle['id'],reason='대공 진지 승무원 해제')
     for site in mission.get('emplacements',[]):
-        if site.get('observed') and site.get('alive') and site.get('owner') is None and site.get('ammo',0)>0 and own:
+        if site.get('observed') and site.get('alive') and site.get('owner') is None and site.get('ammo',0)>0 and own and obs['tick']>=site.get('recapture_after_tick',0):
             soldier=min(own,key=lambda u:(hypot(u['pos']['x_cm']-site['pos']['x_cm'],u['pos']['y_cm']-site['pos']['y_cm']),u['id']));distance=hypot(soldier['pos']['x_cm']-site['pos']['x_cm'],soldier['pos']['y_cm']-site['pos']['y_cm'])
             add(soldier,'anti_air',20 if distance<=400 else 2,site['pos'],110,target=site['id'] if distance<=400 else 0,reason='중립 대공 진지 운용',locks=[site['id']])
         elif squads and not site.get('observed'):add(min(squads,key=lambda s:s['id']),'recon',2,site['pos'],60,reason='중립 대공 진지 정찰')
@@ -89,6 +92,7 @@ def candidates(obs):
             if counts[kind]>=amount or living>=mission['limits']['infantry_limit' if infantry else 'vehicle_limit'] or obs['resources']['credits']<spec['cost'] or infantry and not obs['resources']['tickets']:continue
             c=add(hq,'supply',11,hq['pos'],100,target=hq['id'],reason='시나리오 편성 손실 보충')
             if c:c['command']['arg0']=PURCHASE_TYPES.index(kind);c.update(credits=spec['cost'],tickets=int(infantry))
+    if mode!='conquest':logistics(obs,add)
     buckets=defaultdict(lambda:defaultdict(list));seen=set()
     for c in sorted(items,key=lambda c:(-c['score'],c['command']['unit'],tuple(c['command'].values()))):
         key=tuple(c['command'][k] for k in ('op','unit','target','arg0','arg1'))

@@ -7,7 +7,7 @@ from sb3_contrib import MaskablePPO
 from stable_baselines3.common.logger import configure
 from engine.replay import encode,decode
 from engine.runtime import Engine
-RULES_VERSION='combined-arms-5'
+RULES_VERSION='combined-arms-6'
 CATALOG_VERSION='combined-arms-3'
 from .mission_policy import export
 from .mission_numpy import NumpyPolicy as CandidatePolicy

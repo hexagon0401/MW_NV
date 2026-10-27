@@ -14,7 +14,7 @@ TRAIN_SEEDS=range(6000,6100)
 def validate_factory(factory):
     for seed in (6000,20000):
         w=factory(seed,swap=False)
-        if w.rules_version!='combined-arms-5' or w.catalog_version!='combined-arms-3' or w.mode not in ('conquest','elimination','capture_flag'):raise ValueError('external scenario requires explicit compatible rules/observation contract')
+        if w.rules_version!='combined-arms-6' or w.catalog_version!='combined-arms-3' or w.mode not in ('conquest','elimination','capture_flag'):raise ValueError('external scenario requires explicit compatible rules/observation contract')
         from engine.multi_scenario import validate
         validate(w)
     return factory

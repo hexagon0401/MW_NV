@@ -18,6 +18,7 @@
 '3':
   scenario_id: '3'
   mode: elimination
+  combat_ticket_rule: armed_purchase_value
   map_id: fractured-frontier
   map_version: '1'
   width_m: 1536
@@ -49,6 +50,7 @@
   regenerate_supply: false
   time_limit_s: 3600
   neutral_aa_count: 2
+  capture_score_limit: 2
   steal_troops: 3
   steal_seconds: 15
   return_seconds: 5

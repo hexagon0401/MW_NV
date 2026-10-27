@@ -36,6 +36,8 @@ export class Timeline{
   if(kind==='UNIT_DAMAGED'&&p.damage)(this.state.damage??=[]).push({...p,tick:e.sim_tick+1});
   if(kind==='HQ_DECISION')(this.state.decisions??={})[p.team]=structuredClone(p.metadata);
   if(kind==='SUPPLY_CHANGED'&&p.team!=null&&this.state.mission?.teams?.[p.team])for(const [key,value] of Object.entries(p.costs??{}))this.state.mission.teams[p.team][key]-=value;
+  if(kind==='COMBAT_TICKETS_CHANGED'&&this.state.mission?.combat_tickets)this.state.mission.combat_tickets[p.team]=p.remaining;
+  if(kind==='FLAG_STOLEN'&&p.score!=null)this.state.scores[p.team]=p.score;
   if(kind==='SCORE_TICK')this.state.scores={...p.scores};
   if(kind.startsWith('ORDER_')&&p.cmd_id!==undefined&&p.team!==undefined){const key=`${p.team}:${p.cmd_id}`,old=this.commands.get(key);this.commands.set(key,{...old,...p,status:kind.slice(6),accepted_tick:old?.accepted_tick??e.sim_tick});}
   if(f){if(kind==='CAPTURE_PROGRESS'){f.progress_ms=p.progress_ms;f.capturing=p.team;}if(kind==='OBJECTIVE_CAPTURED'){f.owner=p.team;f.progress_ms=0;f.capturing=null;}if(kind==='OBJECTIVE_NEUTRALIZED'){f.owner=null;f.progress_ms=0;}}

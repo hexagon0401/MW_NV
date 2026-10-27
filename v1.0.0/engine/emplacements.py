@@ -8,6 +8,7 @@ def operate(w,key,command,leave=False):
     if soldier is None or not soldier.alive or station is None or station.type_id!='AA_SITE' or not station.alive:raise OrderError('INVALID_TARGET')
     if leave:
         if station.crew_id!=soldier.id or soldier.team!=command.team:raise OrderError('FOREIGN_UNIT')
+        station.recapture_after_tick=w.tick+300
         soldier.carrier_id=None;soldier.task_state='IDLE';station.crew_id=None;station.team=None;station.passenger_ids=[]
         w.emit('DISEMBARK_DONE',unit=soldier.id,vehicle=station.id,x_cm=soldier.pos.x_cm,y_cm=soldier.pos.y_cm)
         w.emit('EMPLACEMENT_LEFT',unit=soldier.id,vehicle=station.id);return True
@@ -18,6 +19,8 @@ def operate(w,key,command,leave=False):
     if not hasattr(w,'emplacement_timers'):w.emplacement_timers={}
     w.emplacement_timers[key]=w.emplacement_timers.get(key,0)+200;soldier.task_state='OPERATING'
     if w.emplacement_timers[key]<8000:return False
+    if w.tick<getattr(station,'recapture_after_tick',0):raise OrderError('ILLEGAL_STATE')
+    station.occupied_tick=w.tick
     station.team=command.team;station.crew_id=soldier.id;soldier.carrier_id=station.id;soldier.task_state='ONBOARD';station.passenger_ids=[soldier.id]
     w.emit('EMPLACEMENT_CAPTURED',unit=station.id,team=int(command.team),crew=soldier.id);return True
 

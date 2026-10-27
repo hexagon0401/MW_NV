@@ -171,6 +171,8 @@ class Emplacement(Vehicle):
     crew_id: int | None = None
     capture_team: Team | None = None
     capture_ms: int = 0
+    occupied_tick: int = 0
+    recapture_after_tick: int = 0
     def __post_init__(self):
         natural(self.id,'id',1)
         if self.team is not None and not isinstance(self.team,Team):raise ValueError('team')

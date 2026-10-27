@@ -30,6 +30,6 @@ class MissionPolicy(MaskableActorCriticPolicy):
 
 def export(model,path):
     weights={k:v.detach().cpu().numpy() for k,v in model.policy.mlp_extractor.state_dict().items() if k.startswith('pi_')}
-    np.savez(path,contract=np.array(CONTRACT),rules_version=np.array('combined-arms-5'),**weights)
+    np.savez(path,contract=np.array(CONTRACT),rules_version=np.array('combined-arms-6'),**weights)
 
 from .mission_numpy import NumpyPolicy

@@ -6,6 +6,27 @@ from .mode_rules import end
 from .capabilities import enabled
 
 
+def armed_value(w,u):
+    spec=(w.unit_specs if u.id in w.soldiers else w.vehicle_specs)[u.type_id]
+    return spec['cost'] if spec['attack'] and u.type_id!='AA_SITE' else 0
+
+
+def initialize_tickets(w):
+    if hasattr(w,'combat_tickets'):return
+    initial={int(t):sum(armed_value(w,u) for u in [*w.soldiers.values(),*w.vehicles.values()] if u.team==t) for t in Team}
+    w.combat_tickets=dict(initial);w.initial_combat_tickets=initial;w.ticket_losses=[]
+
+
+def update_tickets(w):
+    initialize_tickets(w)
+    counted=set(w.ticket_losses)
+    for u in sorted([*w.soldiers.values(),*w.vehicles.values()],key=lambda u:u.id):
+        if u.alive or u.id in counted or u.team is None or not armed_value(w,u):continue
+        team=int(u.team);w.ticket_losses.append(u.id)
+        w.combat_tickets[team]=max(0,w.combat_tickets[team]-armed_value(w,u))
+        w.emit('COMBAT_TICKETS_CHANGED',team=team,unit=u.id,remaining=w.combat_tickets[team],initial=w.initial_combat_tickets[team])
+
+
 def combat_possible(w,team):
     if any(u.alive and u.team==team and (w.unit_specs if u.id in w.soldiers else w.vehicle_specs)[u.type_id]['attack'] and enabled(w,u) for u in [*w.soldiers.values(),*w.vehicles.values()]):return True
     state=w.teams[team];spec=rules(w)
@@ -62,24 +83,32 @@ def flags_update(w):
                 flag['progress_ms']+=200
                 if flag['progress_ms']>=config['steal_seconds']*1000:
                     flag.update(status='carried',carrier=attackers[0].id,return_ms=0)
-                    w.emit('FLAG_STOLEN',owner=owner,team=enemy,carrier=flag['carrier'],participants=[u.id for u in attackers])
+                    w.teams[Team(enemy)].score+=1
+                    w.emit('FLAG_STOLEN',owner=owner,team=enemy,carrier=flag['carrier'],participants=[u.id for u in attackers],score=w.teams[Team(enemy)].score)
+                    if w.teams[Team(enemy)].score>=config.get('capture_score_limit',2):scored.append(Team(enemy))
     for key,request in getattr(w,'mission_interactions',{}).items():
         flag=w.flags[request['owner']]
         if w.queue.status.get(key)=='RUNNING' and (flag['status']!=request['status'] or request['team'] in scored):w.queue.finish(w,key)
     if scored:
         winners=set(scored)
-        for team in winners:w.teams[team].score+=1
-        end(w,next(iter(winners)) if len(winners)==1 else None,'FLAG_RETURN' if len(winners)==1 else 'SIMULTANEOUS_FLAG_RETURN')
+        reason='FLAG_CAPTURE_LIMIT' if any(w.teams[t].score>=config.get('capture_score_limit',2) for t in winners) else 'FLAG_RETURN'
+        end(w,next(iter(winners)) if len(winners)==1 else None,reason if len(winners)==1 else 'SIMULTANEOUS_FLAG_VICTORY')
 
 
 def update(w):
     config=rules(w)
     if config['mode']=='elimination':
-        alive={t:combat_possible(w,t) for t in Team}
+        update_tickets(w)
+        alive={t:w.combat_tickets[int(t)]>0 and combat_possible(w,t) for t in Team}
         if not all(alive.values()):
             winner=next((t for t in Team if alive[t]),None);end(w,winner,'COMBAT_EXHAUSTED' if winner is not None else 'SIMULTANEOUS_EXHAUSTION');return
     elif config['mode']=='capture_flag':flags_update(w)
-    if not getattr(w,'ended',False) and (w.tick+1)*.2>=config['time_limit_s']:end(w,None,'TIME_LIMIT_DRAW')
+    if not getattr(w,'ended',False) and (w.tick+1)*.2>=config['time_limit_s']:
+        if config['mode']=='elimination':
+            # Integer cross multiplication avoids floating tie/rounding differences.
+            a=w.combat_tickets[0]*w.initial_combat_tickets[1];b=w.combat_tickets[1]*w.initial_combat_tickets[0]
+        else:a=w.teams[Team.A].score;b=w.teams[Team.B].score
+        end(w,Team.A if a>b else Team.B if b>a else None,'TIME_LIMIT_TICKETS' if config['mode']=='elimination' and a!=b else 'TIME_LIMIT_FLAG_SCORE' if a!=b else 'TIME_LIMIT_DRAW')
 
 
 def telemetry(w):

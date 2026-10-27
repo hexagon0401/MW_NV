@@ -1,8 +1,9 @@
 # MW-NV v1.0.0 STATE
-Current:T20 supply phase implemented;mission/NIM phases next
-Changed:authoritative ammo/resupply events;finite partial stock;resupply fire pause
-Tests:Python logistics3 passed;JS compatibility fixture updated,new rewind coverage
-Runtime:legacy learner retained;old multi-mode validation stop requested
-Compatibility:old artillery ammo without authoritative events shown unknown
-Next:mission loss tickets,flag scoring,transport staging,NIM demonstration
+Current:T20 mission rules/staging phase;NIM demonstrations next
+Rules:combined-arms-6;loss-value combat tickets;flag theft2 or return wins
+Supply:authoritative ammo,partial finite stock,truck HQ reload,priority empty ammo
+Mission:fortress exterior staging;AA60s dwell/cooldown;grid search goals
+Tests:mission rules/scoring/logistics/tactics17 passed;staging/support2 passed
+Runtime:legacy unchanged;old validation retained/stopping,new diagnostics required
+Next:NIM paired demonstration scheduler and balanced imitation;regression/deploy
 Usage:UNKNOWN

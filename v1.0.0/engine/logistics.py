@@ -19,8 +19,10 @@ def near(a,b,w=None):
     from .catalog import load_vehicles
     footprints=w.vehicle_specs if w is not None else load_vehicles()
     if getattr(b,'type_id',None) in footprints:
-        angle=getattr(b,'heading',0) or 0;rx=dx*cos(angle)+dy*sin(angle);ry=-dx*sin(angle)+dy*cos(angle);length,width=footprints[b.type_id]['footprint_cm'];dx=max(0,abs(rx)-length/2);dy=max(0,abs(ry)-width/2)
-    return hypot(dx,dy)<=300
+        angle=getattr(b,'heading',0) or 0;rx=dx*cos(angle)+dy*sin(angle);ry=-dx*sin(angle)+dy*cos(angle);length,width=footprints[b.type_id]['footprint_cm'];extra=footprints[a.type_id]['footprint_cm'] if getattr(a,'type_id',None) in footprints else (0,0)
+        dx=max(0,abs(rx)-(length+extra[0])/2);dy=max(0,abs(ry)-(width+extra[1])/2)
+    limit=2300 if w is not None and getattr(w,'mode',None)=='capture_flag' and getattr(b,'kind',None)=='HQ' else 300
+    return hypot(dx,dy)<=limit
 
 
 def transfer_cargo(w,truck_id,amount):
