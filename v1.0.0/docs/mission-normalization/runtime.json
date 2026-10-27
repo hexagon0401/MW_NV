@@ -1,0 +1,27 @@
+{
+  "updated_at": 1793063400.1501627,
+  "deployment": "ef723b5c",
+  "legacy": {
+    "pid": 180223,
+    "games": 126,
+    "generation": 300,
+    "phase": "checkpoint",
+    "teacher_pairs": 1021,
+    "nim_last_error": null
+  },
+  "new_rules": {
+    "root": "data/mission-normalization-v2",
+    "pid": 182769,
+    "stage": "engine_audit",
+    "status": "running",
+    "code_sha256": "71327e01b11b1318bd206621f509432c5b40114af3d1791484b4cccc97080ec3",
+    "completed_audit_cases": 0,
+    "required_audit_cases": 30,
+    "mixed_learning_active": false
+  },
+  "teacher_ablation": {
+    "status": "not_started",
+    "command": ".venv/bin/python -m learning.teacher_comparison --root data/teacher-ablation-v2 --source data/mission-normalization-v2/migrated --updates 128"
+  },
+  "strategic_improvement_established": false
+}
