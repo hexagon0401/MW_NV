@@ -52,7 +52,7 @@ def document(db='data/results.sqlite',game_mode=None,scenario_id=None):
             if learner not in ('PPO1','PPO2'):continue
             values=run['learners'].setdefault(learner,dict(games=0,wins=0,losses=0,draws=0,opportunities={},selected={},role_outcomes={},recent=[]));values['games']+=1
             outcome='draws' if row['winner'] is None else 'wins' if row['winner']==('A','B').index(team) else 'losses';values[outcome]+=1
-            values['recent'].append(dict(generation=league.get('generation',league.get('evaluation_games')),execution_kind=row.get('mode'),evidence_level='insufficient',game_mode=row.get('game_mode'),scenario_id=row.get('scenario_id'),mission_stats=row.get('mission_stats'),match=row['id'],outcome=outcome,score=row['scores'],team=team,swapped=row['swapped'],policies=row['policies'],objectives=row.get('objective_stats'),fingerprint=league.get('metrics',{}).get('teams',{}).get(team)))
+            values['recent'].append(dict(generation=league.get('generation'),execution_kind=row.get('mode'),evidence_level='insufficient',game_mode=row.get('game_mode'),scenario_id=row.get('scenario_id'),mission_stats=row.get('mission_stats'),match=row['id'],outcome=outcome,score=row['scores'],team=team,swapped=row['swapped'],policies=row['policies'],objectives=row.get('objective_stats'),fingerprint=league.get('metrics',{}).get('teams',{}).get(team)))
             for role,outcomes in league.get('metrics',{}).get('teams',{}).get(team,{}).get('role_outcomes',{}).items():
                 target=values['role_outcomes'].setdefault(role,{})
                 for kind,count in outcomes.items():target[kind]=target.get(kind,0)+count

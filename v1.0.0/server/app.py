@@ -19,7 +19,11 @@ def create_app(store=None,live_runner=None,lifespan=None):
     def learning_insights(game_mode:str='',scenario_id:str='',learner:str='',generation:int|None=None,execution_kind:str='',evidence:str=''):
         from learning.league_metrics import document
         from learning.strategy_evidence import filter_document
-        try:return filter_document(document(root/'results.sqlite',game_mode or None,scenario_id or None),learner or None,generation,execution_kind or None,evidence or None)
+        try:
+            result=filter_document(document(root/'results.sqlite',game_mode or None,scenario_id or None),learner or None,generation,execution_kind or None,evidence or None)
+            from learning.strategy_history import document as history_document
+            result['drilldown']=history_document(root/'results.sqlite',game_mode=game_mode or None,scenario_id=scenario_id or None,learner=learner or None,generation=generation,execution_kind=execution_kind or None,evidence=evidence or None)
+            return result
         except ValueError as exc:raise HTTPException(400,str(exc))
     @app.get('/api/objectives')
     def objective_statistics(mode:str='',rules_version:str='',catalog_version:str='',map_id:str='',map_version:str='',map_family:str='',swapped:str='',policy_a:str='',policy_b:str=''):

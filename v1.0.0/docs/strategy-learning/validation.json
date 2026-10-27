@@ -1,0 +1,35 @@
+{
+  "code_sha256": "14a0caee48f4a81f9801eb7b7f0d522888bea7d1a998740b45fc32c4b45ca843",
+  "python_full": {
+    "passed": 286,
+    "seconds": 405.77,
+    "snapshot": "stage2; later changes separately scoped"
+  },
+  "later_python_scopes": [
+    36,
+    24,
+    19,
+    18,
+    12,
+    9,
+    19
+  ],
+  "overlap": true,
+  "javascript": {
+    "passed": 50,
+    "build": true
+  },
+  "browser": {
+    "local": true,
+    "preview": true,
+    "fixtures": true
+  },
+  "pending": [
+    "30-game audit completion",
+    "migration retention",
+    "192-game mixed pilot",
+    "three-arm NIM study",
+    "tactics5 retention and performance",
+    "heldout tactic/transfer verification"
+  ]
+}

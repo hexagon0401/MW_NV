@@ -75,3 +75,9 @@ def test_tank_routes_fit_sixteen_metre_corridor():
     obs=dict(terrain=cells,enemies=[],catalog=dict(units={},vehicles={'TANK':{'footprint_cm':[900,450]}}))
     actor=dict(type_id='TANK',pos=dict(x_cm=2000,y_cm=4000))
     assert route(obs,actor,(10000,4000),'shortest') is not None
+
+
+def test_large_open_route_does_not_exhaust_budget_on_equal_cost_plateau():
+    obs=dict(terrain=[[0]*384 for _ in range(384)],enemies=[],catalog=dict(units={'INF':{}},vehicles={}))
+    actor=dict(type_id='INF',pos=dict(x_cm=200,y_cm=200))
+    assert route(obs,actor,(150000,150000),'shortest',max_nodes=2000) is not None

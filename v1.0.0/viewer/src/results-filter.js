@@ -9,3 +9,8 @@ export function filterStrategyInsights(doc,url){
  result.runs=(result.runs??[]).map(run=>({...run,learners:Object.fromEntries(Object.entries(run.learners??{}).filter(([id])=>!learner||id===learner).map(([id,l])=>[id,{...l,recent:(l.recent??[]).filter(r=>(generation===null||r.generation===generation)&&(!kind||r.execution_kind===kind)&&(!evidence||r.evidence_level===evidence))}]))}));
  return {...result,detail_scope:raw!==null||kind||evidence?'recent_examples_only':'full_aggregates',aggregate_scope:'original_mode_and_scenario_filters'};
 }
+export function summarizeStrategyHistory(groups,url){
+ const keys=['learner','execution_kind','evidence','game_mode','scenario_id'],raw=url.searchParams.get('generation'),generation=raw===null?null:Number(raw);
+ const selected=groups.filter(r=>keys.every(k=>!url.searchParams.get(k)||r[k]===url.searchParams.get(k))&&(generation===null||r.generation===generation));
+ const out={scope:'all_recorded_completed_learner_appearances',complete:true,games:0,wins:0,losses:0,draws:0,groups:selected};for(const r of selected)for(const k of ['games','wins','losses','draws'])out[k]+=r[k];out.win_rate=out.games?out.wins/out.games:0;return out;
+}

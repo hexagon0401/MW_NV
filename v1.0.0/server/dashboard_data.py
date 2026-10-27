@@ -77,7 +77,11 @@ def trends(rows):
                 rolling[model].append(win);l=learners.setdefault(model,dict(games=0,opportunities={},selected={},outcomes={},steps=None));l['games']+=1
                 metrics=r.get('league',{}).get('metrics',{}).get('teams',{}).get(team,{})
                 for name in ('opportunities','selected'):
-                    for key,n in metrics.get('selected_rounds' if name=='selected' and 'selected_rounds' in metrics else name,{}).items():l[name][key]=l[name].get(key,0)+n
+                    for key,n in metrics.get(name,{}).items():l[name][key]=l[name].get(key,0)+n
+                if 'selected_rounds' in metrics:
+                    for field,source in (('selected_rounds','selected_rounds'),('rate_opportunities','opportunities')):
+                        for key,n in metrics.get(source,{}).items():
+                            dest=l.setdefault(field,{});dest[key]=dest.get(key,0)+n
                 for key,outcomes in metrics.get('role_outcomes',{}).items():
                     dest=l['outcomes'].setdefault(key,{})
                     for status,n in outcomes.items():dest[status]=dest.get(status,0)+n
@@ -89,7 +93,7 @@ def trends(rows):
             label=r.get('created_at') or r['id'];learning.append(dict(label=label,**{x.lower():sum(rolling[x])*100/len(rolling[x]) if rolling[x] else None for x in rolling}))
             point=dict(label=label)
             for model,l in learners.items():
-                for role,n in l['opportunities'].items():point[model+'_'+role]=100*l['selected'].get(role,0)/n if n else None
+                for role,n in l['opportunities'].items():point[model+'_'+role]=100*l.get('selected_rounds',{}).get(role,0)/l.get('rate_opportunities',{}).get(role,0) if l.get('rate_opportunities',{}).get(role,0) else None
             tactics.append(point)
     for (milestone,scenario),scores in sorted(periods.items()):
         evaluation.append(dict(label=f'{milestone}games / map{scenario}',**{x.lower():sum(scores[x])/len(scores[x]) if scores[x] else None for x in rolling}))

@@ -33,3 +33,20 @@ def test_insight_filter_explicitly_limits_example_scope():
     out=filter_document(d,'PPO1',1,'training');assert set(out['runs'][0]['learners'])=={'PPO1'}
     assert out['detail_scope']=='recent_examples_only' and 'PPO2' in d['runs'][0]['learners']
     with pytest.raises(ValueError):filter_document(d,'foreign')
+
+
+def test_full_generation_history_does_not_truncate_to_recent_examples(tmp_path):
+    from learning.results import insert
+    from learning.strategy_history import document,publish
+    db=tmp_path/'results.sqlite'
+    for i in range(130):
+        insert(db,dict(rules_version='combined-arms-6',policies={'A':'one','B':'two'},scores=[1,0],steps=0,ticks=1,seed=i,id=str(i),kind='match',ended=True,mode='training',winner=0,league=dict(run='r',generation=i,assignments={'A':'PPO1','B':'PPO2'}),game_mode='elimination',scenario_id='3'))
+    d=document(db,learner='PPO1',generation=0)
+    assert d['games']==1 and d['wins']==1 and d['complete']
+    assert document(db,learner='PPO2')['games']==130
+    class Store:
+        bucket='test'
+        def __init__(self):self.calls=[]
+        def _request(self,*args):self.calls.append(args)
+    store=Store();cache={};paths=publish(store,db,cache);first=len(store.calls);publish(store,db,cache)
+    assert len(store.calls)==first+1 and len(paths)==4 # three generation buckets and index

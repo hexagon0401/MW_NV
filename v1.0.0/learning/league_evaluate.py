@@ -44,7 +44,7 @@ def evaluate(root,models,state,progress=None,seeds=range(10000,10005),scenario_f
                             w=env.engine.world;score=.5 if w.winner is None else float(int(w.winner)==('A','B').index(team))
                             policies={team:policy.policy_id,other:baseline.policy_id if opponent_name=='initial' else 'algorithm'}
                             mid=f'{state["run"]}-eval-{state["completed_games"]}-{hashlib.sha256(identity.encode()).hexdigest()[:16]}'
-                            record_world('data/results.sqlite',w,'evaluation',policies,match_id=mid,initial_frame=initial,metadata={'league':dict(run=state['run'],assignments={team:f'PPO{i+1}',other:opponent_name},evaluation_games=state['completed_games'],frozen_policy=policy.policy_id)})
+                            record_world('data/results.sqlite',w,'evaluation',policies,match_id=mid,initial_frame=initial,metadata={'league':dict(run=state['run'],assignments={team:f'PPO{i+1}',other:opponent_name},generation=state.get('generation'),evaluation_games=state['completed_games'],frozen_policy=policy.policy_id)})
                             result=dict(case=case,cache=identity,learner=f'PPO{i+1}',policy=policy.policy_id,opponent=opponent_name,seed=seed,team=team,swapped=swap,score=score,scores=[w.teams[t].score for t in (0,1)],match_id=mid,reused=False)
                         report['results'].append(result);completed[case]=result;cache[identity]=result;atomic_json(path,report)
     report['complete']=True;atomic_json(path,report);return report

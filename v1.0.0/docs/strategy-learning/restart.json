@@ -7,5 +7,22 @@
     "ppo2.npz": "65257842c71587396e0b00d5a302e33b19824727767e0d1ccf43ff1ba06e6bff",
     "ppo1.npz": "06fe1c90d822afd79ad2b5b5d87c9226a2ec18efd7e915a0779a092705c1546c"
   },
-  "optimizer_reset": false
+  "optimizer_reset": false,
+  "resumed_pid": 199551,
+  "code_commit": "9af5ee8",
+  "resume_verification": [
+    {
+      "learner": 1,
+      "all_weights_identical": true,
+      "optimizer_identical": true,
+      "steps_identical": true
+    },
+    {
+      "learner": 2,
+      "all_weights_identical": true,
+      "optimizer_identical": true,
+      "steps_identical": true
+    }
+  ],
+  "resumed_checkpoint": "data/league-v1/checkpoints/checkpoint-00000389-e9047d40"
 }

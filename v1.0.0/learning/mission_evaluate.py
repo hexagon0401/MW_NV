@@ -73,7 +73,7 @@ def evaluate(root,models,state,progress=None,seeds=range(10000,10005),stage='sta
                             e,result=play(seed,mode,{team:policy,1-team:initial if opponent=='initial' else None},swap,progress,activity_role='evaluation',activity_run=state['run'])
                             from .results import record_world
                             match_id=state['run']+'-eval-'+str(state['completed_games'])+'-'+hashlib.sha256(case.encode()).hexdigest()[:16]
-                            record_world('data/results.sqlite',e.world,'evaluation',{('A','B')[team]:policy.policy_id,('A','B')[1-team]:initial.policy_id if opponent=='initial' else 'algorithm'},match_id=match_id,metadata={'league':dict(run=state['run'],assignments={('A','B')[team]:f'PPO{learner}',('A','B')[1-team]:opponent},evaluation_games=state['completed_games'],frozen_policy=policy.policy_id)})
+                            record_world('data/results.sqlite',e.world,'evaluation',{('A','B')[team]:policy.policy_id,('A','B')[1-team]:initial.policy_id if opponent=='initial' else 'algorithm'},match_id=match_id,metadata={'league':dict(run=state['run'],assignments={('A','B')[team]:f'PPO{learner}',('A','B')[1-team]:opponent},generation=state.get('generation'),evaluation_games=state['completed_games'],frozen_policy=policy.policy_id)})
                             result.update(case=case,learner=f'PPO{learner}',opponent=opponent,team=team,score=.5 if result['winner'] is None else float(result['winner']==team));report['results'].append(result);atomic_json(path,report)
     report['complete']=True;atomic_json(path,report);return report
 

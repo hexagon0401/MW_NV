@@ -48,9 +48,11 @@ def publish(db='data/results.sqlite'):
     objectives=objective_document(doc['matches']);objectives['updated_at']=doc['updated_at']
     store._request('object/'+store.bucket+'/objective-stats.json.gz','PUT',gzip.compress(json.dumps(objectives,separators=(',',':')).encode(),mtime=0))
     from .league_metrics import document as league_document
+    from .strategy_history import publish as publish_strategy_history
+    paths_for_cache.update(publish_strategy_history(store,db,cache))
     league=league_document(db);league['task_views']={key:league_document(db,None if key.split(':')[0]=='*' else key.split(':')[0],None if key.split(':')[1]=='*' else key.split(':')[1]) for key in views};store._request('object/'+store.bucket+'/league-insights.json.gz','PUT',gzip.compress(json.dumps(league,separators=(',',':')).encode(),mtime=0))
     paths_for_cache.update(paths)
     obsolete=set(cache.get('previous',[]))-paths_for_cache-set(cache.get('current',[]))
     if obsolete:store._request('object/'+store.bucket,'DELETE',json.dumps({'prefixes':sorted(obsolete)}).encode())
-    temporary=cache_path.with_suffix('.partial');temporary.write_text(json.dumps(dict(current=sorted(paths_for_cache),previous=cache.get('current',[]))));temporary.replace(cache_path)
+    temporary=cache_path.with_suffix('.partial');temporary.write_text(json.dumps(dict(current=sorted(paths_for_cache),previous=cache.get('current',[]),strategy_hashes=cache.get('strategy_hashes',{}))));temporary.replace(cache_path)
     return len(rows)
