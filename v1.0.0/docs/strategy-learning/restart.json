@@ -24,5 +24,12 @@
       "steps_identical": true
     }
   ],
-  "resumed_checkpoint": "data/league-v1/checkpoints/checkpoint-00000389-e9047d40"
+  "resumed_checkpoint": "data/league-v1/checkpoints/checkpoint-00000389-e9047d40",
+  "remote_source_recovery": {
+    "status": "verified",
+    "release": "training-2026-10-004",
+    "asset": "games-00000164-b28fbc79e0b316e9.tar.gz",
+    "sha256": "b28fbc79e0b316e9fec993638095fac3f0a4e131a0ac8a8afac6d68efe8a79be",
+    "download_and_load_verified": true
+  }
 }

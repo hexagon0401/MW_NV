@@ -23,9 +23,9 @@ def route(obs,actor,goal,style,max_nodes=20000):
     if not legal(start) or not legal(end):return None
     threats=[(e['pos']['x_cm']/400,e['pos']['y_cm']/400) for e in obs['enemies']]
     def risk(p):return min(1,sum(max(0,1-math.hypot(p[0]-x,p[1]-y)/25) for x,y in threats))
-    heap=[(0,start)];cost={start:0};parent={};visited=0
+    heap=[(0,0,start)];cost={start:0};parent={};visited=0
     while heap and visited<max_nodes:
-        _,p=heapq.heappop(heap);visited+=1
+        _,_,p=heapq.heappop(heap);visited+=1
         if p==end:
             path=[p]
             while path[-1]!=start:path.append(parent[path[-1]])
@@ -36,7 +36,7 @@ def route(obs,actor,goal,style,max_nodes=20000):
             step=1+(4*risk(q) if style=='avoid' else 0)+(1.5 if style=='cover' and cells[q[1]][q[0]]!=2 else 0)
             value=cost[p]+step
             if value<cost.get(q,float('inf')):
-                cost[q]=value;parent[q]=p;heapq.heappush(heap,(value+abs(q[0]-end[0])+abs(q[1]-end[1]),q))
+                cost[q]=value;parent[q]=p;heapq.heappush(heap,(value+abs(q[0]-end[0])+abs(q[1]-end[1]),-value,q))
     return None
 
 
