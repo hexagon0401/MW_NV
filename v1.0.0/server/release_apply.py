@@ -25,6 +25,8 @@ def execute(registry,handlers):
         if attempt['phase'] in ('RECOVERY_REQUIRED','ROLLING_BACK'):
             handler.rollback(journal(),lambda **v:save('ROLLING_BACK',**v));save('ROLLED_BACK');return
         if attempt['phase']=='QUEUED':
+            with registry.db() as c:
+                if not all(registry._dependency(c,d) for d in definition['spec']['dependencies']):raise ValueError('release dependencies changed')
             evidence=observe(definition['spec'],definition['paths'],item['content_digest'])
             if evidence.get('evidence_digest')!=item['content_digest'] or evidence.get('blockers') or not set(definition['spec']['validation_plan']).issubset({s['id'] for s in evidence['steps']}) or not all(s['state']=='PASS' for s in evidence['steps'] if s.get('required',True) or s['id'] in definition['spec']['validation_plan']):raise ValueError('required evidence changed')
             handler.validate();save('SAVING')

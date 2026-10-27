@@ -64,3 +64,19 @@ def test_failed_rollback_keeps_exclusive_recovery_state(tmp_path,monkeypatch):
     module.execute(r,{'mixed_training':Handler})
     assert r.pending()['phase']=='RECOVERY_REQUIRED'
     with pytest.raises(ValueError):r.command(cmd(d))
+
+
+def test_dependency_rollback_after_request_prevents_execution(tmp_path,monkeypatch):
+    r,d=prepared(tmp_path,monkeypatch)
+    # A dependency can be restored after the request and before worker execution.
+    candidate=spec();candidate['revision']=2;candidate['dependencies']=[dict(id='base',revision=1)]
+    base=dict(spec(),id='base');r.register(base)
+    with r.db() as c:c.execute("UPDATE releases SET state=? WHERE id='base'",(json.dumps(dict(status='APPLIED')),))
+    d=r.register(candidate);r.observe('test',dict(evidence_digest=d,steps=[dict(id='engine',state='PASS')],blockers=[]))
+    (tmp_path/'definitions/test.json').write_text(json.dumps(dict(spec=candidate,paths={})))
+    r.command(cmd(d))
+    with r.db() as c:c.execute("UPDATE releases SET state=? WHERE id='base'",(json.dumps(dict(status='ROLLED_BACK')),))
+    class Handler:
+        def __init__(self,*_):pass
+        def validate(self):raise AssertionError('dependent release must not execute')
+    module.execute(r,{'mixed_training':Handler});assert r.get('test')['status']=='FAILED'

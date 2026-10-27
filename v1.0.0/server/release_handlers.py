@@ -13,8 +13,13 @@ BASE=Path(os.environ.get('MW_NV_INSTALLATION_BASE',BASE)).resolve()
 def owned(pid,module,root=None,start=None):
     try:
         args=Path(f'/proc/{pid}/cmdline').read_bytes().split(b'\0')
-        return module.encode() in args and (root is None or str(Path(root).resolve()).encode() in args or str(root).encode() in args) and (start is None or process_start(pid)==start)
-    except (OSError,ValueError):return False
+        same_root=root is None
+        if root is not None and b'--root' in args:
+            value=Path(args[args.index(b'--root')+1].decode())
+            actual=value if value.is_absolute() else Path(f'/proc/{pid}/cwd').resolve()/value
+            same_root=actual.resolve()==Path(root).resolve()
+        return module.encode() in args and same_root and (start is None or process_start(pid)==start)
+    except (OSError,ValueError,IndexError,UnicodeError):return False
 
 
 def alive_run(root):
@@ -138,7 +143,8 @@ class MixedTraining:
         # Verify the restored coordinator registered its real operational root.
         deadline=time.monotonic()+1800
         while time.monotonic()<deadline:
-            if alive_run(root) and read(BASE/'data/control/run.json').get('root')==str(root.resolve()):return
+            run=read(BASE/'data/control/run.json');status=read(root/'training-status.json')
+            if alive_run(root) and run.get('root')==str(root.resolve()) and status.get('run_id')==run.get('run_id') and status.get('status')=='running' and status.get('phase') in ('learning','paused','evaluation'):return
             time.sleep(5)
         raise TimeoutError('rollback health not confirmed')
 

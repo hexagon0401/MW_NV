@@ -3,3 +3,4 @@
 
 #dash-menu{display:none}@media(max-width:640px){#dash-menu{display:inline-block}#dash-nav{display:none}#dash-nav.mobile-open{display:flex}}
 .release-card{border-left:2px solid #9aa7b2}.release-card h2{font-size:17px}.release-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.release-terminal{background:#05080b;color:#e8edf2;border:1px solid #26323c;padding:16px;max-height:340px;overflow:auto;font:12px/1.8 'Geist Mono','NanumSquare',monospace;white-space:pre-wrap;overflow-wrap:anywhere}.release-terminal:focus{outline:1px solid #d6e3f8}
+#dash-filters[hidden]{display:none}

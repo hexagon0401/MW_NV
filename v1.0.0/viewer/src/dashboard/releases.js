@@ -11,6 +11,7 @@ export async function releases(content,session,signal){
  const open=el('button',current===item.id?'상세 접기':'진단 · 실행 기록');open.onclick=()=>{current=current===item.id?null:item.id;location.hash='releases?id='+(current??'');};p.append(open);content.append(p);
  if(current!==item.id&&new URLSearchParams(location.hash.split('?')[1]).get('id')!==item.id)continue;current=item.id;
  p.append(table(['진단','상태','완료 / 목표'],(item.steps??[]).map(s=>[s.title,`[${s.state}]`,s.total==null?(s.completed??'—'):`${s.completed??0} / ${s.total}`])));
+ if(item.validation_connection==='offline')p.append(note('VALIDATION WORKER OFFLINE / 마지막 완료 진단은 유지합니다.'));
  if(item.current){const c=item.current;p.append(note(`현재 ${c.case??'—'} · ${c.phase==='replay'?'리플레이 해시 검증':c.phase==='resource_wait'?'CPU·메모리 예산 대기':c.phase==='pilot_evaluation'?'격리 파일럿 평가':c.phase==='pilot'?'격리 파일럿':'경기 실행'} · ${Math.floor((c.sim_seconds??0)/60)}분${c.journal_total?` · 기록 ${c.journal_completed??0}/${c.journal_total}`:''} · ${c.state??'—'}`));}
  if(item.attempts?.length)p.append(table(['적용 이력','동작','실제 단계'],item.attempts.map(a=>[new Date(a.updated*1000).toLocaleString('ko-KR'),a.action+' / '+(a.digest?.slice(0,8)??'—'),a.phase])));
  if(item.blockers?.length)p.append(note('BLOCKED / '+item.blockers.join(' · ')));

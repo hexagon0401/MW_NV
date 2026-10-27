@@ -10,6 +10,9 @@ def prepare(root,legacy):
     root=Path(root);root.mkdir(parents=True,exist_ok=True)
     with (root/'prepare.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        import os
+        from server.telemetry import process_start
+        atomic_json(root/'validation-agent.json',dict(pid=os.getpid(),start=process_start(os.getpid())))
         certificate=json.loads((root/'validation.json').read_text())
         if certificate.get('code_sha256')!=code_fingerprint() or not certificate.get('static_checks_passed') or not certificate.get('geometry_complete'):raise ValueError('current static/geometry certificate required')
         archive=json.loads((root/'source-archive.json').read_text())
