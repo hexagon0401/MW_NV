@@ -1,5 +1,5 @@
 {
-  "code_sha256": "71327e01b11b1318bd206621f509432c5b40114af3d1791484b4cccc97080ec3",
+  "code_sha256": "5fa51cbd57f136ed6599d015b1d3c13138f5285255aaa32b039839f45dda964f",
   "static_checks_passed": true,
   "geometry_complete": true,
   "geometry_seeds_per_mode": 30,
@@ -74,7 +74,7 @@
     "passed": 11,
     "seconds": 4.56
   },
-  "source_commit": "4b99648",
+  "source_commit": "a29249a",
   "final_routing_scope": {
     "passed": 14,
     "seconds": 33.12
@@ -82,5 +82,9 @@
   "final_coach_scope": {
     "passed": 6,
     "seconds": 5.15
+  },
+  "final_study_scope": {
+    "passed": 9,
+    "seconds": 5.58
   }
 }
