@@ -1,6 +1,6 @@
 # MW-NV v1.0.0 STATE
-Current:T18 checkpoint optimization + SAVING heartbeat COMPLETE/deployed
-Read:docs/checkpoint-speed/README.md;docs/dashboard/OPERATIONS.md
+Current:T19 mission draw analysis COMPLETE;runtime unchanged
+Read:docs/mission-draw-analysis/REPORT.md;evidence.json;checkpoint-speed/README.md
 Site:https://mw-nv.pages.dev/dashboard/ production04868df7;rollback1e288a6a
 Verified:T18 Python16+12(overlap)/JS47/build;Chromium SAVING;restore parity passed
 UI:separate entry,no Pixi/replay;finite intro/Escape/reduced motion;current-match spectator
@@ -12,5 +12,5 @@ Recovery:gen258/107games full local copy preserved;remote archive enqueued,retai
 T11:23 completed audits retained;engine/agents/config unchanged;new pin revalidated
 Perf:writer sample2.38x;full live startup save40.226s;public heartbeat not stale
 Auth:actual owner82876856 verified via GitHub API;control enabled after verification
-Next:monitor learning/T11;no remaining T18 blocker
+Next:recommended HQ exterior staging/transport chain + AA occupancy hysteresis fixes
 Usage:UNKNOWN
