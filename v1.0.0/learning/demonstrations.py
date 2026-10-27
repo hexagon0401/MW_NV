@@ -14,6 +14,20 @@ from .nim_budget import PairLease
 from .self_play import atomic_json
 
 
+def record_outcomes(teacher,events,tick,totals,counts=None):
+    counts=dict(counts or {})
+    for event in events:
+        kind=event['event_kind']
+        if kind in ('UNIT_RESUPPLIED','DISEMBARK_DONE','BUILDING_ENTERED','FLAG_STOLEN','FLAG_PICKED_UP','FLAG_RETURNED'):
+            counts[kind]=counts.get(kind,0)+1;totals[kind]=totals.get(kind,0)+1
+    # Only the current decision's labels need updating, not the entire 10k buffer.
+    for row in reversed(teacher.rows):
+        if len(row)<5:continue
+        if row[4].get('tick',-1)<tick:break
+        if row[4].get('tick')==tick:row[4]['outcome']=dict(counts)
+    return counts
+
+
 def run(directory,cpu_seconds=10,clients=None,budget_root='data/nim-budget'):
     directory=Path(directory)
     broker=Path(budget_root);broker.mkdir(parents=True,exist_ok=True);guard=(broker/'demonstration-worker.lock').open('a')
@@ -38,8 +52,12 @@ def run(directory,cpu_seconds=10,clients=None,budget_root='data/nim-budget'):
     try:
         while not stopped[0] and time.process_time()-start<cpu_seconds and not getattr(w,'ended',False):
             if w.tick%150:
+                before=len(w.events);previous=json.loads(progress_path.read_text()) if progress_path.exists() else {}
+                decision_tick=previous.get('decision_tick',w.tick-w.tick%150)
                 while w.tick%150 and not getattr(w,'ended',False) and not stopped[0] and time.process_time()-start<cpu_seconds:e.step(.2)
-                if w.tick%150:break
+                counts=record_outcomes(teacher,w.events[before:],decision_tick,stage_events,previous.get('last_outcome'))
+                previous.update(tick=w.tick,decision_tick=decision_tick,last_outcome=counts,stage_events=stage_events,ended=bool(getattr(w,'ended',False)));atomic_json(progress_path,previous)
+                if w.tick%150 or getattr(w,'ended',False) or stopped[0]:break
             observations={a:e.observe(i) for i,a in enumerate(('A','B'))};items={a:candidates(observations[a]) for a in ('A','B')}
             frozen=SimpleNamespace(items=items,raw=lambda a:observations[a],teacher_source=job['kind'])
             batches=None
@@ -68,19 +86,12 @@ def run(directory,cpu_seconds=10,clients=None,budget_root='data/nim-budget'):
             # Check CPU at every physical tick; preserve command state on exhaustion.
             boundary=w.tick+150-w.tick%150
             while w.tick<boundary and not getattr(w,'ended',False) and not stopped[0] and time.process_time()-start<cpu_seconds:e.step(.2)
-            outcome={}
-            for event in w.events[before:]:
-                kind=event['event_kind']
-                if kind in ('UNIT_RESUPPLIED','DISEMBARK_DONE','BUILDING_ENTERED','FLAG_STOLEN','FLAG_PICKED_UP','FLAG_RETURNED'):outcome[kind]=outcome.get(kind,0)+1
-            # Keep failures too. Labels remain tied to their original decision tick.
-            for row in teacher.rows:
-                if len(row)>4 and row[4].get('tick')==observations['A']['tick']:row[4]['outcome']=outcome
-            for name,count in outcome.items():stage_events[name]=stage_events.get(name,0)+count
+            outcome=record_outcomes(teacher,w.events[before:],observations['A']['tick'],stage_events)
             missing={}
             for a in ('A','B'):
                 roles={c['role'] for c in items[a]};need_supply=any(u['alive'] and u.get('ammo')==0 and observations[a]['catalog']['units'][u['type_id']]['ammo'] for u in observations[a]['units'])
                 missing[a]=(['supply'] if need_supply and 'supply' not in roles else [])+(['infiltrate_or_flag'] if w.mode=='capture_flag' and not roles.intersection(('infiltrate','flag','return','recover')) else [])
-            atomic_json(directory/'progress.json',dict(tick=w.tick,scenario_id=job['scenario_id'],kind=job['kind'],paired=teacher.stats['paired'],samples=len(teacher.rows),teacher=dict(teacher.stats),ended=bool(getattr(w,'ended',False)),cpu_seconds=time.process_time(),last_outcome=outcome,stage_events=stage_events,candidate_missing=missing))
+            atomic_json(directory/'progress.json',dict(tick=w.tick,decision_tick=observations['A']['tick'],scenario_id=job['scenario_id'],kind=job['kind'],paired=teacher.stats['paired'],samples=len(teacher.rows),teacher=dict(teacher.stats),ended=bool(getattr(w,'ended',False)),cpu_seconds=time.process_time(),last_outcome=outcome,stage_events=stage_events,candidate_missing=missing))
             # Continue pending physical commands after a CPU-budget pause rather than
             # resubmitting them. Saved queue/RNG are authoritative on the next slice.
             if w.tick<boundary:break
