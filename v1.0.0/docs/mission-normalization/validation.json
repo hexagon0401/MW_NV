@@ -1,5 +1,5 @@
 {
-  "code_sha256": "5fa51cbd57f136ed6599d015b1d3c13138f5285255aaa32b039839f45dda964f",
+  "code_sha256": "27519ac7e9f28da6a81d5510773a753ce7a03a10c90d56073b12b19cef72d0ef",
   "static_checks_passed": true,
   "geometry_complete": true,
   "geometry_seeds_per_mode": 30,
@@ -74,7 +74,7 @@
     "passed": 11,
     "seconds": 4.56
   },
-  "source_commit": "a29249a",
+  "source_commit": "bad7b5f",
   "final_routing_scope": {
     "passed": 14,
     "seconds": 33.12
@@ -86,5 +86,13 @@
   "final_study_scope": {
     "passed": 9,
     "seconds": 5.58
+  },
+  "teacher_recovery_tests": {
+    "scopes": [
+      16,
+      12,
+      5
+    ],
+    "overlap": true
   }
 }
