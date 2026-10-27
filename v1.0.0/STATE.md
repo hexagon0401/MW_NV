@@ -1,11 +1,11 @@
 # MW-NV v1.0.0 STATE
-Current:T23 typed apply/rollback and isolated pilot COMPLETE;integration verifying
+Current:T23 implementation VERIFIED;final Pages bootstrap pending
 Read:docs/releases/README.md
-Added:revision-bound durable auto intents,serialized phase recovery,typed handlers
-Isolation:frozen runtime,private pilot ledger/control/replay,4-core reservation
-Safety:prepare-only validation;manual or per-revision auto Apply required
-Tests:releases/apply/progress/control22 passed;broader23/24 passed(overlap);JS56/build
-Browser:local desktop/mobile terminal fixtures passed;full Python suite running
-Runtime:legacy PPO unchanged;21 diagnostic cases preserved pending final recert
-Next:complete regression/browser/auth verification;deploy/readiness service bootstrap
+Added:readiness stages/logs,manual Apply,per-version durable auto,typed rollback
+Isolation:frozen candidate runtime/private pilot ledger;no implicit production promotion
+Tests:Python full311+final focused26(overlap);JS56/build;desktop/mobile fixtures
+Continuity:53 original dependency files unchanged;21 verified cases retained and audit resumed
+Runtime:legacy gen434/181games resumed;both weights/optimizers/actor RNG exact;remote recovery verified
+Next:preview final assets;deploy production;check read APIs/unauthenticated denial
+Blocked:30 diagnostics/retention/192 pilot/fixed evaluation must finish before mixed Apply
 Usage:UNKNOWN

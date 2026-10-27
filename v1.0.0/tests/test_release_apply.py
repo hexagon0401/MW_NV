@@ -80,3 +80,17 @@ def test_dependency_rollback_after_request_prevents_execution(tmp_path,monkeypat
         def __init__(self,*_):pass
         def validate(self):raise AssertionError('dependent release must not execute')
     module.execute(r,{'mixed_training':Handler});assert r.get('test')['status']=='FAILED'
+
+
+def test_mixed_prepare_uses_registered_runtime_without_proc_cwd(tmp_path,monkeypatch):
+    import server.release_handlers as handlers
+    from types import SimpleNamespace
+    base=tmp_path;registry=SimpleNamespace(root=base/'data/releases');registry.root.mkdir(parents=True)
+    root=base/'data/legacy';root.mkdir();runtime=registry.root/'artifacts/frozen';runtime.mkdir(parents=True)
+    control=base/'data/control';control.mkdir();(control/'run.json').write_text(json.dumps(dict(root=str(root),source=str(base/'source.npz'),kind='legacy')))
+    (registry.root/'legacy-runtime.json').write_text(json.dumps(dict(root=str(root),runtime=str(runtime))))
+    (root/'state.json').write_text(json.dumps(dict(rules_version='old',contract='tactics-2',generation=42)))
+    monkeypatch.setattr(handlers,'BASE',base);monkeypatch.setattr(handlers,'stop_run',lambda *a:None);monkeypatch.setattr(handlers,'archive_exact',lambda *a:{'verified':True});monkeypatch.setattr(handlers,'exact_recovery',lambda *a:{'verified':True})
+    handler=handlers.MixedTraining(dict(spec=dict(id='mixed',revision=1),paths=dict(legacy=str(root),pilot=str(base/'pilot'))),registry)
+    journal={};handler.prepare(journal,lambda **v:journal.update(v))
+    assert journal['old_run']['cwd']==str(runtime) and journal['old_version']['generation']==42

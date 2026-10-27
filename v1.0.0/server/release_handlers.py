@@ -16,7 +16,7 @@ def owned(pid,module,root=None,start=None):
         same_root=root is None
         if root is not None and b'--root' in args:
             value=Path(args[args.index(b'--root')+1].decode())
-            actual=value if value.is_absolute() else Path(f'/proc/{pid}/cwd').resolve()/value
+            actual=value if value.is_absolute() else BASE/value
             same_root=actual.resolve()==Path(root).resolve()
         return module.encode() in args and same_root and (start is None or process_start(pid)==start)
     except (OSError,ValueError,IndexError,UnicodeError):return False
@@ -80,13 +80,16 @@ class MixedTraining:
             if not old.get('root') or not old.get('source'):raise ValueError('operational source not registered')
             root=Path(old.get('root',self.paths['legacy'])).resolve()
             if not root.is_relative_to(BASE/'data'):raise ValueError('unregistered operational root')
-            pid=old.get('pid');cwd=Path(f'/proc/{pid}/cwd').resolve() if pid and owned(pid,'learning.accelerated_league') else BASE
+            active=read(self.registry.root/'active.json');legacy=read(self.registry.root/'legacy-runtime.json')
+            saved=active if active.get('root')==str(root) else legacy if legacy.get('root')==str(root) else {}
+            cwd=Path(saved['runtime']).resolve() if saved.get('runtime') else BASE
             if cwd==BASE:
                 from .release_artifacts import capture
                 sha=fingerprint(BASE);cwd=capture(BASE,self.registry.root.resolve()/'artifacts/legacy'/sha/'runtime',sha)
                 atomic(self.registry.root/'legacy-runtime.json',dict(root=str(root),runtime=str(cwd)))
             if cwd!=BASE and not cwd.is_relative_to(self.registry.root.resolve()/'artifacts'):raise ValueError('unregistered runtime')
-            notify(old_run=dict(root=str(root),source=old.get('source'),kind=old.get('kind','legacy'),pilot=old.get('pilot',200),cwd=str(cwd)),old_active=read(self.registry.root/'active.json'))
+            old_state=read(root/'state.json')
+            notify(old_version={k:old_state.get(k) for k in ('rules_version','contract','generation')},old_run=dict(root=str(root),source=old.get('source'),kind=old.get('kind','legacy'),pilot=old.get('pilot',200),cwd=str(cwd)),old_active=read(self.registry.root/'active.json'))
             journal.update(old_run=dict(root=str(root),source=old.get('source'),kind=old.get('kind','legacy'),pilot=old.get('pilot',200),cwd=str(cwd)))
         marker='release:'+self.spec['id']+':'+str(self.spec['revision'])+'\n';notify(stop_marker=marker)
         stop_run(journal['old_run']['root'],marker,notify);proof=archive_exact(journal['old_run']['root']);notify(old_recovery=proof)

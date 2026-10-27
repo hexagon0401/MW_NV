@@ -45,9 +45,16 @@ class Registry:
         with self.db() as c:
             r=c.execute('SELECT * FROM releases WHERE id=?',(id,)).fetchone()
             if not r:raise KeyError(id)
-            spec=json.loads(r['spec']);state=json.loads(r['state']);attempts=c.execute('SELECT id,digest,action,phase,updated FROM attempts WHERE release_id=? ORDER BY updated DESC LIMIT 10',(id,)).fetchall()
+            spec=json.loads(r['spec']);state=json.loads(r['state']);attempts=c.execute('SELECT id,digest,action,phase,updated,journal FROM attempts WHERE release_id=? ORDER BY updated DESC LIMIT 10',(id,)).fetchall()
         public={k:spec[k] for k in ('id','revision','title','description','targets','dependencies','handler')}
-        result=dict(**public,content_digest=r['digest'],auto_apply=bool(r['auto']),updated_at=r['updated'],**state,attempts=[dict(a) for a in attempts])
+        safe_attempts=[]
+        for a in attempts:
+            entry=dict(a);journal=json.loads(entry.pop('journal'));version=journal.get('old_version')
+            if isinstance(version,dict):entry['rollback_target']={k:version.get(k) for k in ('rules_version','contract','generation')}
+            if journal.get('old_deployment'):entry['rollback_deployment']=journal['old_deployment']
+            safe_attempts.append(entry)
+        candidate={k:spec['artifact'].get(k) for k in ('artifact_id','runtime_digest','source_commit')}
+        result=dict(**public,candidate=candidate,content_digest=r['digest'],auto_apply=bool(r['auto']),updated_at=r['updated'],**state,attempts=safe_attempts)
         if private:result['spec']=spec
         return result
     def all(self):

@@ -1,0 +1,16 @@
+{
+  "status": "RESUMED",
+  "generation": 434,
+  "completed_games": 181,
+  "both_policy_and_optimizer_exact": true,
+  "actor_rng_exact": true,
+  "checkpoint": "before-t23-checkpoint-00000434-7578cf7c",
+  "global_control_preserved": true,
+  "pid": 211161,
+  "archive_status": "verified",
+  "remote_recovery": {
+    "release": "training-2026-10-005",
+    "sha256": "fcd740ddc215faa3d336a5c3cd36cd8d29aaf0e928303be8df93b7d839955851",
+    "generation": 434
+  }
+}
