@@ -23,10 +23,10 @@ export class Timeline{
   if(flag&&kind==='FLAG_RETURNED'){flag.status='home';flag.carrier=null;[flag.x_cm,flag.y_cm]=flag.home;}
   if(kind==='EMBARK_DONE'&&u){u.carrier_id=p.vehicle;u.task_state='ONBOARD';}
   if(kind==='DISEMBARK_DONE'&&u){u.carrier_id=null;u.task_state='IDLE';}
-  if(kind==='ABSTRACT_ATTACK'&&u){if(p.ammo!=null)u.ammo=p.ammo;else if(u.ammo!=null)u.ammo=Math.max(0,u.ammo-1);u.attack_tick=e.sim_tick+1;u.target_id=p.target;const target=this.units.get(p.target);if(target&&target.hp!=null)target.hp=p.target_hp??Math.max(0,target.hp-p.damage);(this.state.shots??=[]).push({...p,origin:p.origin??{x_cm:u.x_cm,y_cm:u.y_cm},destination:p.destination??(target?{x_cm:target.x_cm,y_cm:target.y_cm}:null),tick:e.sim_tick+1});}
+  if(kind==='ABSTRACT_ATTACK'&&u){u.ammo=p.ammo??null;u.attack_tick=e.sim_tick+1;u.target_id=p.target;const target=this.units.get(p.target);if(target&&target.hp!=null)target.hp=p.target_hp??Math.max(0,target.hp-p.damage);(this.state.shots??=[]).push({...p,origin:p.origin??{x_cm:u.x_cm,y_cm:u.y_cm},destination:p.destination??(target?{x_cm:target.x_cm,y_cm:target.y_cm}:null),tick:e.sim_tick+1});}
   if(kind==='UNIT_TASK_CHANGED'&&u){u.task_state=p.task_state;if(p.deployment)u.deployment=p.deployment;}
   if(kind==='UNIT_DAMAGED'&&u)u.hp=p.hp;
-  if(kind==='UNIT_RESUPPLIED'&&u)for(const name of ['ammo','fuel','heal_pool','repair_pool'])if(p[name]!=null)u[name]=p[name];
+  if(kind==='UNIT_RESUPPLIED'&&u)for(const name of ['ammo','fuel','heal_pool','repair_pool','cargo_supply'])if(p[name]!=null)u[name]=p[name];
   if(kind==='SUPPLY_CHANGED'&&p.vehicle!=null&&p.cargo_supply!=null){const truck=this.units.get(p.vehicle);if(truck)truck.cargo_supply=p.cargo_supply;}
   if(kind==='UNIT_REPAIRED'&&u)u.hp=p.hp;
   if(kind==='UNIT_HEALED'&&u&&u.hp!=null)u.hp+=p.amount;

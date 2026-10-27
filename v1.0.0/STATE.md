@@ -1,9 +1,15 @@
 # MW-NV v1.0.0 STATE
-Current:T20 mission rules/staging phase;NIM demonstrations next
-Rules:combined-arms-6;loss-value combat tickets;flag theft2 or return wins
-Supply:authoritative ammo,partial finite stock,truck HQ reload,priority empty ammo
-Mission:fortress exterior staging;AA60s dwell/cooldown;grid search goals
-Tests:mission rules/scoring/logistics/tactics17 passed;staging/support2 passed
-Runtime:legacy unchanged;old validation retained/stopping,new diagnostics required
-Next:NIM paired demonstration scheduler and balanced imitation;regression/deploy
+Current:T20 implementation/deployment;new-rule diagnostic gates pending
+Rules:combined-arms-6/catalog3/tactics-4;loss tickets;flag2 completed thefts or return
+Supply:authoritative ammo,partial stock,HQ truck reload,fire pause,priority routing
+Mission:legal exterior staging,crew-free squad movement,AA dwell/cooldown,grid search
+Teacher:isolated demos/failure replay,paired budget/backoff,balanced imitation/recovery
+Tests:full266 passed;latest routing14/stats11/compat11/telemetry7 overlap;JS48/build
+Browser:modes3/4 desktop/mobile DPR2;preview production-API routing;public UI verified
+Geometry:60 seeds passed,terrain unchanged;source119games/gen288 remote SHA verified
+Recovery:123games/gen295 preserved;both actors/optimizers identical after resume
+Runtime:legacy180223 active;old audits retained;new pipeline awaiting final source pin
+Pending:fresh30 games,retention,NIM ablation;new mixed teaching not activated yet
+Read:docs/mission-normalization/README.md;validation.json;restart.json
+Next:.venv/bin/python -m learning.mission_pipeline --root data/mission-normalization-v2
 Usage:UNKNOWN

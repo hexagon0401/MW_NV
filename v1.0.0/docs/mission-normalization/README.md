@@ -24,6 +24,9 @@
 새 실행 경로: data/mission-normalization-v2. source-archive.json은 GitHub에서 다운로드/체크섬/모델 로딩을 확인한119경기/288세대 두 정책이다.
 기존 data/multi-mode-v1의 진단은 수정 전 규칙이므로 재사용하지 않는다. 코드 지문 검증,30경기 결정론 진단,기존 맵 능력 유지,최종 기존 모델 원격 보존을 통과해야 전환한다.
 
+검증 인증서가 준비된 뒤 재개 명령:
+`MW_NV_TORCH_THREADS=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MPLCONFIGDIR=/tmp/mw-mpl .venv/bin/python -m learning.mission_pipeline --root data/mission-normalization-v2 --legacy data/league-v1`
+
 동일 초기 모델/고정1작업자/동일 업데이트의 교사 비교:
 `MW_NV_TORCH_THREADS=1 .venv/bin/python -m learning.teacher_comparison --root data/teacher-ablation-v2 --source data/mission-normalization-v2/migrated --updates 128`
 비교 실행은 결과를 자동 승격하지 않는다. 평가 중 NIM/표본 수집/업데이트는 하지 않는다.

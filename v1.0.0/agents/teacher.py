@@ -25,7 +25,18 @@ def canonical_offer(obs,items):
                 if not compatible([offered[i]],selected):break
                 selected.append(offered[i])
             else:plans.append((sum(c['score'] for c in selected),list(ids)))
-    plans=[ids for _,ids in sorted(plans,key=lambda p:(-p[0],p[1]))[:12]] or [[]]
+    ranked=sorted(plans,key=lambda p:(-p[0],p[1]));plans=[]
+    def include(ids):
+        if ids not in plans and len(plans)<12:plans.append(ids)
+    for _,ids in ranked[:3]:include(ids)
+    # Preserve mission alternatives instead of giving the teacher twelve near-identical greedy plans.
+    for op in (8,5,6,18,19,7,13,20,21):
+        alternative=next((ids for _,ids in ranked if any(offered[i]['command']['op']==op for i in ids)),None)
+        if alternative is not None:include(alternative)
+    for _,ids in ranked:
+        include(ids)
+        if len(plans)==12:break
+    plans=plans or [[]]
     compact=dict(valid_plans=plans,tick=obs['tick'],scores={'SELF':obs['scores'][obs['team']],'OPPONENT':obs['scores'][1-obs['team']]},resources=obs['resources'],candidates=output)
     mission=obs.get('mission',{})
     if mission:

@@ -45,7 +45,7 @@ def sample(db,doc,at=None):
         conn.execute('INSERT OR REPLACE INTO dash_hours VALUES (?,?)',(hour,json.dumps(agg)))
         conn.execute('DELETE FROM dash_samples WHERE at<?',(stamp-7*86400,));conn.execute('DELETE FROM dash_hours WHERE hour<?',(stamp-90*86400,))
 
-def compact(r):return {k:r.get(k) for k in ('id','created_at','winner','scores','mode','scenario_id','game_mode','policies','rules_version','map_id','map_version')}|dict(assignments=r.get('league',{}).get('assignments',{}))
+def compact(r):return {k:r.get(k) for k in ('id','created_at','winner','scores','mode','scenario_id','game_mode','policies','rules_version','map_id','map_version','combat_tickets','initial_combat_tickets','termination_reason')}|dict(assignments=r.get('league',{}).get('assignments',{}))
 def scope_key(kind='all',scenario='all',learner='all'):return ':'.join((kind,scenario,learner))
 def group_matches(rows):
     groups=collections.defaultdict(list)

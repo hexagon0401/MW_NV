@@ -229,7 +229,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
                             bundle=slots[index]['worker'].call('snapshot');world=bundle['environment']['world']
                             recent=world.events[-2000:]
                             reason='supply' if any(ev['event_kind']=='ORDER_FAILED' and ev['payload'].get('reason')=='INSUFFICIENT_SUPPLY' for ev in recent) else 'transport' if any(ev['event_kind']=='ORDER_FAILED' and ev['payload'].get('reason') in ('TRAFFIC_TIMEOUT','FORMATION_UNREACHABLE') for ev in recent) else 'no_progress' if not any(ev['event_kind'] in ('ABSTRACT_ATTACK','FLAG_STOLEN','BUILDING_ENTERED','UNIT_RESUPPLIED') and ev['sim_tick']>world.tick-1500 for ev in recent) else None
-                            if reason:coach.failure(world,reason)
+                            if reason:coach.failure(world,reason,slots[index]['info']['assignments'])
                 eligible=[i for i in ids if not packets[i]['ended'] and packets[i]['tick']%150==0]
                 if teacher_enabled and not control.paused() and eligible and time.monotonic()>=max(teacher.next_request,query.cooldown) and teacher.future is None:
                     origin=(teacher.last_worker+1) if teacher.last_worker is not None else 0

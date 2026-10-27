@@ -23,8 +23,8 @@ def training():
 
 def pids():
     ids=set()
-    for root in ('data/league-v1','data/multi-mode-v1'):
-        for name in ('runner.pid','rollout.pid','initial-evaluation.pid','io-jobs/publish.pid','io-jobs/archive.pid'):
+    for root in ('data/league-v1','data/multi-mode-v1','data/mission-normalization-v2'):
+        for name in ('runner.pid','rollout.pid','pipeline.pid','initial-evaluation.pid','io-jobs/publish.pid','io-jobs/archive.pid'):
             try:
                 pid=int((Path(root)/name).read_text());args=Path(f'/proc/{pid}/cmdline').read_bytes().split(b'\0')
                 if any(a.startswith((b'learning.',b'server.')) for a in args):ids.add(pid)

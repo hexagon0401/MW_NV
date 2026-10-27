@@ -9,6 +9,11 @@ def staging(obs,goal):
     hq=next((f for f in obs['facilities'] if f['kind']=='HQ' and f['pos']==goal),None)
     if obs['mission']['mode']!='capture_flag' or hq is None:return goal
     direction=1 if goal['x_cm']<obs['map_width_m']*50 else -1
+    terrain=Terrain(obs['map_width_m'],obs['map_height_m']);terrain.cells=obs['terrain'];footprint=FootprintTerrain(terrain,[1000,1000])
+    for radius in (8000,9600,6400,11200):
+        for dx,dy in ((direction,0),(direction,-1),(direction,1),(0,-1),(0,1)):
+            x=goal['x_cm']+dx*radius;y=goal['y_cm']+dy*radius
+            if footprint.passable(x,y):return dict(x_cm=x,y_cm=y)
     return dict(x_cm=goal['x_cm']+direction*8000,y_cm=goal['y_cm'])
 
 

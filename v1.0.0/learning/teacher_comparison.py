@@ -5,12 +5,12 @@ from .self_play import atomic_json
 
 
 def run(root,source,updates=24):
-    root=Path(root);root.mkdir(parents=True,exist_ok=True);source=Path(source).resolve()
+    root=Path(root).resolve();root.mkdir(parents=True,exist_ok=True);source=Path(source).resolve()
     report=dict(source=str(source.name),updates=updates,strategic_improvement_established=False,trials={})
     for lane in ('baseline','enhanced'):
-        target=root/lane;start=time.monotonic()
-        environment=dict(os.environ,MW_NV_MISSION_TEACHER_BASELINE='1' if lane=='baseline' else '0',MW_NV_PUBLISH_TRAINING='0',MW_NV_EXPERIMENT_SEED='8021')
-        subprocess.run([sys.executable,'-m','learning.accelerated_league','--kind','mission','--root',str(target),'--source',str(source),'--updates',str(updates),'--workers','1'],env=environment,check=True)
+        target=root/lane;target.mkdir(exist_ok=True);start=time.monotonic()
+        environment=dict(os.environ,MW_NV_MISSION_TEACHER_BASELINE='1' if lane=='baseline' else '0',MW_NV_PUBLISH_TRAINING='0',MW_NV_EXPERIMENT_SEED='8021',MW_NV_CONTROL_ROOT=str(target/'control'),MW_NV_ACTIVITY_ROOT=str(target/'activity'),PYTHONPATH=str(Path(__file__).resolve().parents[1]))
+        subprocess.run([sys.executable,'-m','learning.accelerated_league','--kind','mission','--root',str(target),'--source',str(source),'--updates',str(updates),'--workers','1'],env=environment,cwd=target,check=True)
         # Both trials begin from the same two source models and use fixed schedules/RNG.
         from .mission_state import load
         from .mission_env import MissionEnv,MissionTeacher

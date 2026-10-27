@@ -19,6 +19,8 @@ def run(directory,cpu_seconds=10,clients=None,budget_root='data/nim-budget'):
     w=decode(json.loads(gzip.decompress(checkpoint.read_bytes()))) if checkpoint.exists() else create(job['seed'],swap=job['swap'],scenario_id=job['scenario_id'])
     if w.rules_version!='combined-arms-6':raise ValueError('incompatible demonstration checkpoint')
     if 10000<=w.seed<10100 or 20000<=w.seed<20100:raise ValueError('held-out seed cannot be coached')
+    from server.telemetry import Activity
+    activity=Activity(job['kind'],job['id'],job.get('run_id'),job['scenario_id'],['NIM-teacher'])
     e=Engine(w);teacher=MissionTeacher();samples=directory/'samples.npz'
     if samples.exists():teacher.load(samples)
     progress_path=directory/'progress.json'
@@ -52,6 +54,7 @@ def run(directory,cpu_seconds=10,clients=None,budget_root='data/nim-budget'):
                         if not available:break
                         selected.append(max(available,key=lambda c:(c['score'],-c['id'])))
                     chosen[a]=selected
+            activity.update(w.tick)
             before=len(w.events)
             for i,a in enumerate(('A','B')):
                 for c in commands(observations[a],chosen[a]):
@@ -84,6 +87,7 @@ def run(directory,cpu_seconds=10,clients=None,budget_root='data/nim-budget'):
             from .results import record_world
             record_world('data/results.sqlite',w,job['kind'],{'A':'NIM-teacher-with-algorithm-fallback','B':'NIM-teacher-with-algorithm-fallback'},match_id=job.get('run_id','coach')+'-'+job['id'],initial_frame=initial,metadata=dict(coaching=job))
         atomic_json(directory/'slice.json',dict(cpu_seconds=time.process_time(),tick=w.tick,ended=bool(getattr(w,'ended',False)),paired=teacher.stats['paired'],samples=len(teacher.rows)))
+        activity.close('COMPLETED' if getattr(w,'ended',False) else 'IDLE')
         for sig,handler in old.items():signal.signal(sig,handler)
     return w
 

@@ -23,22 +23,24 @@ class MissionCoach:
     def schedule(self,games):
         while self.state['scheduled']<games//10:
             number=self.state['scheduled'];self.state['scheduled']+=1
-            job=dict(id=f'demo-{number:08d}',scenario_id='3' if number%2==0 else '4',seed=4000+number%1000,swap=bool(number%4>=2),kind='demonstration',swap_learners=bool(number%2))
+            job=dict(id=f'demo-{number:08d}',scenario_id='3' if number%2==0 else '4',seed=4000+number%1000,swap=bool((number//4)%2),kind='demonstration',swap_learners=bool((number//2)%2))
             self._job(job)
         self._save()
     def _job(self,job,world=None):
         folder=self.root/job['id'];folder.mkdir(exist_ok=True);job.setdefault('run_id','coach-'+__import__('hashlib').sha256(str(self.root.parent.resolve()).encode()).hexdigest()[:12]);atomic_json(folder/'job.json',job)
         if world is not None:(folder/'world.json.gz').write_bytes(gzip.compress(json.dumps(encode(world),separators=(',',':')).encode(),compresslevel=1))
         self.state['jobs'].append(job['id'])
-    def failure(self,world,reason):
+    def failure(self,world,reason,assignments=None):
         if getattr(world,'mode','conquest') not in ('elimination','capture_flag'):return
         # Deduplicate by mission and failure category. No evaluation worlds enter here.
-        key=f'failure-{world.scenario_id}-{reason}'
+        assignments=assignments or {'A':'PPO1','B':'PPO2'}
+        signature=__import__('hashlib').sha256(json.dumps(assignments,sort_keys=True).encode()).hexdigest()[:6]
+        key=f'failure-{world.scenario_id}-{reason}-{signature}'
         if key in self.state.get('failure_keys',[]):return
         self.state.setdefault('failure_keys',[]).append(key);self.state['failure_keys']=self.state['failure_keys'][-100:]
         recent=[j for j in self.state['jobs'] if j.startswith('failure-')]
         if len(recent)>=100:return
-        self._job(dict(id=key,scenario_id=world.scenario_id,seed=world.seed,swap=getattr(world,'swapped',False),kind='failure_replay',reason=reason,swap_learners=False),world);self._save()
+        self._job(dict(id=key,scenario_id=world.scenario_id,seed=world.seed,swap=getattr(world,'swapped',False),kind='failure_replay',reason=reason,assignments=assignments,swap_learners=False),world);self._save()
     def running(self):return self.process is not None and self.process.poll() is None
     def poll(self,buffers,pids,paused=False):
         now=time.time();history=self.state['training_history'];increment=0.
@@ -62,7 +64,9 @@ class MissionCoach:
                 for row in labels.rows:
                     meta=row[4];key=[int(meta.get('tick',0)),int(row[3]),int(meta.get('prefix',0))]
                     if key>done:
-                        learner=int(row[3])^int(job['swap_learners']);buffers[learner].rows.append(row)
+                        learner=job.get('assignments',{}).get(('A','B')[int(row[3])])
+                        if learner is None:learner='PPO'+str((int(row[3])^int(job['swap_learners']))+1)
+                        if learner in ('PPO1','PPO2'):buffers[int(learner[-1])-1].rows.append(row)
                     keys.append(key)
                 self.state['imported'][self.current]=max([done,*keys])
             if result.get('ended'):

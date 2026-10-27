@@ -19,7 +19,7 @@ def archive(root,checkpoint,state,full):
     if full:
         for name in ('baseline','opponents'):
             if (root/name).exists():shutil.copytree(root/name,temp/name)
-        step=96 if state.get('contract')=='tactics-3' else 50
+        step=96 if state.get('contract') in ('tactics-3','tactics-4') else 50
         milestone=state['completed_games']//step*step
         for name in sorted({'games-00000000',f'games-{state["completed_games"]:08d}',f'games-{milestone:08d}'}):
             src=root/'evaluations'/name

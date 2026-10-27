@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "url": "https://mw-nv.pages.dev",
+  "deployment": "d6c2f1cb",
+  "dashboard": true,
+  "replay": true,
+  "admin_auth_preserved": true,
+  "status": 200,
+  "page_errors": []
+}

@@ -31,7 +31,7 @@ class LiveRunner:
             endpoint='https://integrate.api.nvidia.com/v1'
             if model=='local':model='nvidia/nemotron-3.5-lightning-30b-a3b'
         from agents.mission_hq import MissionHQ,MissionHybridHQ
-        mission=self.engine.world.rules_version=='combined-arms-5';tactical=MissionHQ if mission else TacticalHQ;hybrid=MissionHybridHQ if mission else HybridHQ
+        mission=self.engine.world.rules_version in ('combined-arms-5','combined-arms-6');tactical=MissionHQ if mission else TacticalHQ;hybrid=MissionHybridHQ if mission else HybridHQ
         self.hq=hq;self.policies={t:hybrid(endpoint,model,policy=policy,timeout=30 if hq=='nim' else 60,api_key=os.environ.get('NVIDIA_API_KEY_A' if t==0 else 'NVIDIA_API_KEY_B') if hq=='nim' else None) if hq in ('local','nim') else (tactical(policy) if self.engine.world.config.map_width_m>=1024 else RuleHQ()) for t in Team}
         self.stream_id=uuid.uuid4().hex;self.condition=Condition();self.stop_event=Event();self.thread=None
         w=self.engine.world
@@ -59,7 +59,7 @@ class LiveRunner:
     def advance(self):
         if self.stop_event.is_set() or getattr(self.engine.world,'ended',False):return
         w=self.engine.world
-        interval=50 if w.rules_version=='combined-arms-5' and self.hq=='rules' else 150
+        interval=50 if w.rules_version in ('combined-arms-5','combined-arms-6') and self.hq=='rules' else 150
         if w.tick%interval==0 and self.last_hq_tick!=w.tick:
             self.last_hq_tick=w.tick
             if self.hq in ('local','nim'):

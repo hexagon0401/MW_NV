@@ -65,11 +65,11 @@ def candidates(obs):
                 spec=catalog['vehicles'][vehicle['type_id']]
                 if spec['capacity']>=len(members) and not vehicle['passenger_ids'] and vehicle['task_state'] not in BUSY and hypot(vehicle['pos']['x_cm']-members[0]['pos']['x_cm'],vehicle['pos']['y_cm']-members[0]['pos']['y_cm'])<10000:
                     add(squad,'transport',5,vehicle['pos'],105,target=vehicle['id'],reason='임무 지역으로 분대 수송',locks=[vehicle['id']]);break
+        vehicle_goals=[staging(obs,g) for g in goals[:3]]
         for vehicle in vehicles:
             spec=catalog['vehicles'][vehicle['type_id']]
             if carrier_ids.intersection(vehicle['passenger_ids']) or spec.get('immobile') or vehicle['task_state'] in BUSY or vehicle['fuel']<=0:continue
-            for goal in goals[:3]:
-                goal=staging(obs,goal)
+            for goal in vehicle_goals:
                 if vehicle['passenger_ids'] and hypot(vehicle['pos']['x_cm']-goal['x_cm'],vehicle['pos']['y_cm']-goal['y_cm'])<4000:
                     add(vehicle,'transport',6,vehicle['pos'],150,reason='임무 구역 도착·하차');continue
                 if vehicle.get('deployment')!='PACKED':continue
@@ -93,7 +93,7 @@ def candidates(obs):
             if counts[kind]>=amount or living>=mission['limits']['infantry_limit' if infantry else 'vehicle_limit'] or obs['resources']['credits']<spec['cost'] or infantry and not obs['resources']['tickets']:continue
             c=add(hq,'supply',11,hq['pos'],100,target=hq['id'],reason='시나리오 편성 손실 보충')
             if c:c['command']['arg0']=PURCHASE_TYPES.index(kind);c.update(credits=spec['cost'],tickets=int(infantry))
-    if mode!='conquest':logistics(obs,add)
+    logistics(obs,add)
     buckets=defaultdict(lambda:defaultdict(list));seen=set()
     for c in sorted(items,key=lambda c:(-c['score'],c['command']['unit'],tuple(c['command'].values()))):
         key=tuple(c['command'][k] for k in ('op','unit','target','arg0','arg1'))

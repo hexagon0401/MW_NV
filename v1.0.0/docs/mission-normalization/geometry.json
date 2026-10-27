@@ -1,0 +1,309 @@
+{
+  "passed": true,
+  "seeds_per_mode": 30,
+  "pre_change_commit": "7a1efe4",
+  "unchanged_terrain": true,
+  "seconds": 301.7909581179847,
+  "cases": [
+    {
+      "mode": "3",
+      "seed": 0,
+      "terrain_sha256": "202d0b3ffdee8d8ff8a6fae51bab66993cb51f23563e9db7cdb90b8c43c4fbc2"
+    },
+    {
+      "mode": "3",
+      "seed": 1,
+      "terrain_sha256": "ec7745064c3ad4f3db020554573044f14d864b3f04d6cad3ce480bd1097a0cc6"
+    },
+    {
+      "mode": "3",
+      "seed": 2,
+      "terrain_sha256": "a971eea08144a29518a2bfba3601a19cb6a06d818999c956760e41b97f67def4"
+    },
+    {
+      "mode": "3",
+      "seed": 3,
+      "terrain_sha256": "1abf8af0373d0f78fe4f9bd73d94352a587c5aa2dc7894932289c3aad90457e7"
+    },
+    {
+      "mode": "3",
+      "seed": 4,
+      "terrain_sha256": "ab97824c03df6799e70e4e4317a17d4140189e1d5a4ac1bcea9aed07e5268ac7"
+    },
+    {
+      "mode": "3",
+      "seed": 5,
+      "terrain_sha256": "9205c8ee0a0c2f4be26cacbe5df53ee57248b9cba87b80839663bfa0d432e189"
+    },
+    {
+      "mode": "3",
+      "seed": 6,
+      "terrain_sha256": "e54c42c823a2beb1761e638ad0013cb3b72b0d9055d4f38d0383ade1ba2359db"
+    },
+    {
+      "mode": "3",
+      "seed": 7,
+      "terrain_sha256": "83738d4df6bb005e3a7d8247bf19ccbac80f813a7078242de80fb2940dd53ae2"
+    },
+    {
+      "mode": "3",
+      "seed": 8,
+      "terrain_sha256": "3bb0425f575ccc095fa6ec8c6310027997aed4027af29cd02800ae0ead8f84e4"
+    },
+    {
+      "mode": "3",
+      "seed": 9,
+      "terrain_sha256": "25e6673c78586a21c6445f59d9bd6646ceebe606e86a0d87a9e5b2a81173aa5b"
+    },
+    {
+      "mode": "3",
+      "seed": 10,
+      "terrain_sha256": "71c9011e41add7593487db77b636fe3d8030e92170538d870c5d8640c264cbef"
+    },
+    {
+      "mode": "3",
+      "seed": 11,
+      "terrain_sha256": "bb21060f0e941f5ddf6556fe5e3dd9ace0bb09d568d08e896b5720f3168f1e83"
+    },
+    {
+      "mode": "3",
+      "seed": 12,
+      "terrain_sha256": "5491282da9580f4e50572b5cf38e8964e0621fe55940382a673dc734fccc0b8e"
+    },
+    {
+      "mode": "3",
+      "seed": 13,
+      "terrain_sha256": "607f696f78b66a342ef56039b9b73d3590b5c16efc0fb3dddb9015ddfa51947b"
+    },
+    {
+      "mode": "3",
+      "seed": 14,
+      "terrain_sha256": "9725b9dba04415b7c55414b614f9bdfb918db9d95c73924dc5c629f41eb84fc4"
+    },
+    {
+      "mode": "3",
+      "seed": 15,
+      "terrain_sha256": "3753df504cfd92b1097a02d42c9267f616a18031cd3551cb161395f4b2afa02b"
+    },
+    {
+      "mode": "3",
+      "seed": 16,
+      "terrain_sha256": "0c040c2e7a61248369aac9e91ca2ebbff9a1ac2437e57ac9eead449a53652dd9"
+    },
+    {
+      "mode": "3",
+      "seed": 17,
+      "terrain_sha256": "02e82e6a053254d719ef5b01e8dca9a97ba42483a1594ac0cac1faf64ec28e2a"
+    },
+    {
+      "mode": "3",
+      "seed": 18,
+      "terrain_sha256": "ed884178ccfef37bc46246227440b076bb48cab02faa31217b2f069e51db8553"
+    },
+    {
+      "mode": "3",
+      "seed": 19,
+      "terrain_sha256": "e76977d04e90b8abc437bb71fedd2614e94da2a9358a836b4e03ef47d9780c57"
+    },
+    {
+      "mode": "3",
+      "seed": 20,
+      "terrain_sha256": "e20024dc97f96c3c191833e5643febdbc8f9a4fe74e2f009becac8ea28b98f12"
+    },
+    {
+      "mode": "3",
+      "seed": 21,
+      "terrain_sha256": "8b4d92ba7b075eb5d1a168ec569f0122b0f6204a8f7e7a133c0d3f3c30a8e3aa"
+    },
+    {
+      "mode": "3",
+      "seed": 22,
+      "terrain_sha256": "4b674688159d0efc425fddf2d70c729d811933461c3f8ec4fdb4420294164799"
+    },
+    {
+      "mode": "3",
+      "seed": 23,
+      "terrain_sha256": "f1f4526b1d553bf9c19fb0f852fb56a8619c267df2568852fc73c4353615546b"
+    },
+    {
+      "mode": "3",
+      "seed": 24,
+      "terrain_sha256": "e6d34292c425f85c3ce28d9565baaa6189c1ca604928ea58affac9e88cc78bb0"
+    },
+    {
+      "mode": "3",
+      "seed": 25,
+      "terrain_sha256": "fd3b8d517d65c271506bf44e70e1de04581275bc44ee95f697d051096038ebea"
+    },
+    {
+      "mode": "3",
+      "seed": 26,
+      "terrain_sha256": "ff8a3a32a2352a6e2751aea200a05b4a35a3c1cd86261115e75c379f5ec71dd0"
+    },
+    {
+      "mode": "3",
+      "seed": 27,
+      "terrain_sha256": "86a067c164deb3e010ebd0d6feae46cd8694627c7eb573942800623d6c891959"
+    },
+    {
+      "mode": "3",
+      "seed": 28,
+      "terrain_sha256": "5682d63422f817824740e4c06e780134835bf5b89571a172e0d1339b0189c7f1"
+    },
+    {
+      "mode": "3",
+      "seed": 29,
+      "terrain_sha256": "bb0294804e970473d773af72d7a132b7aa8248fdef6936195968a50f39f96a6a"
+    },
+    {
+      "mode": "4",
+      "seed": 0,
+      "terrain_sha256": "74d6820c2569623da037af6d828d117f6ee8a05c80291eec65c6f9a7dc489d4b"
+    },
+    {
+      "mode": "4",
+      "seed": 1,
+      "terrain_sha256": "79a7685d98e91c7af051df25632f8577f922a515028c819394c8569ced5f877f"
+    },
+    {
+      "mode": "4",
+      "seed": 2,
+      "terrain_sha256": "e799ec35cace8e3755803ab6e50a69ed47177ea78a6583e371ae51936241ef48"
+    },
+    {
+      "mode": "4",
+      "seed": 3,
+      "terrain_sha256": "52da06e06677576b1b8df1fd31a7d450b83cc50752b8d749fbab1b49e583c899"
+    },
+    {
+      "mode": "4",
+      "seed": 4,
+      "terrain_sha256": "c40e7466085e93b0e5034d95e0623b7c0554795388d946117c20efc8cb962aea"
+    },
+    {
+      "mode": "4",
+      "seed": 5,
+      "terrain_sha256": "ac77c17d7d0baf16400d43340fd8e5762032c0f999e6c3e8312e6ce1b852a439"
+    },
+    {
+      "mode": "4",
+      "seed": 6,
+      "terrain_sha256": "3ba3241b7a8e64eb5920ded7ca973da1640ded01e11d602c4e3ec2c23c5e7cfa"
+    },
+    {
+      "mode": "4",
+      "seed": 7,
+      "terrain_sha256": "c00fe6132fef66d2fd51d44dddd4e03feba1b4006d1c55fcf01c7a5ddd8ac6e8"
+    },
+    {
+      "mode": "4",
+      "seed": 8,
+      "terrain_sha256": "08d97a3d1461c337fc500e182d65d243ac00e9d692b9e89c3f984f9bd9723a8b"
+    },
+    {
+      "mode": "4",
+      "seed": 9,
+      "terrain_sha256": "e750f8901bb2db676802d98b3847f491fcee7ff2800d383a046ce06c8e1e67fc"
+    },
+    {
+      "mode": "4",
+      "seed": 10,
+      "terrain_sha256": "ff14929e065ab51be9e865195364cece2f4049df213fa43915d3a640bfcc9a04"
+    },
+    {
+      "mode": "4",
+      "seed": 11,
+      "terrain_sha256": "60ce8dfb762c4672364cdb7802584cf97672ea28bb5abb21109bc3f0039e2efc"
+    },
+    {
+      "mode": "4",
+      "seed": 12,
+      "terrain_sha256": "500e6c8413519ff09dbe6cfcec5f2afc6dd60526a72321a26aa1ee3744747b46"
+    },
+    {
+      "mode": "4",
+      "seed": 13,
+      "terrain_sha256": "3ac7524775de7175951d85e70e7ef3301c485a7c5da78756ff241adc763f199d"
+    },
+    {
+      "mode": "4",
+      "seed": 14,
+      "terrain_sha256": "32e46d7143318c593295f4594db0f5fe1f387f4b3b4df52fa6c4c96157d5fcc2"
+    },
+    {
+      "mode": "4",
+      "seed": 15,
+      "terrain_sha256": "571eddf0b54c871d30f6eb5d1f9b81b8e36aed3905a38adeef734bc3b7e67500"
+    },
+    {
+      "mode": "4",
+      "seed": 16,
+      "terrain_sha256": "11bfcfbfb7c809c0af95a05675ec5c7452fbbb98d520d174a17d52393a66cfed"
+    },
+    {
+      "mode": "4",
+      "seed": 17,
+      "terrain_sha256": "5bda8c272c7085c5782c617a16091dc2a9ca79e6d8e22739b5bd0605c43730e2"
+    },
+    {
+      "mode": "4",
+      "seed": 18,
+      "terrain_sha256": "f99a1344f3d029cf5bd8197dac861f92296ba551072443bddbbd28d62a03f7b3"
+    },
+    {
+      "mode": "4",
+      "seed": 19,
+      "terrain_sha256": "78f515ca8d8c54fa4804e0e249eea4d210b22bc29eefb1091e2cbbcff54b51c5"
+    },
+    {
+      "mode": "4",
+      "seed": 20,
+      "terrain_sha256": "be00c36c98b9f44390156809f5937f8c55d12b50d5e4f40cc2f23edaa96f6947"
+    },
+    {
+      "mode": "4",
+      "seed": 21,
+      "terrain_sha256": "5077ca38f83787e148d95eb1c90203f504dbf19ed1d6d5f7f67cf9ced3e2897b"
+    },
+    {
+      "mode": "4",
+      "seed": 22,
+      "terrain_sha256": "91ad58a1229b0ee15a209b5177b9b638046ef93caad0901bac4bec3310ca7850"
+    },
+    {
+      "mode": "4",
+      "seed": 23,
+      "terrain_sha256": "8a9d7e036b8955dde418bc0594b446693b5225ef819a19f9ea8ab6e23ddfdbfd"
+    },
+    {
+      "mode": "4",
+      "seed": 24,
+      "terrain_sha256": "3681b4ae5437ce40d134548d8cd10981c3aa1469e18ed60f38bb5570a68c6dae"
+    },
+    {
+      "mode": "4",
+      "seed": 25,
+      "terrain_sha256": "d499977191de9e86edd42318a3dc4d5aff4b776bbc67f71e802f31aff95784f5"
+    },
+    {
+      "mode": "4",
+      "seed": 26,
+      "terrain_sha256": "1d2f6d6edbcda153a4e6457b2bfa207f56562464b4692a943f0c8b2db1a877da"
+    },
+    {
+      "mode": "4",
+      "seed": 27,
+      "terrain_sha256": "89c0fb349b8013e59dc7acf38721c156702959c5c53251bcd9152b7f54083373"
+    },
+    {
+      "mode": "4",
+      "seed": 28,
+      "terrain_sha256": "15ef07fcf579867cd4305ec253f512caeff69c24f2855bea91c639ae86e70bf8"
+    },
+    {
+      "mode": "4",
+      "seed": 29,
+      "terrain_sha256": "a4538dde814cae266f7c664199dcea66bbf789f914def3863aa812f43887958b"
+    }
+  ]
+}

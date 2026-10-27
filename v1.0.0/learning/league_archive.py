@@ -27,7 +27,7 @@ def _spool(root,checkpoint,state,full=False,asset_root=None):
         initial_report=asset_root/'evaluations'/'games-00000000'/'report.json'
         if full and initial_report.exists():tar.add(initial_report,arcname='initial-evaluation.json')
         if full:
-            step=96 if state.get('contract')=='tactics-3' else 50
+            step=96 if state.get('contract') in ('tactics-3','tactics-4') else 50
             milestone=state['completed_games']//step*step
             for name in sorted({'games-00000000',f'games-{state["completed_games"]:08d}',f'games-{milestone:08d}'}):
                 for p in sorted((asset_root/'evaluations'/name).glob('*')):

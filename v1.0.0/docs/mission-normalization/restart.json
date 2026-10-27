@@ -1,0 +1,20 @@
+{
+  "preserved": "data/preserved/before-t20-checkpoint-00000295-df406712",
+  "generation": 295,
+  "games": 123,
+  "run": "league-7be9acf574df",
+  "old_pid": 171019,
+  "new_pid": 180223,
+  "model_reset": false,
+  "control_desired": "running",
+  "time": 1793062749.4585598,
+  "restored_actor_arrays_equal": [
+    true,
+    true
+  ],
+  "restored_optimizers_equal": [
+    true,
+    true
+  ],
+  "initial_restored_checkpoint": "data/league-v1/checkpoints/checkpoint-00000295-876567a0"
+}

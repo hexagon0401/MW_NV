@@ -50,3 +50,22 @@ def test_demo_executes_separately_and_keeps_original_labels(tmp_path,monkeypatch
     from learning.results import records,aggregate
     assert records('data/results.sqlite')[0]['mode']=='demonstration'
     assert aggregate('data/results.sqlite')['total_matches']==0
+
+
+def test_demo_side_and_start_balance_per_mode(tmp_path):
+    c=MissionCoach(tmp_path);c.schedule(80)
+    jobs=[json.loads((c.root/j/'job.json').read_text()) for j in c.state['jobs']]
+    for mode in ('3','4'):
+        assert {(j['swap'],j['swap_learners']) for j in jobs if j['scenario_id']==mode}=={(False,False),(False,True),(True,False),(True,True)}
+
+def test_comparison_training_isolates_status_control_and_ledger(tmp_path,monkeypatch):
+    import learning.teacher_comparison as experiment
+    seen=[]
+    class Done(Exception):pass
+    def call(args,**kw):seen.append(kw);raise Done()
+    monkeypatch.setattr(experiment.subprocess,'run',call)
+    import pytest
+    with pytest.raises(Done):experiment.run(tmp_path/'study',tmp_path/'models',1)
+    call=seen[0];assert call['cwd']==(tmp_path/'study/baseline').resolve()
+    assert call['env']['MW_NV_CONTROL_ROOT']==str((tmp_path/'study/baseline/control').resolve())
+    assert call['env']['MW_NV_PUBLISH_TRAINING']=='0'
