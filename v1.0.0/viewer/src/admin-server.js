@@ -1,3 +1,4 @@
+import {releaseAdmin} from './release-admin.js';
 // Pages-only BFF. Never imported by either browser entrypoint.
 import {SignJWT,jwtVerify} from 'jose';
 const enc=new TextEncoder(),owner='82876856',allowed=new Set(['pause_ppo','resume_ppo']);
@@ -37,6 +38,7 @@ async function handleAdmin(req,env,fetcher=fetch){
  if(path==='/api/admin/auth/logout'){
   if(!mutation(req,env,session))return response({error:'csrf_or_method'},403);const headers=new Headers({'Cache-Control':'no-store'});headers.append('Set-Cookie',setCookie('__Host-mw_nv_admin','',0));headers.append('Set-Cookie',setCookie('__Host-mw_nv_csrf','',0,false));return new Response(null,{status:204,headers});
  }
+ if(path==='/api/admin/releases')return releaseAdmin(req,env,session,{response,mutation,smallBody,store,maybeStore},fetcher);
  if(path!=='/api/admin/control')return response({error:'not_found'},404);
  if(env.MW_NV_ADMIN_CONTROL_ENABLED!=='true')return response({error:'control_disabled'},503);
  try{const status=await store(env,'control/status.json','GET',undefined,fetcher);const online=Number.isFinite(status.last_seen)&&Date.now()/1000-status.last_seen<90&&Date.now()/1000>=status.last_seen-60;

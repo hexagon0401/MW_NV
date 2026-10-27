@@ -1,13 +1,10 @@
 # MW-NV v1.0.0 STATE
-Current:T22 corrections APPLIED;gated long validations RUNNING
-Read:docs/strategy-learning/README.md;validation.json;runtime.json
-Changed:shared inputs,balanced imitation,KL guards,3-arm study,history API/UI
-Added:gated tactics5 routes/history/variants,remote population,source/license pins
-Tests:full Python286 passed;later focused scopes passed(overlap);JS50/build
-Browser:desktop/mobile local+preview;production dashboard/training/auth/insights200
-Models:source164/gen389 preserved+remote verified;exact weights/optimizer resume
-Runtime:legacy PPO199551;diagnostics203363;pilot-dependent study202943
-Diagnostics:21 verified cases retained by dependency/journal proof;retention pending
-Limits:tactics5 demo/history transfer parity and long empirical evaluations pending
-Next:monitor rollout-status.json and teacher-ablation-v3/status.json;PPO166+games
+Current:T23 release registry/read-only terminal UI COMPLETE;apply integration ongoing
+Read:docs/releases/README.md
+Added:typed manifests,SQLite state/events/intents,journal,cursor logs,public API/UI
+Safety:mission validation no longer stops/replaces production automatically
+Progress:observer-only simulation/replay heartbeat;21 verified cases preserved
+Tests:registry5 + rollout2 passed;JS53/build passed;progress parity scope running
+Runtime:legacy PPO unchanged;diagnostics paused for source certification
+Next:isolated pilot budget;registered apply/rollback handlers;auth tests/deploy
 Usage:UNKNOWN

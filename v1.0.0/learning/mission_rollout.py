@@ -11,7 +11,6 @@ def code_fingerprint():
 
 
 def run(root,legacy):
-    legacy_command=None;legacy_stopped=False
     root=Path(root);legacy=Path(legacy);root.mkdir(parents=True,exist_ok=True);identity=code_fingerprint();status=dict(stage='validation',status='running',code_sha256=identity,started_at=time.time(),mixed_training_started=False)
     def report(stage,**extra):
         if identity!=code_fingerprint():raise ValueError('code changed during validation; keep legacy worker and restart this pipeline')
@@ -37,40 +36,13 @@ def run(root,legacy):
             report('migration_retention_confirmation');retention=migration_gate(root,seeds=(*range(10000,10005),*range(10040,10060)),progress=progress)
         if not retention['retained']:
             atomic_json(root/'validation-gates.json',dict(approved_for_pilot=False,reason='map2_retention_not_established',retention=retention['intervals']));report('paused',status='paused',reason='map2_retention_not_established');return status
-        report('preserve_legacy_at_update_boundary')
-        try:
-            pid=int((legacy/'runner.pid').read_text());argv=(Path('/proc')/str(pid)/'cmdline').read_bytes().split(b'\0');legacy_command=[a.decode() for a in argv if a]
-            if not any(m in legacy_command for m in ('learning.league','learning.accelerated_league')):legacy_command=None
-        except (OSError,ValueError):pass
-        (legacy/'STOP').write_text('T11 validated migration; preserve final consumed checkpoint before switch\n')
-        deadline=time.monotonic()+1800
-        while True:
-            try:
-                pid=int((legacy/'runner.pid').read_text());cmd=(Path('/proc')/str(pid)/'cmdline').read_bytes()
-                running=any(m in cmd.split(b'\0') for m in (b'learning.league',b'learning.accelerated_league'))
-            except (OSError,ValueError):running=False
-            if not running:legacy_stopped=True;break
-            if time.monotonic()>deadline:raise ValueError('legacy worker did not stop at a safe boundary; do not force kill')
-            time.sleep(5);progress()
-        from .league_archive import spool,publish_pending
-        folder=legacy/json.loads((legacy/'current.json').read_text())['path'];state=json.loads((folder/'state.json').read_text());spool(legacy,folder,state,True);verified=publish_pending(legacy)
-        if verified['status']!='verified':raise ValueError('final legacy recovery upload/download/load verification failed; preserved locally, no mixed launch')
-        atomic_json(root/'validation-gates.json',dict(approved_for_pilot=True,code_sha256=identity,engine_games=30,retention=retention['intervals'],legacy_generation=state['generation'],source_archive_verified=True))
-        report('mixed_pilot',mixed_training_started=True)
-        command=[sys.executable,'-u','-m','learning.accelerated_league','--kind','mission','--root',str(root),'--source',str(root/'migrated'),'--pilot','192']
-        result=subprocess.run(command,env=dict(os.environ,MW_NV_TORCH_THREADS='2',MW_NV_PUBLISH_TRAINING='1'))
-        report('mixed_worker_stopped',status='stopped',returncode=result.returncode)
+        # Validation authorizes an isolated pilot, never an operational switch.
+        atomic_json(root/'validation-gates.json',dict(approved_for_pilot=True,code_sha256=identity,engine_games=30,retention=retention['intervals'],source_archive_verified=True,production_apply_required=True))
+        report('candidate_validated',status='validated',mixed_training_started=False)
+
     except (OSError,ValueError,KeyError,RuntimeError,InterruptedError) as exc:
         status.update(stage='paused',status='paused',reason=str(exc)[:400],updated_at=time.time());atomic_json(root/'rollout-status.json',status)
-    if legacy_command and (not status.get('mixed_training_started') or status.get('returncode',0)!=0):
-        stop=legacy/'STOP'
-        if stop.exists() and stop.read_text().startswith('T11 validated migration'):
-            stop.unlink()
-            try:
-                pid=int((legacy/'runner.pid').read_text());alive=any(m in (Path('/proc')/str(pid)/'cmdline').read_bytes().split(b'\0') for m in (b'learning.league',b'learning.accelerated_league'))
-            except (OSError,ValueError):alive=False
-            if alive:status['legacy_pause_cancelled']=True;atomic_json(root/'rollout-status.json',status);return status
-            log=(legacy/'runner.log').open('ab');process=subprocess.Popen(legacy_command,stdout=log,stderr=log,stdin=subprocess.DEVNULL,start_new_session=True,env=dict(os.environ,MW_NV_PUBLISH_TRAINING='1'));log.close();status['legacy_resumed_pid']=process.pid;atomic_json(root/'rollout-status.json',status)
+
     return status
 
 if __name__=='__main__':

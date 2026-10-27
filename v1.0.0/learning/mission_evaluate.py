@@ -51,6 +51,7 @@ def play(seed,scenario_id,policies=None,swap=False,progress=None,limit=None,reco
             activity.update(w.tick)
             if progress:
                 if hasattr(progress,'advance_simulation'):progress.advance_simulation((w.tick-before)*.2)
+                if hasattr(progress,'case_tick'):progress.case_tick(w.tick)
                 progress('evaluation')
     return e,dict(seed=seed,scenario_id=str(scenario_id),swapped=swap,complete=bool(getattr(w,'ended',False)),winner=None if getattr(w,'winner',None) is None else int(w.winner),scores=[w.teams[t].score for t in (0,1)],tick=w.tick,hash=w.checksum(),metrics=collect(w,initial),failures=dict(Counter(ev['payload'].get('reason','unknown') for ev in w.events if ev['event_kind']=='ORDER_FAILED')))
 
@@ -130,9 +131,10 @@ def audit(root,count=10,progress=None):
     for mode in ('2','3','4'):
         for seed in range(count):
             if (mode,seed) in done:continue
-            e,result=play(seed,mode,swap=bool(seed%2),progress=progress,record=True)
-            from engine.replay import replay
-            result['replay_hash_verified']=replay(e.document()).checksum()==result['hash']
+            from .validation_progress import CaseProgress,replay as observed_replay
+            with CaseProgress(root,mode,seed,bool(seed%2),progress) as observer:
+                e,result=play(seed,mode,swap=bool(seed%2),progress=observer,record=True)
+                result['replay_hash_verified']=observed_replay(e.document(),observer).checksum()==result['hash']
             report['results'].append(result);atomic_json(path,report)
     report['complete']=True;report['counts']=dict(Counter(r['scenario_id'] for r in report['results']));atomic_json(path,report);return report
 

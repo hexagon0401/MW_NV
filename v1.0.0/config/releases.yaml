@@ -1,0 +1,32 @@
+schema: 1
+releases:
+  - id: mixed-maps
+    revision: 1
+    title: 맵 2·3·4 혼합 학습
+    description: 섬멸·깃발전을 같은 두 PPO에 통합합니다. 진단·정책 유지·격리 파일럿·평가 후 적용합니다.
+    targets: [engine, scenarios, policies, training]
+    dependencies: []
+    handler: mixed_training
+    artifact: {artifact_id: mixed-r1}
+    validation_plan: [engine-2, engine-3, engine-4, retention, pilot, evaluation, recovery, build]
+    planned: false
+  - id: tactics-5
+    revision: 1
+    title: 경로 탐색·전장 적응 학습
+    description: 새로운 경로 후보와 환경 변형입니다. 혼합 학습 검증 이후 별도 준비합니다.
+    targets: [policies, training]
+    dependencies: [{id: mixed-maps, revision: 1}]
+    handler: mixed_training
+    artifact: {artifact_id: tactics5-r1}
+    validation_plan: [design, implementation, tests, retention, pilot, evaluation]
+    planned: true
+  - id: map-5
+    revision: 1
+    title: 맵 5 · 자유 전장
+    description: 대형 전장·랜덤 스폰의 향후 업데이트입니다. 아직 구현하거나 실행하지 않습니다.
+    targets: [scenarios, engine, policies]
+    dependencies: [{id: mixed-maps, revision: 1}]
+    handler: mixed_training
+    artifact: {artifact_id: map5-r1}
+    validation_plan: [design, implementation, geometry, diagnostics, pilot, evaluation]
+    planned: true
