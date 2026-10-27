@@ -8,17 +8,23 @@ from server.telemetry import Activity
 
 FIELDS=('agents','items','selected','finished','reserved_supply','initial_costs','history')
 def snapshot(env):
-    return dict(world=env.engine.world,presentation_events=env.engine.presentation_events,scenario_id=getattr(env,'scenario_id',None),**{k:getattr(env,k) for k in FIELDS})
+    return dict(exploration_history={k:getattr(env,k,None) for k in ('history_tick','current_summaries','summary_history')},world=env.engine.world,presentation_events=env.engine.presentation_events,scenario_id=getattr(env,'scenario_id',None),**{k:getattr(env,k) for k in FIELDS})
 def restore(env,payload):
     env.engine=Engine(payload['world']);env.engine.presentation_events=payload['presentation_events']
     for k in FIELDS:setattr(env,k,payload[k])
     if payload.get('scenario_id') is not None:env.scenario_id=payload['scenario_id']
+    for k,v in payload.get('exploration_history',{}).items():
+        if v is not None:setattr(env,k,v)
     env.cached_observations={a:env.raw(a) for a in ('A','B')};env.cached_tick=env.engine.world.tick
     return env
 
 def make_env(kind):
     if kind=='mission':
         from .mission_env import MissionEnv
+        if os.environ.get('MW_NV_EXPLORATION')=='1':
+            from .exploration_env import ExplorationEnv
+            from .scenario_variants import factory
+            return ExplorationEnv(decision_seconds=10)
         return MissionEnv(decision_seconds=10)
     from .candidate_env import CandidateEnv
     from .training_maps import training_scenario
@@ -56,7 +62,12 @@ def serve(conn,kind):
                 env.decision_sources={a:l+' 지휘' for a,l in info['assignments'].items()}
                 for a,spans in info['policy_spans'].items():
                     if spans[-1]!=generation:spans.append(generation)
-                _,rewards,*_=env.step(actions)
+                _,rewards,_,_,infos=env.step(actions)
+                for a,details in infos.items():
+                    for rejection in details.get('rejections',[]):
+                        values=info['metrics'][a].setdefault('rejections',{});reason=rejection['reason'];values[reason]=values.get(reason,0)+1
+                        info['metrics'][a].setdefault('rejected_commands',[]).append(rejection)
+                        info['metrics'][a]['rejected_commands']=info['metrics'][a]['rejected_commands'][-6:]
                 if activity:activity.update(env.engine.world.tick,state='RUNNING' if env.agents else 'COMPLETED')
                 conn.send(packet(env,rewards))
             elif op=='mark':

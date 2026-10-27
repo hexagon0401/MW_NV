@@ -21,7 +21,7 @@ def vector(obs,items):
     if tickets:x[45]=tickets['remaining']/max(1,tickets['initial'])
     x[46]=min(1,obs['scores'][obs['team']]/max(1,config.get('score_limit',1)))
     x[47]=float(bool(tickets))
-    # tactics-4 was trained with empty history; do not inject evaluation-only state.
+    history=obs.get('recent_summary',[])[:14];x[48:48+len(history)]=history
     diagonal=max(1,(obs['map_width_m']**2+obs['map_height_m']**2)**.5)
     all_own={u['id']:u for u in [*own,*vehicles]}
     for c in items:

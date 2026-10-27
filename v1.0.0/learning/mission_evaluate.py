@@ -23,26 +23,31 @@ def play(seed,scenario_id,policies=None,swap=False,progress=None,limit=None,reco
     from engine.replay import RecordingEngine
     world=scenario_factory(seed,swap=swap) if scenario_factory else create(seed,swap=swap,scenario_id=scenario_id)
     e=(RecordingEngine if record else Engine)(world);w=e.world;initial=frame(w);history={0:[],1:[]};policies=policies or {};decisions=0
+    exploration=any(getattr(p,'contract',None)=='tactics-5' for p in policies.values());view=None
+    if exploration:
+        from .exploration_env import ExplorationEnv
+        view=ExplorationEnv();view.engine=e;view.history={};view._round()
     with Activity(activity_role,f'{scenario_id}:{seed}:{int(swap)}',activity_run,str(scenario_id),[getattr(p,'policy_id','algorithm') for p in policies.values()]) as activity:
         while not getattr(w,'ended',False) and (limit is None or w.tick*.2<limit):
             # Both observations fixed before either team submits; no enemy command leakage.
-            observations={t:e.observe(t) for t in (0,1)};batches={}
+            observations={t:(view.raw(('A','B')[t]) if view else e.observe(t)) for t in (0,1)};batches={}
             for t in (0,1):
-                o=observations[t];o['recent_summary']=[];policy=policies.get(t);old=isinstance(policy,LegacyPolicy);items=(legacy_candidates if old else candidates)(o);selected=[]
+                o=observations[t];o['recent_summary']=o.get('recent_summary',[]) if exploration else history[t];policy=policies.get(t);old=isinstance(policy,LegacyPolicy);items=(view.items[('A','B')[t]] if exploration and not old else (legacy_candidates if old else candidates)(o));selected=[]
                 for _ in range(4):
                     available=compatible(items,selected);mask=np.zeros(65,dtype=bool);mask[64]=True
                     for c in available:mask[c['id']]=True
                     from .decision_inputs import encode
-                    x=encode(o,available,selected,mission=not old)
+                    x=encode(o,available,selected,mission=not old,contract=getattr(policy,'contract',None))
                     action=policy.predict(x,mask) if policy else max(available,key=lambda c:(c['score'],-c['id']))['id'] if available else 64
                     if action==64:break
                     selected.append(next(c for c in available if c['id']==action))
-                batches[t]=commands(o,selected)
+                batches[t]=commands(o,selected);history[t]=x[:7].tolist()+history[t][:7]
             for t in (0,1):
                 for command in batches[t]:
                     try:e.submit_for(t,command)
                     except OrderError:pass
             before=w.tick;e.step(10);decisions+=1
+            if view:view._round()
             activity.update(w.tick)
             if progress:
                 if hasattr(progress,'advance_simulation'):progress.advance_simulation((w.tick-before)*.2)

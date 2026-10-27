@@ -20,8 +20,11 @@ class ShapeEnv(gym.Env):
     def step(self,a):return np.zeros(OBS_SIZE,np.float32),0.,False,False,{}
     def action_masks(self):return np.ones(65,dtype=bool)
 
-def initialize(seed=0):
-    model=MaskablePPO(MissionPolicy,ShapeEnv(),n_steps=64,batch_size=32,n_epochs=2,target_kl=.02,gamma=.99**(1/3),gae_lambda=.95**(1/3),seed=seed,device='cpu',verbose=0)
+def initialize(seed=0,exploration=False):
+    env=ShapeEnv()
+    if exploration:
+        env.observation_space=Box(-4,4,(2112,),np.float32)
+    model=MaskablePPO(MissionPolicy,env,n_steps=64,batch_size=32,n_epochs=2,target_kl=.02,gamma=.99**(1/3),gae_lambda=.95**(1/3),seed=seed,device='cpu',verbose=0)
     model.set_logger(configure(folder=None,format_strings=[]));return model
 
 def identity(c):return tuple(c['command'][k] for k in ('op','unit','target','arg0','arg1'))

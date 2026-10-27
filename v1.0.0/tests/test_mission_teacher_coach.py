@@ -67,8 +67,8 @@ def test_comparison_training_isolates_status_control_and_ledger(tmp_path,monkeyp
     monkeypatch.setattr(experiment.subprocess,'run',call)
     import pytest
     with pytest.raises(Done):experiment.run(tmp_path/'study',tmp_path/'models',1)
-    call=seen[0];assert call['cwd']==(tmp_path/'study/baseline').resolve()
-    assert call['env']['MW_NV_CONTROL_ROOT']==str((tmp_path/'study/baseline/control').resolve())
+    call=seen[0];assert call['cwd']==(tmp_path/'study/8021/ppo_only').resolve()
+    assert call['env']['MW_NV_CONTROL_ROOT']==str((tmp_path/'study/8021/ppo_only/control').resolve())
     assert call['env']['MW_NV_PUBLISH_TRAINING']=='0'
 
 def test_only_one_demonstration_worker_globally(tmp_path):
@@ -86,13 +86,13 @@ def test_completed_comparison_trial_does_not_train_extra_updates(tmp_path,monkey
     import learning.mission_state as states
     import learning.mission_evaluate as evaluation
     root=tmp_path/'study'
-    for lane in ('baseline','enhanced'):
-        folder=root/lane;folder.mkdir(parents=True);(folder/'state.json').write_text('{"generation":1}')
+    for lane in ('ppo_only','ordinary','enhanced'):
+        folder=root/'8021'/lane;folder.mkdir(parents=True);(folder/'state.json').write_text('{"generation":1}')
     class Env:
         def reset(self,*args):pass
     monkeypatch.setattr(environments,'MissionEnv',Env)
     monkeypatch.setattr(states,'load',lambda *args:([],dict(generation=1,completed_games=0)))
     monkeypatch.setattr(evaluation,'evaluate',lambda *args,**kwargs:dict(complete=True,results=[]))
     monkeypatch.setattr(experiment.subprocess,'run',lambda *args,**kwargs:(_ for _ in ()).throw(AssertionError('extra training')))
-    result=experiment.run(root,tmp_path/'models',1)
+    result=experiment.run(root,tmp_path/'models',1,seeds=(8021,))
     assert all(r['last_invocation_updates']==0 for r in result['trials'].values())

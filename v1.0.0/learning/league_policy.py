@@ -59,9 +59,10 @@ def update(model,rows,last_value,teacher):
     if len(rows)<2:model.normalize_advantage=False
     model.target_kl=.02
     model.train();model.normalize_advantage=True
-    model.target_kl = .02
+    gradient_norm=float(torch.sqrt(sum(p.grad.detach().square().sum() for p in model.policy.parameters() if p.grad is not None))) if any(p.grad is not None for p in model.policy.parameters()) else None
     loss = teacher.imitate(model)
     diagnostics = {k.removeprefix('train/'): float(v) for k,v in model.logger.name_to_value.items() if k.startswith('train/') and np.isscalar(v) and np.isfinite(v)}
+    diagnostics['last_ppo_gradient_norm_after_clip']=gradient_norm
     if any(not torch.isfinite(p).all() for p in model.policy.parameters()):raise ValueError('nonfinite policy')
     return dict(steps=len(rows),imitation=loss,diagnostics=diagnostics,teacher=dict(teacher.stats))
 

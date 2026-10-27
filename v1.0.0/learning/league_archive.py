@@ -27,7 +27,7 @@ def _spool(root,checkpoint,state,full=False,asset_root=None):
         initial_report=asset_root/'evaluations'/'games-00000000'/'report.json'
         if full and initial_report.exists():tar.add(initial_report,arcname='initial-evaluation.json')
         if full:
-            step=96 if state.get('contract') in ('tactics-3','tactics-4') else 50
+            step=96 if state.get('contract') in ('tactics-3','tactics-4','tactics-5') else 50
             milestone=state['completed_games']//step*step
             for name in sorted({'games-00000000',f'games-{state["completed_games"]:08d}',f'games-{milestone:08d}'}):
                 for p in sorted((asset_root/'evaluations'/name).glob('*')):
@@ -38,7 +38,7 @@ def _spool(root,checkpoint,state,full=False,asset_root=None):
         info=tarfile.TarInfo('statistics.jsonl');info.size=len(body);tar.addfile(info,io.BytesIO(body))
     digest=hashlib.sha256(temporary.read_bytes()).hexdigest();path=folder/(name.removesuffix('.tar.gz')+'-'+digest[:16]+'.tar.gz');temporary.replace(path)
     name=path.name
-    atomic_json(path.with_suffix('.json'),dict(asset=name,sha256=hashlib.sha256(path.read_bytes()).hexdigest(),full=full,run=state['run'],games=state['completed_games'],generation=state['generation']))
+    atomic_json(path.with_suffix('.json'),dict(asset=name,sha256=hashlib.sha256(path.read_bytes()).hexdigest(),full=full,run=state['run'],games=state['completed_games'],generation=state['generation'],policies={f'ppo{i}.npz':hashlib.sha256((Path(checkpoint)/f'ppo{i}.npz').read_bytes()).hexdigest() for i in (1,2)}))
     return path
 
 
@@ -58,12 +58,12 @@ def verify(path,digest,full):
             if any(not e.isfile() or Path(e.name).is_absolute() or '..' in Path(e.name).parts or len(Path(e.name).parts)>(3 if e.name.startswith(('evaluations/','coaching/')) else 2) for e in entries):raise ValueError('archive path')
             tar.extractall(tmp,filter='data')
         p=Path(tmp);state=json.loads((p/'state.json').read_text())
-        if (state['rules_version'],state['contract']) not in (('combined-arms-4','tactics-2'),('combined-arms-5','tactics-3'),('combined-arms-6','tactics-4')):raise ValueError('archive contract')
-        if state['contract'] in ('tactics-3','tactics-4'):
+        if (state['rules_version'],state['contract']) not in (('combined-arms-4','tactics-2'),('combined-arms-5','tactics-3'),('combined-arms-6','tactics-4'),('combined-arms-6','tactics-5')):raise ValueError('archive contract')
+        if state['contract'] in ('tactics-3','tactics-4','tactics-5'):
             if state.get('catalog_version')!='combined-arms-3':raise ValueError('archive catalog')
             from .mission_numpy import NumpyPolicy
             CandidatePolicy=lambda path:NumpyPolicy(path,allow_historical=True)
-        size=1600 if state['contract'] in ('tactics-3','tactics-4') else 1056
+        size=2112 if state['contract']=='tactics-5' else 1600 if state['contract'] in ('tactics-3','tactics-4','tactics-5') else 1056
         for i in (1,2):
             policy=CandidatePolicy(p/f'ppo{i}.npz')
             if full:

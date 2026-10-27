@@ -5,7 +5,7 @@ Goal: independent PPO1/PPO2 learn all modes2/3/4; victory first, then losses/res
 Order: correctness →30 diagnostic games/retention→192-game mixed pilot→gated tactics-5 routes/opponent diversity→three-arm NIM comparison→heldout tactic/transfer evidence. Keep old actors/optimizers/replays and remote verified recoveries. Do not promote untested actors.
 
 ## Stage1
-The real update now calls TeacherBuffer.imitate/sample_rows (mission quotas13/13/6). Training, teacher and evaluation share decision_inputs.encode; tactics-4 history stays empty, matching training. Metadata mission-inputs-2 identifies corrected samples. Old samples remain in original archives but are excluded on load, not silently guessed. Legacy tactics-2 inputs are unchanged.
+The real update now calls TeacherBuffer.imitate/sample_rows (mission quotas13/13/6). Training, teacher and evaluation share decision_inputs.encode; tactics-4 keeps its original prefix-feature history; a deeper audit corrected the initial mistaken assumption that history was empty. Metadata mission-inputs-2 identifies corrected samples. Old samples remain in original archives but are excluded on load, not silently guessed. Legacy tactics-2 inputs are unchanged.
 
 MaskablePPO target_kl=.02 uses installed SB3-Contrib. Auxiliary imitation measures masked forward KL and clips gradients(.5); KL>.02/nonfinite restores only the post-PPO auxiliary starting weights+optimizer. Actual sample mode/stage/team counts and SB3 train diagnostics are persisted in update metadata.
 

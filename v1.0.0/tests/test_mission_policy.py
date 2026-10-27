@@ -32,7 +32,7 @@ def test_modes_and_no_time_shaping():
 def test_teacher_contract_and_mission_anonymity(tmp_path):
     from agents.teacher import canonical_offer
     from agents.tactics import shortlist
-    e=MissionEnv(scenario_id='4');e.reset(1);buffer=MissionTeacher();buffer.rows.append((e.vector('A'),e.mask('A'),64,0));buffer.save(tmp_path/'t.npz');restored=MissionTeacher();restored.load(tmp_path/'t.npz');assert restored.rows[0][0].shape==(1600,)
+    e=MissionEnv(scenario_id='4');e.reset(1);buffer=MissionTeacher();buffer.rows.append((e.vector('A'),e.mask('A'),64,0,{'input_revision':'mission-inputs-2'}));buffer.save(tmp_path/'t.npz');restored=MissionTeacher();restored.load(tmp_path/'t.npz');assert restored.rows[0][0].shape==(1600,)
     payload,_=canonical_offer(e.raw('A'),shortlist(e.items['A']));assert payload['mission']['mode']=='capture_flag';assert {f['owner'] for f in payload['mission']['flags']}=={'SELF','OPPONENT'}
 
 

@@ -40,7 +40,7 @@ class TeacherBuffer:
                     for c in available:mask[c['id']]=True
                     if not mask[action]:raise ValueError('teacher mask')
                     from .decision_inputs import encode,REVISION
-                    values=encode(obs,available,selected,mission=self.observation_size==1600)
+                    values=encode(obs,available,selected,mission=self.observation_size in (1600,2112),contract="tactics-5" if self.observation_size==2112 else None)
                     chosen=next((c for c in available if c['id']==action),None)
                     staged.append((values,mask,action,team,dict(input_revision=REVISION,mode=obs.get('mission',{}).get('mode','conquest'),stage=chosen['role'] if chosen else 'end',prefix=len(selected),source=getattr(env,'teacher_source','ordinary'),tick=obs.get('tick',0))))
                     if action!=64:selected.append(next(c for c in available if c['id']==action))

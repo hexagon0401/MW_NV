@@ -48,7 +48,11 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         from .mission_rollout import code_fingerprint
         if json.loads(gate.read_text()).get('code_sha256')!=code_fingerprint():raise ValueError('T11 validation gate belongs to different code')
     for name in ('opponents','baseline','evaluations','insights'):(root/name).mkdir(exist_ok=True)
-    buffers=[backend.TeacherBuffer(),backend.TeacherBuffer()];query=backend.TeacherBuffer();generators=[torch.Generator().manual_seed(902+i) for i in range(2)]
+    buffer_class=backend.TeacherBuffer
+    if kind=='mission' and os.environ.get('MW_NV_EXPLORATION')=='1':
+        from .exploration_env import ExplorationTeacher
+        buffer_class=ExplorationTeacher
+    buffers=[buffer_class(),buffer_class()];query=buffer_class();generators=[torch.Generator().manual_seed(902+i) for i in range(2)]
     env=make_env(kind)
     if (root/'current.json').exists():models,state=backend.load(root,env,buffers,query,generators)
     else:
@@ -59,13 +63,13 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             models=[MaskablePPO.load(Path(source)/f'ppo{i+1}.zip',device='cpu') for i in range(2)]
             for m in models:m.set_logger(configure(folder=None,format_strings=[]))
         env.reset(0)
-        state=dict(schema=1,run='league-'+uuid.uuid4().hex[:12],rules_version=backend.RULES_VERSION,catalog_version=backend.CATALOG_VERSION,contract='tactics-4' if kind=='mission' else 'tactics-2',map_id='mixed-2-3-4' if kind=='mission' else 'river-districts',map_version='1' if kind=='mission' else '2',generation=0,completed_games=0,episode=0,active=False,rounds=0,last_policy_archive=0,last_full_archive=0,last_evaluation=0,assignments={},teacher_enabled=teacher_enabled)
+        state=dict(schema=1,run='league-'+uuid.uuid4().hex[:12],rules_version=backend.RULES_VERSION,catalog_version=backend.CATALOG_VERSION,contract=getattr(env,'contract','tactics-4') if kind=='mission' else 'tactics-2',map_id='mixed-2-3-4' if kind=='mission' else 'river-districts',map_version='1' if kind=='mission' else '2',generation=0,completed_games=0,episode=0,active=False,rounds=0,last_policy_archive=0,last_full_archive=0,last_evaluation=0,assignments={},teacher_enabled=teacher_enabled)
         for i,m in enumerate(models):
             backend.export(m,root/'baseline'/f'ppo{i+1}.npz')
             if kind=='mission':m.save(root/'baseline'/f'ppo{i+1}.zip')
         backend.save(root,models,env,buffers,query,generators,state)
     from .mission_coach import MissionCoach
-    coach=MissionCoach(root) if kind=='mission' and teacher_enabled and os.environ.get('MW_NV_MISSION_TEACHER_BASELINE')!='1' else None
+    coach=MissionCoach(root) if kind=='mission' and teacher_enabled and os.environ.get('MW_NV_MISSION_TEACHER_BASELINE')!='1' and os.environ.get('MW_NV_DISABLE_MISSION_COACH')!='1' else None
     state['pilot']=pilot;state['teacher_enabled']=teacher_enabled
     control.register(root,source,kind,pilot,state['run'],state.get('control_desired'))
     state.setdefault('last_policy_update',state['generation']);state.setdefault('last_full_update',state['generation'])
@@ -129,7 +133,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         except (OSError,ValueError):pass
         if publish:io.start(root)
         reporter.round=state['generation'];reporter.base_steps=sum(m.num_timesteps for m in models)
-        reporter(dict(phase=phase,games=state['completed_games'],sim_seconds=simulated,policy_steps=reporter.base_steps,algorithm='Independent adaptive MaskablePPO',maps='3 balanced modes' if kind=='mission' else '4 terrain variants',nim_in_training=teacher_enabled,teacher=dict(query.stats),coaching=coach.stats if coach else None,learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows)) for i,m in enumerate(models)],decision_seconds=10,teacher_seconds=30,workers=adaptive.workers,cpu_budget=resources()['cpu_budget'],adaptation_reason=adaptive.reason,aggregate_sim_speed=True,worker_sim_seconds=dict(worker_sim),games_per_hour=(state['completed_games']-completed_start)*3600/elapsed,updates_per_hour=updates*3600/elapsed,evaluation_cases=cases,evaluation_total=240 if kind=='mission' else 80,backup=state.get('backup','pending'),map_id=state['map_id'],map_version=state['map_version'],rules_version=state['rules_version'],runtime_schema='adaptive-1',publication=publication,run_id=state['run'],control_version=control.state().get('version',0)),force=force)
+        reporter(dict(mixed_training_active=kind=='mission',contract=state['contract'],teacher_condition='enhanced' if coach else 'ordinary' if teacher_enabled else 'ppo_only',collected_rounds_by_mode=state.get('collected_rounds_by_mode',{}),completed_by_mode=state.get('completed_by_mode',{}),learning_diagnostics={f'PPO{i+1}':state.get(f'ppo{i+1}_last_update',{}) for i in range(2)},last_completed_evaluation=state.get('last_evaluation'),phase=phase,games=state['completed_games'],sim_seconds=simulated,policy_steps=reporter.base_steps,algorithm='Independent adaptive MaskablePPO',maps='3 balanced modes' if kind=='mission' else '4 terrain variants',nim_in_training=teacher_enabled,teacher=dict(query.stats),coaching=coach.stats if coach else None,learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows)) for i,m in enumerate(models)],decision_seconds=10,teacher_seconds=30,workers=adaptive.workers,cpu_budget=resources()['cpu_budget'],adaptation_reason=adaptive.reason,aggregate_sim_speed=True,worker_sim_seconds=dict(worker_sim),games_per_hour=(state['completed_games']-completed_start)*3600/elapsed,updates_per_hour=updates*3600/elapsed,evaluation_cases=cases,evaluation_total=240 if kind=='mission' else 80,backup=state.get('backup','pending'),map_id=state['map_id'],map_version=state['map_version'],rules_version=state['rules_version'],runtime_schema='adaptive-1',publication=publication,run_id=state['run'],control_version=control.state().get('version',0)),force=force)
     report.advance_simulation=reporter.advance_simulation
     def checkpoint():
         with reporter.busy():
@@ -144,7 +148,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             for k in ('descriptor','assignments','fixed_opponent','initial_frame','metrics','episode_starts','policy_spans'):state[k]=info.get(k)
             state['control_desired']=control.state()['desired']
             state.update(active=info['active'],episode=info.get('episode',next_episode),next_episode=next_episode,adaptive=dict(workers=adaptive.workers,reason=adaptive.reason))
-            safe_query=backend.TeacherBuffer();safe_query.stats=dict(query.stats);safe_query.cooldown=query.cooldown
+            safe_query=buffer_class();safe_query.stats=dict(query.stats);safe_query.cooldown=query.cooldown
             path=backend.save(root,models,primary,buffers,safe_query,generators,state);backend.record_update(root,state,models)
             if coach:coach.prune()
             return path
@@ -219,9 +223,12 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
                         from .results import record_world
                         record_world('data/results.sqlite',w,'training',policy_ids,match_id=f'{state["run"]}-{info["episode"]:08d}',initial_frame=meta['initial_frame'],metadata={'league':metadata})
                         state['completed_games']+=1;info['active']=False
+                        counts=state.setdefault('completed_by_mode',{});mode=info['descriptor'].get('scenario_id','2');counts[mode]=counts.get(mode,0)+1
                         if publish:
                             engine=restore(make_env(kind),b['environment']).engine
                             io.latest(root,'replay',(engine,meta['initial_frame'],{'league':dict(run=state['run'],assignments=info['assignments'],generation=state['generation'])}))
+                for index in ids:
+                    counts=state.setdefault('collected_rounds_by_mode',{});mode=slots[index]['info']['descriptor'].get('scenario_id','2');counts[mode]=counts.get(mode,0)+1
                 if coach:
                     for index in ids:
                         p=packets[index]

@@ -2,8 +2,10 @@
 REVISION = 'mission-inputs-2'
 
 
-def encode(obs, items, selected=(), *, mission=False):
-    if mission:
+def encode(obs, items, selected=(), *, mission=False,contract=None):
+    if contract=="tactics-5":
+        from .exploration_features import vector
+    elif mission:
         from .mission_features import vector
     else:
         from .candidate_policy import vector

@@ -35,14 +35,14 @@ def test_rejected_imitation_restores_weights_and_optimizer(monkeypatch):
     assert b.stats['imitation_rollbacks']==1
 
 
-def test_mission_prefix_matches_rollout_and_ignores_legacy_history():
+def test_mission_prefix_matches_rollout_and_preserves_training_history():
     e=MissionEnv();e.reset(7);obs=e.raw('A');items=e.items['A'];selected=items[:1]
     from agents.tactics import compatible
     e.selected['A']=selected;available=compatible(items,selected)
     a=e.vector('A');b=encode(obs,available,selected,mission=True)
     np.testing.assert_array_equal(a,b)
     obs['recent_summary']=[.9]*14
-    np.testing.assert_array_equal(encode(obs,available,selected,mission=True),b)
+    np.testing.assert_allclose(encode(obs,available,selected,mission=True)[48:62],[.9]*14)
     assert b[17]==sum(c.get('supply_cost',0) for c in selected)/max(1,obs['resources']['supply'])
 
 
