@@ -38,7 +38,7 @@ def _spool(root,checkpoint,state,full=False,asset_root=None):
         info=tarfile.TarInfo('statistics.jsonl');info.size=len(body);tar.addfile(info,io.BytesIO(body))
     digest=hashlib.sha256(temporary.read_bytes()).hexdigest();path=folder/(name.removesuffix('.tar.gz')+'-'+digest[:16]+'.tar.gz');temporary.replace(path)
     name=path.name
-    atomic_json(path.with_suffix('.json'),dict(asset=name,sha256=hashlib.sha256(path.read_bytes()).hexdigest(),full=full,run=state['run'],games=state['completed_games'],generation=state['generation'],policies={f'ppo{i}.npz':hashlib.sha256((Path(checkpoint)/f'ppo{i}.npz').read_bytes()).hexdigest() for i in (1,2)}))
+    atomic_json(path.with_suffix('.json'),dict(asset=name,sha256=hashlib.sha256(path.read_bytes()).hexdigest(),full=full,run=state['run'],games=state['completed_games'],generation=state['generation'],styles={f'ppo{i}.npz':state.get('behavior_profiles',{}).get(f'PPO{i}','unknown') for i in (1,2)},policies={f'ppo{i}.npz':hashlib.sha256((Path(checkpoint)/f'ppo{i}.npz').read_bytes()).hexdigest() for i in (1,2)}))
     return path
 
 

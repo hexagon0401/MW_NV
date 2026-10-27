@@ -49,3 +49,29 @@ def test_group_quotas_and_variation_determinism():
     items=[dict(role=role,score=i,command=dict(unit=i)) for role in ('flag','attack','transport','supply') for i in range(25)]
     result=balanced(items)
     assert len(result)==64 and all(sum(c['role']==r for c in result)==16 for r in ('flag','attack','transport','supply'))
+
+
+def test_successor_preparation_rejects_unfinished_pilot(tmp_path):
+    import json,pytest
+    from learning.exploration_bootstrap import prepare
+    (tmp_path/'state.json').write_text(json.dumps(dict(contract='tactics-4',completed_games=191)))
+    (tmp_path/'validation-gates.json').write_text('{}')
+    with pytest.raises(ValueError,match='pilot'):prepare(tmp_path,tmp_path/'next')
+    assert not (tmp_path/'next').exists()
+
+
+def test_distillation_only_matches_real_commands(tmp_path):
+    from learning.mission_initialize import initialize
+    from learning.exploration_bootstrap import distill
+    torch.set_num_threads(1);m=initialize(5);source=tmp_path/'old.npz';export(m,source)
+    report=distill(source,tmp_path/'new.zip',seed=6,rounds=1,epochs=1)
+    assert report['matched_commands_only'] and report['critic_fresh'] and report['optimizer_fresh']
+    assert NumpyPolicy(tmp_path/'new.npz').contract=='tactics-5'
+
+
+def test_tank_routes_fit_sixteen_metre_corridor():
+    cells=[[6]*30 for _ in range(20)]
+    for row in cells[8:12]:row[:]=[1]*30
+    obs=dict(terrain=cells,enemies=[],catalog=dict(units={},vehicles={'TANK':{'footprint_cm':[900,450]}}))
+    actor=dict(type_id='TANK',pos=dict(x_cm=2000,y_cm=4000))
+    assert route(obs,actor,(10000,4000),'shortest') is not None

@@ -1,0 +1,11 @@
+{
+  "games": 164,
+  "generation": 389,
+  "source": "data/league-v1/checkpoints/checkpoint-00000389-02bd3a29",
+  "preserved": "data/preserved/before-t22-checkpoint-00000389-02bd3a29",
+  "policy_files": {
+    "ppo2.npz": "65257842c71587396e0b00d5a302e33b19824727767e0d1ccf43ff1ba06e6bff",
+    "ppo1.npz": "06fe1c90d822afd79ad2b5b5d87c9226a2ec18efd7e915a0779a092705c1546c"
+  },
+  "optimizer_reset": false
+}

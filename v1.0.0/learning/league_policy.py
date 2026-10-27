@@ -64,6 +64,8 @@ def update(model,rows,last_value,teacher):
     diagnostics = {k.removeprefix('train/'): float(v) for k,v in model.logger.name_to_value.items() if k.startswith('train/') and np.isscalar(v) and np.isfinite(v)}
     diagnostics['last_ppo_gradient_norm_after_clip']=gradient_norm
     if any(not torch.isfinite(p).all() for p in model.policy.parameters()):raise ValueError('nonfinite policy')
+    from .online_metrics import merge
+    teacher.stats['reward_moments']=merge(teacher.stats.get('reward_moments'),[r['reward'] for r in rows])
     return dict(steps=len(rows),imitation=loss,diagnostics=diagnostics,teacher=dict(teacher.stats))
 
 

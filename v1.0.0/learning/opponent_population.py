@@ -40,14 +40,24 @@ class Population:
             m=json.loads(manifest.read_text())
             if m.get('status')!='verified' or m.get('full') or 'transport' not in m:continue
             for member,digest in m.get('policies',{}).items():
-                entries.setdefault(digest,dict(id=digest,sha256=digest,file=digest+'.npz',generation=m['generation'],style='unknown',remote=dict(release=m['release'],transport=m['transport'],member=member)))
+                entries.setdefault(digest,dict(id=digest,sha256=digest,file=digest+'.npz',generation=m['generation'],style=m.get('styles',{}).get(member,'unknown'),remote=dict(release=m['release'],transport=m['transport'],member=member)))
         rows=sorted(entries.values(),key=lambda e:(e['generation'],e['id']))
-        self.state['entries']=rows if len(rows)<=32 else [rows[round(i*(len(rows)-1)/31)] for i in range(32)]
+        if len(rows)<=32:self.state['entries']=rows
+        else:
+            chosen={rows[0]['id']:rows[0],rows[-1]['id']:rows[-1]}
+            for style in sorted({e['style'] for e in rows}):
+                if len(chosen)>=32:break
+                e=next(e for e in reversed(rows) if e['style']==style);chosen[e['id']]=e
+            for i in range(32):
+                if len(chosen)>=32:break
+                e=rows[round(i*(len(rows)-1)/31)];chosen[e['id']]=e
+            self.state['entries']=sorted(chosen.values(),key=lambda e:(e['generation'],e['id']))
         self.save()
-    def choose(self,episode):
+    def choose(self,episode,learner=None):
         block=str(episode//96);counts=self.state['blocks'].setdefault(block,{})
         available=[e for e in self.state['entries'] if (self.root/'opponents'/e['file']).exists() or e.get('remote')]
-        e=select(available,self.state['payoffs'],4903+episode,counts);counts[e['id']]=counts.get(e['id'],0)+1
+        payoffs=self.state.get('payoffs_by_learner',{}).get(learner,self.state['payoffs'])
+        e=select(available,payoffs,4903+episode,counts);counts[e['id']]=counts.get(e['id'],0)+1
         self.state['blocks']={block:counts};self.save();return e
     def resolve(self,entry,fetch):
         folder=self.root/'opponents';folder.mkdir(exist_ok=True);path=folder/entry['file']
@@ -62,7 +72,8 @@ class Population:
         files=sorted((self.root/'opponents').glob('*.npz'),key=lambda p:p.stat().st_mtime,reverse=True)
         pinned=set(pinned);verified={e['file'] for e in self.state['entries'] if e.get('remote')}
         # Never remove the only unverified copy to pretend the cache limit was met.
-        keep={p.name for p in files[:8]}|pinned
+        unpinned=[f for f in files if f.name not in pinned]
+        keep=pinned|{p.name for p in unpinned[:max(0,8-len(pinned))]}
         for p in files:
             if p.name not in keep and p.name in verified:p.unlink()
         return dict(local=len(list((self.root/'opponents').glob('*.npz'))),blocked_unverified=sum(p.name not in keep and p.name not in verified for p in files))
@@ -78,3 +89,23 @@ def fetch_remote(remote,destination):
             member=tar.getmember(remote['member'])
             if not member.isfile() or member.size>16*1024**2 or member.name not in ('ppo1.npz','ppo2.npz'):raise ValueError('invalid opponent archive member')
             destination.write_bytes(tar.extractfile(member).read())
+
+
+def evaluate_selection(root,models,state,progress=None,pinned=()):
+    from .mission_policy import export
+    from .mission_numpy import NumpyPolicy
+    from .mission_evaluate import play
+    population=Population(root);population.sync_verified()
+    if not population.state['entries']:return
+    for i,model in enumerate(models):
+        learner=f'PPO{i+1}';scores=population.state.setdefault('payoffs_by_learner',{}).setdefault(learner,{})
+        entry=min(population.state['entries'],key=lambda e:(scores.get(e['id'],{}).get('games',0),e['generation'],e['id']))
+        opponent=NumpyPolicy(population.resolve(entry,fetch_remote));path=Path(root)/f'probe-ppo{i+1}.npz';export(model,path);policy=NumpyPolicy(path)
+        value=dict(games=0,score=0.,source_policy=policy.policy_id,partition='opponent_selection')
+        for seed in (9000+state['completed_games']//96*2%900,9001+state['completed_games']//96*2%900):
+            for team in (0,1):
+                for swap in (False,True):
+                    _,result=play(seed,('2','3','4')[(state['completed_games']//96)%3],{team:policy,1-team:opponent},swap,progress,activity_role='evaluation',activity_run=state['run']+'-population')
+                    value['games']+=1;value['score']+=.5 if result['winner'] is None else float(result['winner']==team)
+        scores[entry['id']]=value;population.save();path.unlink()
+    population.prune(pinned)

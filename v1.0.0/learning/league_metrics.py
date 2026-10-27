@@ -11,7 +11,13 @@ def opportunity(metrics,team,items):
 
 def selection(metrics,team,candidate,tick):
     role=candidate['role']+':'+candidate.get('analysis',{}).get('tactic','direct');counter=metrics[team]['selected'];counter[role]=counter.get(role,0)+1
-    metrics[team]['commands'].append(dict(role=role,unit=candidate['command']['unit'],op=candidate['command']['op'],target=candidate['command']['target'],tick=tick,cmd_id=tick*100+sum(r['tick']==tick for r in metrics[team]['commands'])+1))
+    rounds=metrics[team].setdefault('selected_rounds',{});seen=metrics[team].setdefault('selection_round',dict(tick=tick,roles=[]))
+    if seen['tick']!=tick:seen.update(tick=tick,roles=[])
+    if role not in seen['roles']:rounds[role]=rounds.get(role,0)+1;seen['roles'].append(role)
+    analysis=candidate.get('analysis',{})
+    routes=metrics[team].setdefault('routes',{});style=analysis.get('route_style')
+    if style:routes[style]=routes.get(style,0)+1
+    metrics[team]['commands'].append(dict(route_style=style,role=role,unit=candidate['command']['unit'],op=candidate['command']['op'],target=candidate['command']['target'],tick=tick,cmd_id=tick*100+sum(r['tick']==tick for r in metrics[team]['commands'])+1))
 
 def finish(metrics,world,initial=None):
     from .tactical_patterns import detect
@@ -46,7 +52,7 @@ def document(db='data/results.sqlite',game_mode=None,scenario_id=None):
             if learner not in ('PPO1','PPO2'):continue
             values=run['learners'].setdefault(learner,dict(games=0,wins=0,losses=0,draws=0,opportunities={},selected={},role_outcomes={},recent=[]));values['games']+=1
             outcome='draws' if row['winner'] is None else 'wins' if row['winner']==('A','B').index(team) else 'losses';values[outcome]+=1
-            values['recent'].append(dict(game_mode=row.get('game_mode'),scenario_id=row.get('scenario_id'),mission_stats=row.get('mission_stats'),match=row['id'],outcome=outcome,score=row['scores'],team=team,swapped=row['swapped'],policies=row['policies'],objectives=row.get('objective_stats'),fingerprint=league.get('metrics',{}).get('teams',{}).get(team)))
+            values['recent'].append(dict(generation=league.get('generation',league.get('evaluation_games')),execution_kind=row.get('mode'),evidence_level='insufficient',game_mode=row.get('game_mode'),scenario_id=row.get('scenario_id'),mission_stats=row.get('mission_stats'),match=row['id'],outcome=outcome,score=row['scores'],team=team,swapped=row['swapped'],policies=row['policies'],objectives=row.get('objective_stats'),fingerprint=league.get('metrics',{}).get('teams',{}).get(team)))
             for role,outcomes in league.get('metrics',{}).get('teams',{}).get(team,{}).get('role_outcomes',{}).items():
                 target=values['role_outcomes'].setdefault(role,{})
                 for kind,count in outcomes.items():target[kind]=target.get(kind,0)+count
@@ -60,4 +66,4 @@ def document(db='data/results.sqlite',game_mode=None,scenario_id=None):
     for run in runs.values():
         for name in ('PPO1','PPO2'):run['learners'].setdefault(name,dict(games=0,wins=0,losses=0,draws=0,opportunities={},selected={},role_outcomes={},recent=[]))
         for learner in run['learners'].values():learner['win_rate']=learner['wins']/max(1,learner['games']);learner['recent']=learner['recent'][-100:];learner['recent50_wins']=sum(r['outcome']=='wins' for r in learner['recent'][-50:]);learner['recent50_games']=min(50,len(learner['recent']))
-    return dict(schema=1,evidence='observed_change_only',runs=list(runs.values()),causal_claim=False)
+    return dict(evidence_levels=['insufficient','observed_change','discovery_candidate','reproduced_tactic','effect_confirmed'],schema=1,evidence='observed_change_only',runs=list(runs.values()),causal_claim=False)

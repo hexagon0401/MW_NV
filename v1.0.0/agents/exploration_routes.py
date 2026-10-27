@@ -10,12 +10,16 @@ def route(obs,actor,goal,style,max_nodes=20000):
     cells=obs['terrain'];height=len(cells);width=len(cells[0]);vehicle=actor.get('type_id') in obs['catalog']['vehicles'];spec=(obs['catalog']['vehicles'] if vehicle else obs['catalog']['units'])[actor['type_id']]
     start=(actor['pos']['x_cm']//400,actor['pos']['y_cm']//400);end=(goal[0]//400,goal[1]//400)
     air=bool(spec.get('aircraft',actor['type_id']=='HEL'))
-    half=spec.get('footprint_cm',[100,100]);half=[max(0,math.ceil(float(x)/800)) for x in half] if vehicle and not air else [0,0]
+    footprint=spec.get('footprint_cm',[100,100])
     allowed=(0,1,7,8) if vehicle else (0,1,2,4,5,7,8,10)
     def legal(p):
         x,y=p
-        if not(half[0]<=x<width-half[0] and half[1]<=y<height-half[1]):return False
-        return air or all(cells[cy][cx] in allowed for cy in range(y-half[1],y+half[1]+1) for cx in range(x-half[0],x+half[0]+1))
+        if not(0<=x<width and 0<=y<height):return False
+        if air:return True
+        if not vehicle:return cells[y][x] in allowed
+        cx,cy=x*400+200,y*400+200;hw,hh=footprint[0]//2,footprint[1]//2
+        left,right=(cx-hw)//400,(cx+hw-1)//400;top,bottom=(cy-hh)//400,(cy+hh-1)//400
+        return 0<=left<=right<width and 0<=top<=bottom<height and all(cells[cy][cx] in allowed for cy in range(top,bottom+1) for cx in range(left,right+1))
     if not legal(start) or not legal(end):return None
     threats=[(e['pos']['x_cm']/400,e['pos']['y_cm']/400) for e in obs['enemies']]
     def risk(p):return min(1,sum(max(0,1-math.hypot(p[0]-x,p[1]-y)/25) for x,y in threats))
@@ -72,7 +76,8 @@ def candidates(obs):
             waypoint=points[min(20,len(points)-1)];key=waypoint
             if key in seen:continue
             seen.add(key);copy=deepcopy(c);copy['command'].update(arg0=waypoint[0]//100,arg1=waypoint[1]//100)
-            copy['analysis'].update(info,route_style=style,route_goal=goal)
+            spec=(obs['catalog']['vehicles'] if actor['type_id'] in obs['catalog']['vehicles'] else obs['catalog']['units'])[actor['type_id']]
+            copy['analysis'].update(info,route_style=style,route_goal=goal,eta_s=info['path_length_m']/max(.1,spec.get('speed_mps',1.6)))
             hq=next((f for f in obs['facilities'] if f['kind']=='HQ' and f['owner']==obs['team']),None)
             gx=waypoint[0]/(obs['map_width_m']*100)
             copy['features'][14:16]=[1-gx if hq and hq['pos']['x_cm']>obs['map_width_m']*50 else gx,waypoint[1]/(obs['map_height_m']*100)]

@@ -1,12 +1,12 @@
 # MW-NV v1.0.0 STATE
-Current:T22 stage1 COMPLETE;gated exploration/experiments implemented,integrating
-Read:docs/strategy-learning/README.md;sources.json
-Corrections:balanced real imitation,shared prefix encoding,KL guards,teacher provenance
-History:preserve tactics4 prefix history;earlier empty-history diagnosis corrected
-Added:tactics5 rows32/routes/history,training variants,population,3-arm NIM tooling
-Tests:29 scoped passed;earlier31 scoped passed after valid-fixture correction(overlap)
-Models:legacy PPO active unchanged;no reset or forced restart
-Validation:21 verified games preserved;pipeline paused until final source certification
-Next:finish runtime integration/API;full regression;recertify/restart validation
-Remaining:192-game pilot,NIM ablation,transfer evidence;no improvement claim
+Current:T22 code/tests COMPLETE;runtime/deployment finalizing
+Read:docs/strategy-learning/README.md;diagnostic-continuity.json
+Changed:unified inputs,balanced imitation,KL rollback/metrics,3-arm study
+Added:gated tactics5 routes/history/variants,remote population,API/UI diagnostics
+Tests:Python full286 passed405.77s;later scoped36/24/19/18 passed(overlap)
+Web:49 tests/build;Chromium local+Pages preview desktop/mobile fixtures passed
+Models:164 games/gen389 safely stopped;consumed checkpoint copied before restart
+Diagnostics:21 verified cases continuity proven;policy evaluations require rerun
+Limits:tactics5 demo teacher blocked;full historical generation aggregates pending
+Next:resume exact legacy models;restart pinned diagnostics/study;production UI deploy
 Usage:UNKNOWN

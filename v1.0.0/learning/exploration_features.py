@@ -17,9 +17,11 @@ def vector(obs,items):
         if u:own[s['id']]=u
     for c in items:
         index=c['id'];row=x[64+index*32:64+(index+1)*32];row[:24]=old[64+index*24:64+(index+1)*24]
-        a=own.get(c['command']['unit']);p=a['pos'] if a else dict(x_cm=0,y_cm=0);analysis=c.get('analysis',{});goal=analysis.get('route_goal',(p['x_cm'],p['y_cm']))
+        a=own.get(c['command']['unit']);p=a['pos'] if a else dict(x_cm=0,y_cm=0);analysis=c.get('analysis',{});goal=analysis.get('route_goal',(c['command'].get('arg0',0)*100,c['command'].get('arg1',0)*100) if c['command']['op'] in (2,7,10) else (p['x_cm'],p['y_cm']))
         dx,dy=(goal[0]-p['x_cm'])/100,(goal[1]-p['y_cm'])/100
         hq=next((f for f in obs['facilities'] if f['kind']=='HQ' and f['owner']==obs['team']),None)
         if hq and hq['pos']['x_cm']>obs['map_width_m']*50:dx=-dx
-        row[24:]=[dx/diagonal,dy/diagonal,analysis.get('path_length_m',analysis.get('distance_m',0))/diagonal,analysis.get('risk',0),analysis.get('cover',0),-1 if analysis.get('unexplored') is None else analysis.get('unexplored',-1),(a or {}).get('fuel',0)/100,analysis.get('eta_s',0)/max(1,obs.get('mission',{}).get('limits',{}).get('time_limit_s',3600))]
+        spec=obs['catalog']['vehicles'].get((a or {}).get('type_id'),{})
+        fuel_margin=((a or {}).get('fuel',0)-analysis.get('path_length_m',analysis.get('distance_m',0))*spec.get('fuel_per_100m',0)/100)/max(1,spec.get('fuel_max',100))
+        row[24:]=[dx/diagonal,dy/diagonal,analysis.get('path_length_m',analysis.get('distance_m',0))/diagonal,analysis.get('risk',0),analysis.get('cover',0),-1 if analysis.get('unexplored') is None else analysis.get('unexplored',-1),fuel_margin,analysis.get('eta_s',0)/max(1,obs.get('mission',{}).get('limits',{}).get('time_limit_s',3600))]
     return np.clip(x,-4,4)

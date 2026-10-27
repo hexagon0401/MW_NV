@@ -47,6 +47,14 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         if not gate.exists() or not json.loads(gate.read_text()).get('approved_for_pilot'):raise ValueError('T11 validation gates required')
         from .mission_rollout import code_fingerprint
         if json.loads(gate.read_text()).get('code_sha256')!=code_fingerprint():raise ValueError('T11 validation gate belongs to different code')
+    exploring=kind=='mission' and os.environ.get('MW_NV_EXPLORATION')=='1'
+    if exploring:
+        proof=json.loads((root/'strategy-gates.json').read_text())
+        from .mission_rollout import code_fingerprint
+        if not proof.get('approved_for_exploration') or proof.get('code_sha256')!=code_fingerprint():raise ValueError('completed pilot exploration certificate required')
+        if not (root/'current.json').exists() and any(hashlib.sha256((Path(source)/name).read_bytes()).hexdigest()!=digest for name,digest in proof.get('initialized_sha256',{}).items()):raise ValueError('successor initialization changed')
+        # Demonstration workers currently store tactics-4 labels; never mix contracts.
+        if teacher_enabled and os.environ.get('MW_NV_DISABLE_MISSION_COACH')!='1':raise ValueError('tactics-5 supports ordinary teacher only until demonstration history parity passes')
     for name in ('opponents','baseline','evaluations','insights'):(root/name).mkdir(exist_ok=True)
     buffer_class=backend.TeacherBuffer
     if kind=='mission' and os.environ.get('MW_NV_EXPLORATION')=='1':
@@ -107,6 +115,12 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         if descriptor['kind']=='past':
             picker=random.Random(4903+next_episode) if kind=='mission' else random
             files=sorted((root/'opponents').glob('*.npz'));options=files if files and picker.random()>=.5 else sorted((root/'baseline').glob('*.npz'));fixed=str(picker.choice(options).relative_to(root))
+        if exploring and descriptor['kind']=='past':
+            from .opponent_population import Population,fetch_remote
+            population=Population(root);population.sync_verified()
+            if population.state['entries']:
+                entry=population.choose(next_episode,f'PPO{descriptor["learner"]+1}');fixed=str(population.resolve(entry,fetch_remote).relative_to(root))
+                population.prune([Path(fixed).name,*[Path(s['info']['fixed_opponent']).name for s in slots if s['info'].get('fixed_opponent')]])
         info=dict(run_id=state['run'],active=True,episode=next_episode,descriptor=descriptor,assignments=assignment,fixed_opponent=fixed,generation=state['generation'],episode_starts={'A':True,'B':True})
         slot['info']=info;next_episode+=1;packets[index]=slot['worker'].call('reset',info)
     last_phase={'value':None}
@@ -133,7 +147,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         except (OSError,ValueError):pass
         if publish:io.start(root)
         reporter.round=state['generation'];reporter.base_steps=sum(m.num_timesteps for m in models)
-        reporter(dict(mixed_training_active=kind=='mission',contract=state['contract'],teacher_condition='enhanced' if coach else 'ordinary' if teacher_enabled else 'ppo_only',collected_rounds_by_mode=state.get('collected_rounds_by_mode',{}),completed_by_mode=state.get('completed_by_mode',{}),learning_diagnostics={f'PPO{i+1}':state.get(f'ppo{i+1}_last_update',{}) for i in range(2)},last_completed_evaluation=state.get('last_evaluation'),phase=phase,games=state['completed_games'],sim_seconds=simulated,policy_steps=reporter.base_steps,algorithm='Independent adaptive MaskablePPO',maps='3 balanced modes' if kind=='mission' else '4 terrain variants',nim_in_training=teacher_enabled,teacher=dict(query.stats),coaching=coach.stats if coach else None,learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows)) for i,m in enumerate(models)],decision_seconds=10,teacher_seconds=30,workers=adaptive.workers,cpu_budget=resources()['cpu_budget'],adaptation_reason=adaptive.reason,aggregate_sim_speed=True,worker_sim_seconds=dict(worker_sim),games_per_hour=(state['completed_games']-completed_start)*3600/elapsed,updates_per_hour=updates*3600/elapsed,evaluation_cases=cases,evaluation_total=240 if kind=='mission' else 80,backup=state.get('backup','pending'),map_id=state['map_id'],map_version=state['map_version'],rules_version=state['rules_version'],runtime_schema='adaptive-1',publication=publication,run_id=state['run'],control_version=control.state().get('version',0)),force=force)
+        reporter(dict(mode_counter_since_generation=state.get('mode_counter_since_generation'),mixed_training_active=kind=='mission',contract=state['contract'],teacher_condition='enhanced' if coach else 'ordinary' if teacher_enabled else 'ppo_only',collected_rounds_by_mode=state.get('collected_rounds_by_mode',{}),completed_by_mode=state.get('completed_by_mode',{}),learning_diagnostics={f'PPO{i+1}':state.get(f'ppo{i+1}_last_update',{}) for i in range(2)},last_completed_evaluation=state.get('last_evaluation'),phase=phase,games=state['completed_games'],sim_seconds=simulated,policy_steps=reporter.base_steps,algorithm='Independent adaptive MaskablePPO',maps='3 balanced modes' if kind=='mission' else '4 terrain variants',nim_in_training=teacher_enabled,teacher=dict(query.stats),coaching=coach.stats if coach else None,learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows)) for i,m in enumerate(models)],decision_seconds=10,teacher_seconds=30,workers=adaptive.workers,cpu_budget=resources()['cpu_budget'],adaptation_reason=adaptive.reason,aggregate_sim_speed=True,worker_sim_seconds=dict(worker_sim),games_per_hour=(state['completed_games']-completed_start)*3600/elapsed,updates_per_hour=updates*3600/elapsed,evaluation_cases=cases,evaluation_total=240 if kind=='mission' else 80,backup=state.get('backup','pending'),map_id=state['map_id'],map_version=state['map_version'],rules_version=state['rules_version'],runtime_schema='adaptive-1',publication=publication,run_id=state['run'],control_version=control.state().get('version',0)),force=force)
     report.advance_simulation=reporter.advance_simulation
     def checkpoint():
         with reporter.busy():
@@ -222,12 +236,17 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
                         metadata=dict(run=state['run'],episode=info['episode'],assignments=info['assignments'],descriptor=info['descriptor'],generation=state['generation'],policy_spans=meta['policy_spans'],metrics=finish(meta['metrics'],w,meta['initial_frame']))
                         from .results import record_world
                         record_world('data/results.sqlite',w,'training',policy_ids,match_id=f'{state["run"]}-{info["episode"]:08d}',initial_frame=meta['initial_frame'],metadata={'league':metadata})
+                        for team,learner in info['assignments'].items():
+                            if learner in ('PPO1','PPO2'):
+                                roles=metadata['metrics']['teams'].get(team,{}).get('selected',{})
+                                state.setdefault('behavior_profiles',{})[learner]='|'.join(k for k,v in sorted(roles.items(),key=lambda r:(-r[1],r[0]))[:2]) or 'unknown'
                         state['completed_games']+=1;info['active']=False
                         counts=state.setdefault('completed_by_mode',{});mode=info['descriptor'].get('scenario_id','2');counts[mode]=counts.get(mode,0)+1
                         if publish:
                             engine=restore(make_env(kind),b['environment']).engine
                             io.latest(root,'replay',(engine,meta['initial_frame'],{'league':dict(run=state['run'],assignments=info['assignments'],generation=state['generation'])}))
                 for index in ids:
+                    state.setdefault('mode_counter_since_generation',state['generation'])
                     counts=state.setdefault('collected_rounds_by_mode',{});mode=slots[index]['info']['descriptor'].get('scenario_id','2');counts[mode]=counts.get(mode,0)+1
                 if coach:
                     for index in ids:
@@ -250,7 +269,8 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             teacher.drain()
             for i,model in enumerate(models):
                 rows=trajectory_rows(model,paths[i],packets)
-                state[f'ppo{i+1}_last_update']=update(model,rows,0.,buffers[i]);backend.export(model,root/'opponents'/f'ppo{i+1}-{state["generation"]:08d}.npz')
+                state[f'ppo{i+1}_last_update']=update(model,rows,0.,buffers[i])
+                if not exploring:backend.export(model,root/'opponents'/f'ppo{i+1}-{state["generation"]:08d}.npz')
                 pinned={s['info'].get('fixed_opponent') for s in slots}
                 for old in sorted((root/'opponents').glob(f'ppo{i+1}-*.npz'))[:-8]:
                     if str(old.relative_to(root)) not in pinned:old.unlink()
@@ -268,7 +288,11 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             if full_due:archive_checkpoint(path,True);state.update(last_full_archive=state['completed_games']//50*50,last_full_update=state['generation'])
             if state['completed_games']//evaluation_step>state.get('last_evaluation',0)//evaluation_step and not stopped():
                 evaluated=True;evaluation_games=state['completed_games']
-                report('evaluation',True);evaluation.evaluate(root,models,state,report);state['last_evaluation']=state['completed_games']//evaluation_step*evaluation_step
+                report('evaluation',True);evaluation.evaluate(root,models,state,report)
+                if exploring:
+                    from .opponent_population import evaluate_selection
+                    evaluate_selection(root,models,state,report,pinned=[Path(s['info']['fixed_opponent']).name for s in slots if s['info'].get('fixed_opponent')])
+                state['last_evaluation']=state['completed_games']//evaluation_step*evaluation_step
                 if not max_updates and kind=='mission' and evaluation.initial_complete(root):
                     verdict=evaluation.pilot_report(root,state)
                     if verdict['pause']:state['pause_reason']='evaluation_regression';stop['value']=True

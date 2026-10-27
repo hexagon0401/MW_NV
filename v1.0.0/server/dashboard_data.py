@@ -77,7 +77,7 @@ def trends(rows):
                 rolling[model].append(win);l=learners.setdefault(model,dict(games=0,opportunities={},selected={},outcomes={},steps=None));l['games']+=1
                 metrics=r.get('league',{}).get('metrics',{}).get('teams',{}).get(team,{})
                 for name in ('opportunities','selected'):
-                    for key,n in metrics.get(name,{}).items():l[name][key]=l[name].get(key,0)+n
+                    for key,n in metrics.get('selected_rounds' if name=='selected' and 'selected_rounds' in metrics else name,{}).items():l[name][key]=l[name].get(key,0)+n
                 for key,outcomes in metrics.get('role_outcomes',{}).items():
                     dest=l['outcomes'].setdefault(key,{})
                     for status,n in outcomes.items():dest[status]=dest.get(status,0)+n

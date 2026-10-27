@@ -23,7 +23,6 @@ def make_env(kind):
         from .mission_env import MissionEnv
         if os.environ.get('MW_NV_EXPLORATION')=='1':
             from .exploration_env import ExplorationEnv
-            from .scenario_variants import factory
             return ExplorationEnv(decision_seconds=10)
         return MissionEnv(decision_seconds=10)
     from .candidate_env import CandidateEnv
