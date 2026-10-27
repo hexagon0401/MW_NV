@@ -28,7 +28,8 @@ def test_teacher_pair_isolation_no_world_mutation_and_failure_symmetry():
 def test_teacher_mask_and_imitation_actor_update(tmp_path):
     e=CandidateEnv();e.reset(0);b=TeacherBuffer()
     for _ in range(16):b.collect(e,clients())
-    for x,mask,action,team in b.rows:assert mask[action] and x.shape==(1056,)
+    for row in b.rows:
+        x,mask,action,team=row[:4];assert mask[action] and x.shape==(1056,)
     from learning.candidate_train import TrainingEnv
     model=TeacherPPO('MlpPolicy',TrainingEnv(stats=None),n_steps=64,batch_size=32,policy_kwargs={'net_arch':{'pi':[128,128],'vf':[128,128]}},device='cpu')
     import torch

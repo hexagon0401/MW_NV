@@ -1,6 +1,6 @@
 // Pages-only readers of precomputed private Storage documents.
 import {cloudRequest} from './cloud-data.js';
-const ranges=['24h','7d','30d','all'],kinds=['all','training','evaluation','hybrid','rules'],scenarios=['all','2','3','4'],learners=['all','PPO1','PPO2'];
+const ranges=['24h','7d','30d','all'],kinds=['all','training','evaluation','hybrid','rules','demonstration','failure_replay'],scenarios=['all','2','3','4'],learners=['all','PPO1','PPO2'];
 export function dashboardQuery(url){const q={};for(const [key,values] of Object.entries({range:ranges,kind:kinds,scenario:scenarios,learner:learners})){q[key]=url.searchParams.get(key)??(key==='range'?'24h':'all');if(!values.includes(q[key]))throw Error('invalid_filter');}const offset=Number(url.searchParams.get('offset')??0);if(!Number.isSafeInteger(offset)||offset<0)throw Error('invalid_offset');q.offset=offset;q.revision=url.searchParams.get('revision');if(q.revision&&!/^[0-9a-f]{64}$/.test(q.revision))throw Error('invalid_revision');return q;}
 export async function dashboardData(env,url,section,fetcher=fetch){const q=dashboardQuery(url),base='/storage/v1/object/authenticated/'+(env.REPLAY_BUCKET??'mw-nv-replays')+'/dashboard/';const read=key=>cloudRequest(env,base+key+'.gz',fetcher);const latest=await read('latest.json');
  if(section==='resources')return read('resources-'+q.range+'.json');

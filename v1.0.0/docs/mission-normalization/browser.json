@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "fixtures": true,
+  "dpr": 2,
+  "rows": [
+    {
+      "mode": "3",
+      "width": 1440,
+      "height": 900,
+      "mission": "MAP 3 · 섬멸 · 전투 티켓 소진 / 60분 잔여 비율 판정"
+    },
+    {
+      "mode": "3",
+      "width": 390,
+      "height": 844,
+      "mission": "MAP 3 · 섬멸 · 전투 티켓 소진 / 60분 잔여 비율 판정"
+    },
+    {
+      "mode": "4",
+      "width": 1440,
+      "height": 900,
+      "mission": "MAP 4 · 깃발 탈취·귀환 · A 깃발 본진 / B 깃발 본진 · 탈취 2점 또는 반납 시 승리"
+    },
+    {
+      "mode": "4",
+      "width": 390,
+      "height": 844,
+      "mission": "MAP 4 · 깃발 탈취·귀환 · A 깃발 본진 / B 깃발 본진 · 탈취 2점 또는 반납 시 승리"
+    }
+  ],
+  "page_errors": []
+}

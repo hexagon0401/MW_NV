@@ -22,14 +22,19 @@ def save(root,models,env,buffers,querier,generators,state):
         for a in ('A','B'):
             obs=env.vector(a);mask=env.mask(a)
             if int(model.predict(obs,deterministic=True,action_masks=mask)[0])!=CandidatePolicy(folder/f'ppo{i+1}.npz').predict(obs,mask):raise ValueError('NumPy parity')
+    if (root/'coaching').exists():
+        coaching=folder/'coaching';coaching.mkdir()
+        coordinator=json.loads((root/'coaching'/'state.json').read_text());shutil.copy2(root/'coaching'/'state.json',coaching/'state.json')
+        for job in coordinator['jobs']:
+            if (root/'coaching'/job).exists():shutil.copytree(root/'coaching'/job,coaching/job,ignore=shutil.ignore_patterns('*.partial'))
     payload=dict(scenario_id=env.scenario_id,world=env.engine.world,presentation_events=env.engine.presentation_events,agents=env.agents,items=env.items,selected=env.selected,finished=env.finished,reserved_supply=env.reserved_supply,initial_costs=env.initial_costs,history=env.history)
     write_environment(folder/'environment.json.gz',payload)
     rng=dict(python=encode(random.getstate()),numpy=None,torch=torch.get_rng_state().tolist(),actors=[g.get_state().tolist() for g in generators])
     # numpy state ndarray is handled explicitly, never through pickle.
     n=np.random.get_state();rng['numpy']=[n[0],n[1].tolist(),*n[2:]]
     atomic_json(folder/'rng.json',rng)
-    for i in range(2):atomic_json(folder/f'PPO{i+1}.json',dict(learner=f'PPO{i+1}',policy=f'ppo{i+1}.npz',generation=state['generation'],rules_version=RULES_VERSION,contract='tactics-3'))
-    for team in ('A','B'):atomic_json(folder/f'{team}.json',dict(team=team,learner=state.get('assignments',{}).get(team),generation=state['generation'],rules_version=RULES_VERSION,contract='tactics-3'))
+    for i in range(2):atomic_json(folder/f'PPO{i+1}.json',dict(learner=f'PPO{i+1}',policy=f'ppo{i+1}.npz',generation=state['generation'],rules_version=RULES_VERSION,contract='tactics-4'))
+    for team in ('A','B'):atomic_json(folder/f'{team}.json',dict(team=team,learner=state.get('assignments',{}).get(team),generation=state['generation'],rules_version=RULES_VERSION,contract='tactics-4'))
     state['teacher_stats']=dict(querier.stats);state['teacher_buffers']=[dict(b.stats) for b in buffers]
     querier.save(folder/'teacher-query.npz')
     if hasattr(env,'accelerated_snapshot'):
@@ -51,7 +56,9 @@ def save(root,models,env,buffers,querier,generators,state):
 
 def load(root,env,buffers,querier,generators):
     root=Path(root);folder=root/json.loads((root/'current.json').read_text())['path'];state=json.loads((folder/'state.json').read_text())
-    if state['rules_version']!=RULES_VERSION or state['contract']!='tactics-3' or state['catalog_version']!=CATALOG_VERSION:raise ValueError('incompatible league checkpoint')
+    if state['rules_version']!=RULES_VERSION or state['contract']!='tactics-4' or state['catalog_version']!=CATALOG_VERSION:raise ValueError('incompatible league checkpoint')
+    if not (root/'coaching').exists() and (folder/'coaching').exists():
+        shutil.copytree(folder/'coaching',root/'coaching')
     with gzip.open(folder/'environment.json.gz','rt') as f:d=decode(json.load(f))
     env.engine=Engine(d.pop('world'));env.engine.presentation_events=d.pop('presentation_events')
     for k,v in d.items():setattr(env,k,v)

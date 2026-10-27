@@ -23,7 +23,7 @@ def _column(w,key,members,destination):
 
 
 def move_squad(w,key,squad,destination,engage=True):
-    members=[w.soldiers[i] for i in squad.member_ids if i in w.soldiers and w.soldiers[i].alive]
+    members=[w.soldiers[i] for i in squad.member_ids if i in w.soldiers and w.soldiers[i].alive and not (w.soldiers[i].carrier_id in w.vehicles and w.vehicles[w.soldiers[i].carrier_id].type_id=='AA_SITE')]
     if not members or any(s.team!=squad.team or s.carrier_id is not None for s in members):raise OrderError('ILLEGAL_STATE')
     if not hasattr(w,'squad_navigation'):w.squad_navigation={}
     state=w.squad_navigation.setdefault(key,dict(mode='formation',attempts=0,last_progress=w.tick,positions={},members=[]))

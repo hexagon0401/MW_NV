@@ -51,7 +51,7 @@ def run(root,source,pilot=192,teacher_enabled=True,max_updates=0,collection_roun
         for i in range(2):
             model=MaskablePPO.load(Path(source)/f'ppo{i+1}.zip',device='cpu');model.set_logger(configure(folder=None,format_strings=[]));models.append(model)
         env.reset(0)
-        state=dict(schema=1,run='league-'+uuid.uuid4().hex[:12],rules_version=RULES_VERSION,catalog_version=CATALOG_VERSION,contract='tactics-3',map_id='mixed-2-3-4',map_version='1',generation=0,completed_games=0,episode=0,active=False,initial_frame=None,metrics=None,assignments={},policy_spans={},episode_starts={},rounds=0,last_policy_archive=0,last_full_archive=0,last_evaluation=-1,pilot=pilot,teacher_enabled=teacher_enabled,source_sha256=[hashlib.sha256((Path(source)/f'ppo{i+1}.npz').read_bytes()).hexdigest() for i in range(2)])
+        state=dict(schema=1,run='league-'+uuid.uuid4().hex[:12],rules_version=RULES_VERSION,catalog_version=CATALOG_VERSION,contract='tactics-4',map_id='mixed-2-3-4',map_version='1',generation=0,completed_games=0,episode=0,active=False,initial_frame=None,metrics=None,assignments={},policy_spans={},episode_starts={},rounds=0,last_policy_archive=0,last_full_archive=0,last_evaluation=-1,pilot=pilot,teacher_enabled=teacher_enabled,source_sha256=[hashlib.sha256((Path(source)/f'ppo{i+1}.npz').read_bytes()).hexdigest() for i in range(2)])
         for i,m in enumerate(models):
             export(m,root/'baseline'/f'ppo{i+1}.npz');m.save(root/'baseline'/f'ppo{i+1}.zip')
         save(root,models,env,buffers,querier,generators,state)

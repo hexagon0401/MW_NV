@@ -58,7 +58,7 @@ def distill(source,output,seed=0,rounds=64,epochs=10):
         if initial is None:initial=mean
     # Distillation optimizer is deliberately discarded; PPO optimizer remains empty.
     path=Path(output);path.parent.mkdir(parents=True,exist_ok=True);model.save(path);export(model,path.with_suffix('.npz'))
-    report=dict(source_sha256=hashlib.sha256(Path(source).read_bytes()).hexdigest(),contract='tactics-3',source_contract='tactics-2',training_seeds_only=True,samples=len(dataset),prefix_masks=True,rounds=rounds,matched=matched,kl_initial=initial,kl_final=mean if epochs else None,critic_fresh=True,optimizer_fresh=not bool(model.policy.optimizer.state))
+    report=dict(source_sha256=hashlib.sha256(Path(source).read_bytes()).hexdigest(),contract='tactics-4',source_contract='tactics-2',training_seeds_only=True,samples=len(dataset),prefix_masks=True,rounds=rounds,matched=matched,kl_initial=initial,kl_final=mean if epochs else None,critic_fresh=True,optimizer_fresh=not bool(model.policy.optimizer.state))
     path.with_suffix('.json').write_text(json.dumps(report,indent=2)+'\n');return model,report
 
 if __name__=='__main__':

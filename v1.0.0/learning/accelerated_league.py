@@ -27,6 +27,8 @@ def trajectory_rows(model,paths,packets):
 
 def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,fixed_workers=None,collection_rounds=64):
     root=Path(root);root.mkdir(parents=True,exist_ok=True);torch.set_num_threads(1)
+    if os.environ.get('MW_NV_EXPERIMENT_SEED'):
+        experiment_seed=int(os.environ['MW_NV_EXPERIMENT_SEED']);random.seed(experiment_seed);np.random.seed(experiment_seed);torch.manual_seed(experiment_seed)
     if (root/'results.sqlite').exists() and not (root/'ledger-imported').exists():
         import sqlite3
         from .results import SCHEMA
@@ -57,11 +59,13 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             models=[MaskablePPO.load(Path(source)/f'ppo{i+1}.zip',device='cpu') for i in range(2)]
             for m in models:m.set_logger(configure(folder=None,format_strings=[]))
         env.reset(0)
-        state=dict(schema=1,run='league-'+uuid.uuid4().hex[:12],rules_version=backend.RULES_VERSION,catalog_version=backend.CATALOG_VERSION,contract='tactics-3' if kind=='mission' else 'tactics-2',map_id='mixed-2-3-4' if kind=='mission' else 'river-districts',map_version='1' if kind=='mission' else '2',generation=0,completed_games=0,episode=0,active=False,rounds=0,last_policy_archive=0,last_full_archive=0,last_evaluation=0,assignments={},teacher_enabled=teacher_enabled)
+        state=dict(schema=1,run='league-'+uuid.uuid4().hex[:12],rules_version=backend.RULES_VERSION,catalog_version=backend.CATALOG_VERSION,contract='tactics-4' if kind=='mission' else 'tactics-2',map_id='mixed-2-3-4' if kind=='mission' else 'river-districts',map_version='1' if kind=='mission' else '2',generation=0,completed_games=0,episode=0,active=False,rounds=0,last_policy_archive=0,last_full_archive=0,last_evaluation=0,assignments={},teacher_enabled=teacher_enabled)
         for i,m in enumerate(models):
             backend.export(m,root/'baseline'/f'ppo{i+1}.npz')
             if kind=='mission':m.save(root/'baseline'/f'ppo{i+1}.zip')
         backend.save(root,models,env,buffers,query,generators,state)
+    from .mission_coach import MissionCoach
+    coach=MissionCoach(root) if kind=='mission' and teacher_enabled and os.environ.get('MW_NV_MISSION_TEACHER_BASELINE')!='1' else None
     state['pilot']=pilot;state['teacher_enabled']=teacher_enabled
     control.register(root,source,kind,pilot,state['run'],state.get('control_desired'))
     state.setdefault('last_policy_update',state['generation']);state.setdefault('last_full_update',state['generation'])
@@ -97,7 +101,8 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         slot=slots[index];block_size=96 if kind=='mission' else 32;descriptor=backend.schedule(next_episode//block_size)[next_episode%block_size]
         assignment=backend.assignments(descriptor);fixed=None
         if descriptor['kind']=='past':
-            files=sorted((root/'opponents').glob('*.npz'));options=files if files and random.random()>=.5 else sorted((root/'baseline').glob('*.npz'));fixed=str(random.choice(options).relative_to(root))
+            picker=random.Random(4903+next_episode) if kind=='mission' else random
+            files=sorted((root/'opponents').glob('*.npz'));options=files if files and picker.random()>=.5 else sorted((root/'baseline').glob('*.npz'));fixed=str(picker.choice(options).relative_to(root))
         info=dict(run_id=state['run'],active=True,episode=next_episode,descriptor=descriptor,assignments=assignment,fixed_opponent=fixed,generation=state['generation'],episode_starts={'A':True,'B':True})
         slot['info']=info;next_episode+=1;packets[index]=slot['worker'].call('reset',info)
     last_phase={'value':None}
@@ -124,10 +129,12 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         except (OSError,ValueError):pass
         if publish:io.start(root)
         reporter.round=state['generation'];reporter.base_steps=sum(m.num_timesteps for m in models)
-        reporter(dict(phase=phase,games=state['completed_games'],sim_seconds=simulated,policy_steps=reporter.base_steps,algorithm='Independent adaptive MaskablePPO',maps='3 balanced modes' if kind=='mission' else '4 terrain variants',nim_in_training=teacher_enabled,teacher=dict(query.stats),learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows)) for i,m in enumerate(models)],decision_seconds=10,teacher_seconds=30,workers=adaptive.workers,cpu_budget=resources()['cpu_budget'],adaptation_reason=adaptive.reason,aggregate_sim_speed=True,worker_sim_seconds=dict(worker_sim),games_per_hour=(state['completed_games']-completed_start)*3600/elapsed,updates_per_hour=updates*3600/elapsed,evaluation_cases=cases,evaluation_total=240 if kind=='mission' else 80,backup=state.get('backup','pending'),map_id=state['map_id'],map_version=state['map_version'],rules_version=state['rules_version'],runtime_schema='adaptive-1',publication=publication,run_id=state['run'],control_version=control.state().get('version',0)),force=force)
+        reporter(dict(phase=phase,games=state['completed_games'],sim_seconds=simulated,policy_steps=reporter.base_steps,algorithm='Independent adaptive MaskablePPO',maps='3 balanced modes' if kind=='mission' else '4 terrain variants',nim_in_training=teacher_enabled,teacher=dict(query.stats),coaching=coach.stats if coach else None,learners=[dict(id=f'PPO{i+1}',steps=m.num_timesteps,teacher_samples=len(buffers[i].rows)) for i,m in enumerate(models)],decision_seconds=10,teacher_seconds=30,workers=adaptive.workers,cpu_budget=resources()['cpu_budget'],adaptation_reason=adaptive.reason,aggregate_sim_speed=True,worker_sim_seconds=dict(worker_sim),games_per_hour=(state['completed_games']-completed_start)*3600/elapsed,updates_per_hour=updates*3600/elapsed,evaluation_cases=cases,evaluation_total=240 if kind=='mission' else 80,backup=state.get('backup','pending'),map_id=state['map_id'],map_version=state['map_version'],rules_version=state['rules_version'],runtime_schema='adaptive-1',publication=publication,run_id=state['run'],control_version=control.state().get('version',0)),force=force)
     report.advance_simulation=reporter.advance_simulation
     def checkpoint():
         with reporter.busy():
+            if coach:
+                coach.close();coach.poll(buffers,[os.getpid(),*[s['worker'].process.pid for s in slots]],True)
             for slot in slots:slot['worker'].call('mark','WAITING')
             all_bundles=[]
             for slot in slots:
@@ -139,6 +146,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             state.update(active=info['active'],episode=info.get('episode',next_episode),next_episode=next_episode,adaptive=dict(workers=adaptive.workers,reason=adaptive.reason))
             safe_query=backend.TeacherBuffer();safe_query.stats=dict(query.stats);safe_query.cooldown=query.cooldown
             path=backend.save(root,models,primary,buffers,safe_query,generators,state);backend.record_update(root,state,models)
+            if coach:coach.prune()
             return path
     def archive_checkpoint(path,full):
         io.archive(root,path,state,full)
@@ -158,13 +166,17 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         adaptive.resume_measurement()
         while not stopped() and (not max_updates or updates<max_updates):
             if control.paused():
+                if coach:coach.poll(buffers,[os.getpid()],True)
                 checkpoint();report('paused',True)
                 while control.paused() and not stopped():
                     teacher.drain();report('paused');time.sleep(1)
                 adaptive.resume_measurement()
                 if stopped():break
+            if coach:
+                coach.schedule(state['completed_games']);coach.poll(buffers,[os.getpid(),*[s['worker'].process.pid for s in slots]],control.paused())
             io.disk_guard(root);teacher.drain();paths=[{},{}];total_rounds=0;batch_sim=0.;evaluated=False
             active=fixed_workers or adaptive.workers
+            if coach and coach.running():active=min(active,max(1,int(resources()['cpu_budget'])-2))
             while len(slots)<active:add_slot()
             for index,slot in enumerate(slots):slot['worker'].call('mark','RUNNING' if index<active else 'WAITING')
             while total_rounds<collection_rounds and not stopped() and not control.paused():
@@ -210,6 +222,14 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
                         if publish:
                             engine=restore(make_env(kind),b['environment']).engine
                             io.latest(root,'replay',(engine,meta['initial_frame'],{'league':dict(run=state['run'],assignments=info['assignments'],generation=state['generation'])}))
+                if coach:
+                    for index in ids:
+                        p=packets[index]
+                        if not p['ended'] and p['tick'] and p['tick']%1500==0:
+                            bundle=slots[index]['worker'].call('snapshot');world=bundle['environment']['world']
+                            recent=world.events[-2000:]
+                            reason='supply' if any(ev['event_kind']=='ORDER_FAILED' and ev['payload'].get('reason')=='INSUFFICIENT_SUPPLY' for ev in recent) else 'transport' if any(ev['event_kind']=='ORDER_FAILED' and ev['payload'].get('reason') in ('TRAFFIC_TIMEOUT','FORMATION_UNREACHABLE') for ev in recent) else 'no_progress' if not any(ev['event_kind'] in ('ABSTRACT_ATTACK','FLAG_STOLEN','BUILDING_ENTERED','UNIT_RESUPPLIED') and ev['sim_tick']>world.tick-1500 for ev in recent) else None
+                            if reason:coach.failure(world,reason)
                 eligible=[i for i in ids if not packets[i]['ended'] and packets[i]['tick']%150==0]
                 if teacher_enabled and not control.paused() and eligible and time.monotonic()>=max(teacher.next_request,query.cooldown) and teacher.future is None:
                     origin=(teacher.last_worker+1) if teacher.last_worker is not None else 0
@@ -262,6 +282,8 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
         state['pause_reason']='ARCHIVE_DISK_LIMIT'
     finally:
         teacher.close()
+        if coach:
+            coach.close();coach.poll(buffers,[os.getpid()],True)
         try:checkpoint()
         finally:
             for slot in slots:slot['worker'].close()
@@ -271,8 +293,8 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
 
 if __name__=='__main__':
     import fcntl
-    p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--source',required=True);p.add_argument('--kind',choices=['legacy','mission'],default='legacy');p.add_argument('--pilot',type=int,default=200);p.add_argument('--updates',type=int,default=0);p.add_argument('--no-teacher',action='store_true');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--source',required=True);p.add_argument('--kind',choices=['legacy','mission'],default='legacy');p.add_argument('--pilot',type=int,default=200);p.add_argument('--updates',type=int,default=0);p.add_argument('--no-teacher',action='store_true');p.add_argument('--workers',type=int,choices=(1,2,3));a=p.parse_args()
     root=Path(a.root);root.mkdir(parents=True,exist_ok=True);lock=(root/'runner.lock').open('a')
     try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     except BlockingIOError:raise SystemExit('league worker already running')
-    (root/'runner.pid').write_text(str(os.getpid()));run(root,a.source,a.kind,a.pilot,a.updates,not a.no_teacher)
+    (root/'runner.pid').write_text(str(os.getpid()));run(root,a.source,a.kind,a.pilot,a.updates,not a.no_teacher,fixed_workers=a.workers)

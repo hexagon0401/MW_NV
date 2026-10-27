@@ -60,6 +60,7 @@ def candidates(obs):
         for squad in squads:
             members=[by_id[i] for i in squad['member_ids'] if i in by_id]
             for vehicle in vehicles:
+                if any(u['alive'] and u['id'] in squad['member_ids'] and u['carrier_id'] is not None for u in obs['units']):continue
                 if not goals or min(hypot(members[0]['pos']['x_cm']-g['x_cm'],members[0]['pos']['y_cm']-g['y_cm']) for g in goals)<15000:continue
                 spec=catalog['vehicles'][vehicle['type_id']]
                 if spec['capacity']>=len(members) and not vehicle['passenger_ids'] and vehicle['task_state'] not in BUSY and hypot(vehicle['pos']['x_cm']-members[0]['pos']['x_cm'],vehicle['pos']['y_cm']-members[0]['pos']['y_cm'])<10000:

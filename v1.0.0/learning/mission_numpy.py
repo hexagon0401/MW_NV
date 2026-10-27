@@ -1,12 +1,12 @@
 """Mac inference uses NumPy only; no Torch import or model deserialization."""
 import hashlib
 import numpy as np
-CONTRACT="tactics-3"
+CONTRACT="tactics-4"
 
 class NumpyPolicy:
-    def __init__(self,path):
+    def __init__(self,path,allow_historical=False):
         with np.load(path,allow_pickle=False) as d:
-            if str(d['contract'])!=CONTRACT or str(d['rules_version'])!='combined-arms-5':raise ValueError('mission policy contract')
+            if (str(d['contract']),str(d['rules_version'])) not in ((CONTRACT,'combined-arms-6'),*((('tactics-3','combined-arms-5'),) if allow_historical else ())):raise ValueError('mission policy contract')
             self.weights={k:d[k].copy() for k in d.files if k.startswith('pi_')}
         template={'pi_rows.0':(64,24),'pi_rows.2':(64,64),'pi_context.0':(128,64),'pi_context.2':(64,128),'pi_score.0':(64,256),'pi_score.2':(1,64),'pi_stop.0':(64,192),'pi_stop.2':(1,64)}
         shapes={key+suffix:shape if suffix=='.weight' else (shape[0],) for key,shape in template.items() for suffix in ('.weight','.bias')}

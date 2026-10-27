@@ -20,6 +20,8 @@ def _spool(root,checkpoint,state,full=False,asset_root=None):
         for p in sorted(Path(checkpoint).iterdir()):
             if p.is_file() and (full or p.name in ('ppo1.npz','ppo2.npz','PPO1.json','PPO2.json','state.json')):tar.add(p,arcname=p.name)
         if full:
+            for p in sorted((Path(checkpoint)/'coaching').rglob('*')):
+                if p.is_file():tar.add(p,arcname=str(p.relative_to(checkpoint)),recursive=False)
             for p in sorted((asset_root/'opponents').glob('*.npz')):tar.add(p,arcname='opponents/'+p.name)
             for p in sorted((asset_root/'baseline').glob('*')):tar.add(p,arcname='baseline/'+p.name)
         initial_report=asset_root/'evaluations'/'games-00000000'/'report.json'
@@ -52,20 +54,25 @@ def verify(path,digest,full):
         if hashlib.sha256(Path(path).read_bytes()).hexdigest()!=digest:raise ValueError('archive checksum')
         with tarfile.open(path,'r:gz') as tar:
             entries=tar.getmembers()
-            if len(entries)>100 or sum(e.size for e in entries)>512*1024**2:raise ValueError('archive size')
-            if any(not e.isfile() or Path(e.name).is_absolute() or '..' in Path(e.name).parts or len(Path(e.name).parts)>(3 if e.name.startswith('evaluations/') else 2) for e in entries):raise ValueError('archive path')
+            if len(entries)>500 or sum(e.size for e in entries)>512*1024**2:raise ValueError('archive size')
+            if any(not e.isfile() or Path(e.name).is_absolute() or '..' in Path(e.name).parts or len(Path(e.name).parts)>(3 if e.name.startswith(('evaluations/','coaching/')) else 2) for e in entries):raise ValueError('archive path')
             tar.extractall(tmp,filter='data')
         p=Path(tmp);state=json.loads((p/'state.json').read_text())
-        if (state['rules_version'],state['contract']) not in (('combined-arms-4','tactics-2'),('combined-arms-5','tactics-3')):raise ValueError('archive contract')
-        if state['contract']=='tactics-3':
+        if (state['rules_version'],state['contract']) not in (('combined-arms-4','tactics-2'),('combined-arms-5','tactics-3'),('combined-arms-6','tactics-4')):raise ValueError('archive contract')
+        if state['contract'] in ('tactics-3','tactics-4'):
             if state.get('catalog_version')!='combined-arms-3':raise ValueError('archive catalog')
-            from .mission_numpy import NumpyPolicy as CandidatePolicy
-        size=1600 if state['contract']=='tactics-3' else 1056
+            from .mission_numpy import NumpyPolicy
+            CandidatePolicy=lambda path:NumpyPolicy(path,allow_historical=True)
+        size=1600 if state['contract'] in ('tactics-3','tactics-4') else 1056
         for i in (1,2):
             policy=CandidatePolicy(p/f'ppo{i}.npz')
             if full:
                 model=MaskablePPO.load(p/f'ppo{i}.zip',device='cpu');obs=np.zeros(size,dtype=np.float32);mask=np.ones(65,dtype=bool)
-                if int(model.predict(obs,deterministic=True,action_masks=mask)[0])!=policy.predict(obs,mask):raise ValueError('archive inference mismatch')
+                if int(model.predict(obs,deterministic=True,action_masks=mask)[0])!=policy.predict(obs,mask):
+                    import torch
+                    with torch.no_grad():actual=model.policy.get_distribution(torch.as_tensor(obs[None]),action_masks=mask[None]).distribution.probs.cpu().numpy()[0]
+                    logits=policy.logits(obs);expected=np.exp(logits-logits.max());expected/=expected.sum()
+                    if not np.allclose(actual,expected,atol=2e-6,rtol=2e-6):raise ValueError('archive inference mismatch')
         if full:
             with gzip.open(p/'environment.json.gz','rt') as f:doc=json.load(f)
             a=Engine(decode(doc)['world']);b=Engine(decode(doc)['world']);a.step(.2);b.step(.2)

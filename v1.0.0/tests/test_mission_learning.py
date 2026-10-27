@@ -16,7 +16,7 @@ def test_balanced_mixed_block():
 
 def test_checkpoint_and_independent_update(tmp_path):
     torch.set_num_threads(1);e=MissionEnv(scenario_id='4');e.reset(4);models=[initialize(81+i) for i in range(2)];buffers=[MissionTeacher(),MissionTeacher()];q=MissionTeacher();g=[torch.Generator().manual_seed(50+i) for i in range(2)]
-    state=dict(generation=0,rules_version='combined-arms-5',catalog_version='combined-arms-3',contract='tactics-3',assignments={},run='test',completed_games=0)
+    state=dict(generation=0,rules_version='combined-arms-6',catalog_version='combined-arms-3',contract='tactics-4',assignments={},run='test',completed_games=0)
     f=save(tmp_path,models,e,buffers,q,g,state);hash_before=e.engine.world.checksum();e2=MissionEnv();restored,st=load(tmp_path,e2,[MissionTeacher(),MissionTeacher()],MissionTeacher(),[torch.Generator(),torch.Generator()]);assert e2.scenario_id=='4' and hash_before==e2.engine.world.checksum()
     from learning.league_archive import spool,verify
     import hashlib

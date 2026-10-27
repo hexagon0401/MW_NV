@@ -11,6 +11,27 @@ from engine.multi_scenario import create
 class MissionTeacher(TeacherBuffer):
     observation_size=OBS_SIZE
     encode=staticmethod(vector)
+    def sample_rows(self):
+        import os
+        if os.environ.get('MW_NV_MISSION_TEACHER_BASELINE')=='1':return super().sample_rows()
+        from collections import defaultdict
+        import random
+        buckets=defaultdict(list)
+        for i,row in enumerate(self.rows):
+            meta=row[4] if len(row)>4 else {};buckets[(meta.get('mode','conquest'),meta.get('stage','unknown'))].append(i)
+        if len(self.rows)<32:return []
+        picked=[]
+        for mode,quota in (('elimination',13),('capture_flag',13),('conquest',6)):
+            stages=[list(v) for (m,_),v in sorted(buckets.items()) if m==mode]
+            for v in stages:random.shuffle(v)
+            while stages and quota:
+                for v in stages:
+                    if v and quota:picked.append(v.pop());quota-=1
+                stages=[v for v in stages if v]
+        remaining=list(set(range(len(self.rows)))-set(picked))
+        picked+=random.sample(remaining,min(32-len(picked),len(remaining)))
+        return [self.rows[i] for i in picked]
+
 
 class MissionEnv(CandidateEnv):
     def __init__(self,scenario_factory=None,decision_seconds=10,scenario_id='2'):

@@ -20,10 +20,12 @@ def run(root,legacy):
         if (root/'VALIDATION_STOP').exists():raise InterruptedError('validation paused; legacy training remains active')
         if time.time()-status.get('updated_at',0)>30:report(status['stage'])
     try:
-        validation=json.loads(Path('docs/multi-mode/validation.json').read_text())
+        certificate=root/'validation.json'
+        validation=json.loads((certificate if certificate.exists() else Path('docs/multi-mode/validation.json')).read_text())
         if validation.get('code_sha256')!=identity:raise ValueError('static validation belongs to different code')
         if not validation['static_checks_passed'] or not validation['geometry_complete']:raise ValueError('static/geometry validation incomplete')
-        proof=Path('docs/multi-mode/source-archive.json')
+        proof=root/'source-archive.json'
+        if not proof.exists():proof=Path('docs/multi-mode/source-archive.json')
         if not proof.exists() or not all(p['status']=='verified' for p in json.loads(proof.read_text())):raise ValueError('source actor archive not verified')
         pin=root/'validation-code.json'
         if pin.exists() and json.loads(pin.read_text())['sha256']!=identity:

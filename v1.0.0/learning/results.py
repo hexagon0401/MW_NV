@@ -12,7 +12,7 @@ def validate(record):
     if not isinstance(record.get('id'),str) or not 1<=len(record['id'])<=128:raise ValueError('record id')
     if not isinstance(record.get('rules_version'),str) or not isinstance(record.get('policies'),dict) or set(record['policies'])!={'A','B'} or any(not isinstance(v,str) or not v for v in record['policies'].values()):raise ValueError('rules/policy versions')
     if record['kind']=='match':
-        if record.get('mode') not in ('training','evaluation','hybrid','rules'):raise ValueError('mode')
+        if record.get('mode') not in ('training','evaluation','hybrid','rules','demonstration','failure_replay'):raise ValueError('mode')
         if record.get('winner') is not None and type(record['winner']) is not int:raise ValueError('winner')
         if record.get('winner') not in (None,0,1) or record.get('ended') is not True:raise ValueError('completed match required')
         if type(record.get('seed')) is not int or not isinstance(record.get('scores'),list) or len(record['scores'])!=2 or any(type(s) is not int or s<0 for s in record['scores']):raise ValueError('seed/scores')
@@ -73,6 +73,7 @@ def aggregate(db):
             if r.get('training_run'):
                 alias=(r['rules_version'],r['training_run']);steps[alias]=steps.get(alias,0)+r['steps']
             continue
+        if r.get('mode') in ('demonstration','failure_replay'):continue
         total+=1
         for i,a in enumerate(('A','B')):
             outcome='draws' if r['winner'] is None else 'wins' if r['winner']==i else 'losses'

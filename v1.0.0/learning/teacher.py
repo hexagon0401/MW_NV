@@ -14,15 +14,17 @@ class TeacherBuffer:
     def __init__(self):self.rows=deque(maxlen=10000);self.stats=dict(paired=0,skipped=0,requests=0);self.cooldown=0
     def save(self,path):
         rows=list(self.rows)
-        np.savez_compressed(path,cooldown_until=np.array(time.time()+max(0,self.cooldown-time.monotonic())),x=np.array([r[0] for r in rows],dtype=np.float32).reshape(-1,self.observation_size),mask=np.array([r[1] for r in rows],dtype=bool).reshape(-1,65),action=np.array([r[2] for r in rows],dtype=np.int64),team=np.array([r[3] for r in rows],dtype=np.int8))
+        np.savez_compressed(path,cooldown_until=np.array(time.time()+max(0,self.cooldown-time.monotonic())),x=np.array([r[0] for r in rows],dtype=np.float32).reshape(-1,self.observation_size),mask=np.array([r[1] for r in rows],dtype=bool).reshape(-1,65),action=np.array([r[2] for r in rows],dtype=np.int64),team=np.array([r[3] for r in rows],dtype=np.int8),metadata=np.array([json.dumps(r[4] if len(r)>4 else {},sort_keys=True) for r in rows],dtype=str))
     def load(self,path):
         with np.load(path,allow_pickle=False) as d:
             if d['x'].shape!=(len(d['action']),self.observation_size) or d['mask'].shape!=(len(d['action']),65) or not np.isfinite(d['x']).all():raise ValueError('teacher buffer contract')
             self.cooldown=time.monotonic()+max(0,float(d['cooldown_until'])-time.time()) if 'cooldown_until' in d else 0
-            for row in zip(d['x'],d['mask'],d['action'],d['team']):self.rows.append(row)
+            for i,row in enumerate(zip(d['x'],d['mask'],d['action'],d['team'])):self.rows.append((*row,json.loads(str(d['metadata'][i])) if 'metadata' in d else {}))
     def collect(self,env,clients=None):
+        self.last_batches=None
         if time.monotonic()<self.cooldown:
             self.stats['skipped']+=1;self.stats['retry_in_seconds']=round(self.cooldown-time.monotonic(),1);return
+        self.last_batches=None
         started=time.monotonic()
         try:
             if clients is None:clients=[LocalHQ('https://integrate.api.nvidia.com/v1',model='nvidia/nemotron-3.5-lightning-30b-a3b',timeout=30,api_key=os.environ.get('NVIDIA_API_KEY_A' if t==0 else 'NVIDIA_API_KEY_B')) for t in (0,1)]
@@ -38,9 +40,10 @@ class TeacherBuffer:
                     for c in available:mask[c['id']]=True
                     if not mask[action]:raise ValueError('teacher mask')
                     values=self.encode(obs,available);values[16]=len(selected)/4;values[17]=sum(c.get('supply_cost',0) for c in selected)/2000
-                    staged.append((values,mask,action,team))
+                    chosen=next((c for c in available if c['id']==action),None)
+                    staged.append((values,mask,action,team,dict(mode=obs.get('mission',{}).get('mode','conquest'),stage=chosen['role'] if chosen else 'end',prefix=len(selected),source=getattr(env,'teacher_source','ordinary'),tick=obs.get('tick',0))))
                     if action!=64:selected.append(next(c for c in available if c['id']==action))
-            self.rows.extend(staged);self.stats['paired']+=1
+            self.rows.extend(staged);self.last_batches=batches;self.stats['paired']+=1
             self.stats.update(consecutive_network_failures=0,last_error=None,last_error_code=None)
         except Exception as exc:
             # Teacher failures never create one-sided labels or stop PPO.
@@ -61,11 +64,14 @@ class TeacherBuffer:
         finally:
             self.stats['last_request_seconds']=round(time.monotonic()-started,3)
             self.stats['retry_in_seconds']=round(max(0,self.cooldown-time.monotonic()),1)
+    def sample_rows(self):
+        groups=[[r for r in self.rows if r[3]==t] for t in (0,1)]
+        if min(map(len,groups))<16:return []
+        return random.sample(groups[0],16)+random.sample(groups[1],16)
     def imitate(self,model):
         import torch
-        groups=[[r for r in self.rows if r[3]==t] for t in (0,1)]
-        if min(map(len,groups))<16:return None
-        rows=random.sample(groups[0],16)+random.sample(groups[1],16)
+        rows=self.sample_rows()
+        if not rows:return None
         obs=torch.as_tensor(np.stack([r[0] for r in rows]),device=model.device)
         actions=torch.as_tensor([r[2] for r in rows],device=model.device)
         masks=np.stack([r[1] for r in rows]);_,log_prob,_=model.policy.evaluate_actions(obs,actions,action_masks=masks)

@@ -86,7 +86,7 @@ def test_mission_parallel_uses_same_two_conditioned_policies(tmp_path,monkeypatc
         model=initialize(81+i);model.save(source_dir/f'ppo{i}.zip');export(model,source_dir/f'ppo{i}.npz')
     monkeypatch.chdir(tmp_path);(tmp_path/'data').mkdir();monkeypatch.delenv('MW_NV_PUBLISH_TRAINING',raising=False)
     state=run(tmp_path/'mission',source_dir,kind='mission',pilot=192,max_updates=1,teacher_enabled=False,fixed_workers=2,collection_rounds=2)
-    assert state['contract']=='tactics-3' and state['next_episode']==2 and state['rounds']==2
+    assert state['contract']=='tactics-4' and state['next_episode']==2 and state['rounds']==2
     assert all(state[f'ppo{i}_last_update']['steps']>0 for i in (1,2))
 
 def test_production_mission_requires_matching_t11_fingerprint(tmp_path):

@@ -1,8 +1,8 @@
-"""tactics-3: scenario-normalized context64 plus64 semantic candidate rows24."""
+"""tactics-4: scenario-normalized context64 plus64 semantic candidate rows24."""
 import numpy as np
 from engine.scenario_spec import specification
 
-CONTRACT='tactics-3'
+CONTRACT='tactics-4'
 OBS_SIZE=1600
 ACTIONS=65
 
@@ -17,6 +17,10 @@ def vector(obs,items):
     for flag in mission.get('flags',[]):
         offset=29 if flag['owner']==obs['team'] else 35;x[offset:offset+5]=[float(flag['status']=='home'),float(flag['status']=='carried'),float(flag['status']=='dropped'),float(flag['position_known']),float(flag.get('carrier') in {u['id'] for u in own})]
     sites=mission.get('emplacements',[]);x[41:45]=[sum(s['observed'] for s in sites)/max(1,len(sites)),sum(s['owner_known'] and s['owner']==obs['team'] for s in sites)/max(1,len(sites)),sum(s['owner_known'] and s['owner'] is None for s in sites)/max(1,len(sites)),sum(v.get('air_only',False) for v in catalog['vehicles'].values())/max(1,len(catalog['vehicles']))]
+    tickets=mission.get('own_combat_tickets')
+    if tickets:x[45]=tickets['remaining']/max(1,tickets['initial'])
+    x[46]=min(1,obs['scores'][obs['team']]/max(1,config.get('score_limit',1)))
+    x[47]=float(bool(tickets))
     history=obs.get('recent_summary',[])[:14];x[48:48+len(history)]=history
     diagonal=max(1,(obs['map_width_m']**2+obs['map_height_m']**2)**.5)
     all_own={u['id']:u for u in [*own,*vehicles]}

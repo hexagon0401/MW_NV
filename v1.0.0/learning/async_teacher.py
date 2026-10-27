@@ -4,7 +4,8 @@ from concurrent.futures import ThreadPoolExecutor
 from types import SimpleNamespace
 
 class AsyncTeacher:
-    def __init__(self,querier,buffers,interval=30):
+    def __init__(self,querier,buffers,interval=30,budget_root='data/nim-budget'):
+        self.budget_root=budget_root
         self.querier=querier;self.buffers=buffers;self.interval=interval
         self.pool=ThreadPoolExecutor(max_workers=1,thread_name_prefix='nim-pair')
         self.future=None;self.next_request=time.monotonic()+max(0,querier.stats.get('next_request_at',0)-time.time());self.last_worker=querier.stats.get('async_worker');self.closed=False
@@ -26,7 +27,13 @@ class AsyncTeacher:
         counts=self.querier.stats.setdefault('worker_attempts',{});counts[str(worker)]=counts.get(str(worker),0)+1
         self.querier.stats.update(next_request_at=time.time()+self.interval,async_worker=worker,source_generation=generation,async_inflight=True)
         def collect():
-            try:self.querier.collect(snapshot)
+            try:
+                from .nim_budget import PairLease
+                lease=PairLease(self.budget_root)
+                with lease as admitted:
+                    if admitted:
+                        self.querier.collect(snapshot);lease.defer(self.querier.stats.get('retry_in_seconds',0))
+                    else:self.querier.stats['budget_skipped']=self.querier.stats.get('budget_skipped',0)+1
             finally:self.querier.stats['async_inflight']=False
         self.future=self.pool.submit(collect);return True
     def close(self):

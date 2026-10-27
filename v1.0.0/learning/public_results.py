@@ -7,12 +7,14 @@ def document(db='data/results.sqlite',game_mode=None,scenario_id=None):
     rows=[r for r in records(db,kind='match') if r['kind']=='match' and r.get('ended')]
     rows=[row for row in rows if (game_mode is None or row.get('game_mode')==game_mode) and (scenario_id is None or row.get('scenario_id')==str(scenario_id))]
     rows.sort(key=lambda r:(r.get('created_at',''),r['id']),reverse=True)
-    teams={a:dict(wins=0,losses=0,draws=0,games=len(rows),win_rate=0.) for a in ('A','B')};modes={}
+    counted=[r for r in rows if r['mode'] not in ('demonstration','failure_replay')]
+    teams={a:dict(wins=0,losses=0,draws=0,games=len(counted),win_rate=0.) for a in ('A','B')};modes={}
     for r in rows:
         modes[r['mode']]=modes.get(r['mode'],0)+1
+        if r['mode'] in ('demonstration','failure_replay'):continue
         for i,a in enumerate(('A','B')):teams[a]['draws' if r['winner'] is None else 'wins' if r['winner']==i else 'losses']+=1
     for value in teams.values():value['win_rate']=value['wins']/max(1,value['games'])
-    summary=dict(total_matches=len(rows),teams=teams,modes=modes,policies=[],training=[])
+    summary=dict(total_matches=len(counted),teams=teams,modes=modes,policies=[],training=[])
     return dict(schema=1,updated_at=datetime.now(timezone.utc).isoformat(),summary=summary,matches=rows)
 
 def publish(db='data/results.sqlite'):

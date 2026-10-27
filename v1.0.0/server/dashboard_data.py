@@ -127,7 +127,7 @@ def files(db,snapshot,now=None):
             compact_rows=[compact(r) for r in items]
             for offset in range(0,len(compact_rows),100):
                 data=compact_rows[offset:offset+100];body=json.dumps(data,separators=(',',':')).encode();key='pages/'+hashlib.sha256(body).hexdigest()[:24]+'.json';out[key]=data;entries.append(key)
-            recent=items[-50:];stats=dict(training_games=sum(r['mode']=='training' for r in items),recent_games=len(recent),recent_a_wins=sum(r['winner']==0 for r in recent))
+            recent=[r for r in items if r['mode'] not in ('demonstration','failure_replay')][-50:];stats=dict(training_games=sum(r['mode']=='training' for r in items),recent_games=len(recent),recent_a_wins=sum(r['winner']==0 for r in recent))
             run_id=snapshot.get('training',{}).get('run_id');rules=snapshot.get('training',{}).get('rules_version')
             learning_rows=[r for r in items if run_id and r.get('league',{}).get('run')==run_id and r['rules_version']==rules]
             learned=trends(learning_rows)
