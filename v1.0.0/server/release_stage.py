@@ -1,5 +1,5 @@
 """Developer-side registration of fixed Pages artifacts; never exposed as a shell API."""
-import argparse,hashlib,json,shutil,subprocess
+import argparse,hashlib,json,shutil,subprocess,os
 from pathlib import Path
 from .releases import Registry,ID
 from .release_handlers import digest_files
@@ -16,6 +16,18 @@ def pages(registry,source,id,revision,title,description):
         shutil.copytree(source/folder,viewer/folder,ignore=shutil.ignore_patterns('.env*','*.key','node_modules','__pycache__'))
     for file in ('wrangler.jsonc','package.json','package-lock.json'):
         if (source/file).exists():shutil.copy2(source/file,viewer/file)
+    # Freeze server dependencies into the deployable worker while the locked
+    # development dependencies are available. Deploying an isolated copy of
+    # raw functions otherwise cannot resolve packages such as jose.
+    cli=source/'node_modules/.bin/wrangler'
+    result=subprocess.run([str(cli),'pages','functions','build','functions','--outdir',str(viewer/'dist/_worker.js'),'--build-output-directory',str(viewer/'dist'),'--output-routes-path',str(viewer/'dist/_routes.json')],cwd=source,env=dict(os.environ,WRANGLER_LOG_PATH='/tmp/mw-release-bundle'),capture_output=True,text=True)
+    if result.returncode:raise ValueError('Pages function bundle failed')
+    for folder in ('src','functions'):
+        for p in (viewer/folder).rglob('*'):
+            if p.is_file() and p.read_bytes()!=(source/p.relative_to(viewer)).read_bytes():raise ValueError('source changed during Pages capture')
+    # Wrangler 4.50 also tries raw functions when a directory worker exists.
+    # Keep the reviewed sources outside its auto-discovery deploy directory.
+    shutil.move(viewer/'functions',destination/'function-sources')
     git=subprocess.run(['git','rev-parse','HEAD'],cwd=source,capture_output=True,text=True,check=True).stdout.strip()
     atomic(viewer/'dist/release-marker.json',dict(release_id=id,revision=revision,source_commit=git))
     manifest={str(p.relative_to(destination)):hashlib.sha256(p.read_bytes()).hexdigest() for p in destination.rglob('*') if p.is_file()}

@@ -106,3 +106,15 @@ def test_canary_source_requires_explicit_canary_and_verified_recovery(tmp_path,m
     h.validate()
     (root/'state.json').write_text(json.dumps(dict(generation=0,completed_games=0)))
     with pytest.raises(ValueError,match='canary source'):h.validate()
+
+
+def test_pages_artifact_requires_frozen_worker_and_rejects_tampering(tmp_path):
+    import hashlib
+    from server.release_handlers import PagesSite,digest_files
+    artifact=tmp_path/'artifact';dist=artifact/'viewer/dist';dist.mkdir(parents=True)
+    (dist/'release-marker.json').write_text('{}');(dist/'_worker.js').write_text('export default {}')
+    manifest={str(p.relative_to(artifact)):hashlib.sha256(p.read_bytes()).hexdigest() for p in dist.iterdir()}
+    (artifact/'files.json').write_text(json.dumps(manifest))
+    h=PagesSite(dict(spec=dict(artifact=dict(sha256=digest_files(manifest))),paths=dict(artifact=str(artifact))),None);h.validate()
+    (dist/'_worker.js').write_text('changed')
+    with pytest.raises(ValueError,match='changed'):h.validate()

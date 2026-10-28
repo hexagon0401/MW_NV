@@ -19,16 +19,29 @@ def training():
                 status=json.loads((Path(base)/'training-status.json').read_text())
                 if status.get('updated_at')==d.get('updated_at'):d['run_id']=json.loads((Path(base)/'state.json').read_text()).get('run');break
             except (OSError,ValueError):pass
-    result={k:d[k] for k in TRAIN_KEYS if k in d};result['teacher']={k:d.get('teacher',{}).get(k) for k in TEACHER_KEYS};result['publication']={k:d.get('publication',{}).get(k) for k in ('queued_archives','queued_replay')};return result
+    result={k:d[k] for k in TRAIN_KEYS if k in d};result['teacher']={k:d.get('teacher',{}).get(k) for k in TEACHER_KEYS};result['publication']={k:d.get('publication',{}).get(k) for k in ('queued_archives','queued_replay')}
+    try:
+        run=json.loads(Path('data/control/run.json').read_text());pid=run.get('pid');alive=bool(pid and process_start(pid) is not None and process_start(pid)==run.get('process_start'))
+        if alive:alive=any(name in Path(f'/proc/{pid}/cmdline').read_bytes().split(b'\0') for name in (b'learning.accelerated_league',b'learning.league',b'learning.mission_league'))
+        result['learner_alive']=alive
+        if not alive and run.get('run_id')==result.get('run_id'):
+            result.update(last_recorded_phase=result.get('phase'),status='offline',phase='offline',workers=0,sim_speed=None)
+    except (OSError,ValueError,KeyError):pass
+    return result
 
 def pids():
     ids=set()
-    for root in ('data/league-v1','data/multi-mode-v1','data/mission-normalization-v2'):
-        for name in ('runner.pid','rollout.pid','pipeline.pid','initial-evaluation.pid','io-jobs/publish.pid','io-jobs/archive.pid'):
+    roots=['data/league-v1','data/multi-mode-v1','data/mission-normalization-v2']
+    try:
+        active=json.loads(Path('data/releases/active.json').read_text());candidate=Path(active['root']).resolve()
+        if candidate.is_relative_to(BASE/'data/releases/production'):roots.append(str(candidate))
+    except (OSError,ValueError,KeyError):pass
+    for root in roots:
+        for name in ('runner.pid','rollout.pid','pipeline.pid','initial-evaluation.pid','io-jobs/publish.pid','io-jobs/archive.pid','validation-agent.json'):
             try:
-                pid=int((Path(root)/name).read_text());args=Path(f'/proc/{pid}/cmdline').read_bytes().split(b'\0')
+                pid=int(json.loads((Path(root)/name).read_text())['pid']) if name.endswith('.json') else int((Path(root)/name).read_text());args=Path(f'/proc/{pid}/cmdline').read_bytes().split(b'\0')
                 if any(a.startswith((b'learning.',b'server.')) for a in args):ids.add(pid)
-            except (OSError,ValueError):pass
+            except (OSError,ValueError,KeyError):pass
     try:
         rows=[tuple(map(int,line.split())) for line in subprocess.check_output(['ps','-eo','pid=,ppid='],text=True).splitlines()]
         for _ in range(4):ids.update(pid for pid,parent in rows if parent in ids)

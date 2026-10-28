@@ -173,6 +173,8 @@ class PagesSite:
             path=(artifact/name).resolve()
             if not path.is_relative_to(artifact) or not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest()!=sha:raise ValueError('Pages artifact changed')
         if not (artifact/'viewer/dist/release-marker.json').exists():raise ValueError('release marker required')
+        worker=artifact/'viewer/dist/_worker.js'
+        if not (worker.is_file() and not worker.read_bytes().startswith(b'----') or (worker/'index.js').is_file()):raise ValueError('bundled Pages worker required')
     def prepare(self,journal,notify):
         if not journal.get('old_deployment'):
             project=self.api('');old=project.get('canonical_deployment',{}).get('id')

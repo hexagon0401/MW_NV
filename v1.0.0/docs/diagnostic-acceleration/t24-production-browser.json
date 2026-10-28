@@ -1,0 +1,12 @@
+{
+  "origin": "https://mw-nv.pages.dev",
+  "fixtures": false,
+  "passed": true,
+  "desktop": "1440x900",
+  "mobile": "390x844",
+  "strict_csp": true,
+  "no_map_download": true,
+  "hidden_poll_stopped": true,
+  "public_apply_not_exposed": true,
+  "page_errors": []
+}

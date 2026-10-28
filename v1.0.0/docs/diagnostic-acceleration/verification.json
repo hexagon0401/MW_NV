@@ -17,5 +17,15 @@
   "midgame20s_identical": true,
   "canary_weights_preserved_without_training": true,
   "parallel_audit_resume_tested": true,
-  "canary_apply_not_yet_executed": true
+  "canary_apply_not_yet_executed": true,
+  "controller_followup": {
+    "passed": 31,
+    "seconds": 0.26,
+    "overlap": true
+  },
+  "real_site_typed_apply": true,
+  "private_audit_backup_verified": true,
+  "restored_training_liveness_correct": true,
+  "start_skill_draft_saved": true,
+  "start_skill_publish_pending": true
 }

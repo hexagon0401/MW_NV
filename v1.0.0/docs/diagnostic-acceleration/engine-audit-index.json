@@ -1,0 +1,370 @@
+{
+  "complete": false,
+  "runtime_digest": "0884176da29b1bf8e80ac9539052d82b473811b01d25bf8db28674b8008dc95d",
+  "results": [
+    {
+      "seed": 0,
+      "scenario_id": "2",
+      "swapped": false,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        102,
+        39
+      ],
+      "tick": 7800,
+      "hash": "9ae26e49b26532d6ca47bde31e4667d17dd4293fde832df74af17306b47fc15c",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 1,
+      "scenario_id": "2",
+      "swapped": true,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        102,
+        9
+      ],
+      "tick": 7350,
+      "hash": "736a37f0659b4bebb757c67c3bba969d40fa77c046a97d7af4cdc9c564e53e9b",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 2,
+      "scenario_id": "2",
+      "swapped": false,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        7,
+        100
+      ],
+      "tick": 6900,
+      "hash": "904036d932ea624cafc57ee701b2a7eaa2b78ed27ee4e238a50b477fa75f6e6d",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 3,
+      "scenario_id": "2",
+      "swapped": true,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        101,
+        61
+      ],
+      "tick": 8250,
+      "hash": "52823e40ecd83323960ce9f6f7c0558042153b77760797555f5f3019af47c729",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 4,
+      "scenario_id": "2",
+      "swapped": false,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        12,
+        100
+      ],
+      "tick": 5550,
+      "hash": "3e5ec34e92c539943d880f2bd30d9f9e70fe3e01ff329b387249466a0be25871",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 5,
+      "scenario_id": "2",
+      "swapped": true,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        102,
+        79
+      ],
+      "tick": 9900,
+      "hash": "b7f513f546ce55e960c03649fe35e45fd1b1e70f725f6d9860b16181d3136014",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 6,
+      "scenario_id": "2",
+      "swapped": false,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        92,
+        100
+      ],
+      "tick": 8700,
+      "hash": "3286555c136158202f5bf4c0fffa54f214730ca13d794a2ae2478d6e612aede0",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 7,
+      "scenario_id": "2",
+      "swapped": true,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        101,
+        18
+      ],
+      "tick": 6450,
+      "hash": "6a14672a226adc2003e50bb6e33f233dc700527a8ad3725be8f50308e698cc91",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 8,
+      "scenario_id": "2",
+      "swapped": false,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        100,
+        84
+      ],
+      "tick": 8400,
+      "hash": "85ff4ce488d3a8008c5d06b3c9ea45f7182b29b058ed0d5fa6248db8987c3faf",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 9,
+      "scenario_id": "2",
+      "swapped": true,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        102,
+        48
+      ],
+      "tick": 9900,
+      "hash": "108ba2d769a3da885864082d734ba1e05ae26eb3532a5bcd62ca35d038b400dc",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 0,
+      "scenario_id": "3",
+      "swapped": false,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 18000,
+      "hash": "04b0287f8d109e55466f9cf3273152781986caa3e419508a6646bb073065e361",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 1,
+      "scenario_id": "3",
+      "swapped": true,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 18000,
+      "hash": "24fdbd6d6c34edfbfb85aebd7dfeebdb2346d662b2eab978d407e81801a77e61",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 2,
+      "scenario_id": "3",
+      "swapped": false,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 7695,
+      "hash": "9efc8d3ea3ea16229c53ca36838fffa788fb82e9ef4e0ccba1a8e7b2bcb35708",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 3,
+      "scenario_id": "3",
+      "swapped": true,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 7156,
+      "hash": "1a0e1f3b6faaa61b7124a1bfd5b3ddc432ed6dbb33f2fce0306dfc5a9975773a",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 4,
+      "scenario_id": "3",
+      "swapped": false,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 7209,
+      "hash": "05e7ef6c0df98d9440037354c88054762ef46bf7516b656c3f7b23e113cc3055",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 5,
+      "scenario_id": "3",
+      "swapped": true,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 5816,
+      "hash": "3919a92910a91c1a3745ef1a89076abdbe4e6cdac11ce7881894fcea4328006e",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 6,
+      "scenario_id": "3",
+      "swapped": false,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 6595,
+      "hash": "034d26dcfee7cc18ac4e0124ebf0fa08b612bdaf96d93685e71c85791ed9dc27",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 7,
+      "scenario_id": "3",
+      "swapped": true,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 18000,
+      "hash": "77e231a473016f9fda44fcf060246f449c49fca17a55b72587790f3fb33fe35a",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 8,
+      "scenario_id": "3",
+      "swapped": false,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 18000,
+      "hash": "51c5e958605b257840b85378f7b378c601d3306e6079f075e71e55ed46dc836b",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 9,
+      "scenario_id": "3",
+      "swapped": true,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 18000,
+      "hash": "5a9c8f373e52a8d6c52d77b71496d1d618c91650073dedca77ba52cf8ee35012",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 0,
+      "scenario_id": "4",
+      "swapped": false,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        0,
+        1
+      ],
+      "tick": 18000,
+      "hash": "d79549fb22b27909309a89091d4afea1cdaf99c8d4bce77d10b4b11e6f7b563a",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 1,
+      "scenario_id": "4",
+      "swapped": true,
+      "complete": true,
+      "winner": null,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 18000,
+      "hash": "ba343fbd5f3d733766b3689962d12d5a8689c19ca00a1614828a0fd690061fda",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 2,
+      "scenario_id": "4",
+      "swapped": false,
+      "complete": true,
+      "winner": null,
+      "scores": [
+        0,
+        0
+      ],
+      "tick": 18000,
+      "hash": "363bb94bb56be7cf4236dd84a38c3ee09e24c7bf03c743ba67897e96df62670f",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 3,
+      "scenario_id": "4",
+      "swapped": true,
+      "complete": true,
+      "winner": 0,
+      "scores": [
+        1,
+        0
+      ],
+      "tick": 18000,
+      "hash": "fa34069ffc3e4132b83f0fd127e2767a792e2007026f941c8e7abc3e35bbb6df",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 4,
+      "scenario_id": "4",
+      "swapped": false,
+      "complete": true,
+      "winner": null,
+      "scores": [
+        1,
+        1
+      ],
+      "tick": 18000,
+      "hash": "e03eaf5106840b1e3be648652ea3567ef3e81905b45de68e0170c3a245068ab2",
+      "replay_hash_verified": true
+    },
+    {
+      "seed": 5,
+      "scenario_id": "4",
+      "swapped": true,
+      "complete": true,
+      "winner": 1,
+      "scores": [
+        0,
+        2
+      ],
+      "tick": 10258,
+      "hash": "6340bab696e2d59d34d4b13dc0542ced00180d6f92600e02da04638a74659c56",
+      "replay_hash_verified": true
+    }
+  ]
+}
