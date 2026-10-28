@@ -1,12 +1,11 @@
 # MW-NV v1.0.0 STATE
-Current:T23 READY FOR RELEASE COMPLETE and production deployed
-Read:docs/releases/README.md;docs/releases/production-api.json
-Added:versioned registry,stages/cursor logs,manual Apply,durable per-version auto,typed rollback
-Safety:validation cannot promote production;candidate runtime/ledger/control/replay isolated
-Tests:Python full311+final focused27(overlap);JS56/build;preview fixtures;real production desktop/mobile
-Runtime:release/control agents online;legacy models/RNG/optimizers retained;remote gen434 recovery verified
-Validation:22/30 diagnostic games;map4 third case running;retention/192 pilot/fixed evaluations pending
-Deploy:39dc74b5;rollback:e476d696;all automatic Apply reservations OFF
-Next:monitor dashboard/#releases;finish gates;administrator Apply or explicit version reservation
-Limits:real mixed Apply/Pages rollback effect not exercised before readiness;Mac/unattended hosting unverified
+Current:T24 exact navigation optimization/parallel resumable audit verified;canary preparing
+Read:docs/diagnostic-acceleration/README.md;DECISIONS.md latest
+Cause:environment replaced;all prior runtime PIDs absent;26/30 saved diagnostics
+Changes:passability/A* derived cache/Mapping views;simulation+replay checkpoints;3-process audit
+Correctness:120s map4 and fixed20s kernel state hashes match prior frozen runtime
+Tests:checkpoint/nav/recovery scopes passed;final full regression running;JS56/build passed
+Authorization:user selected canary first;30 engine/hash/recovery remain mandatory
+Next:final regression;preserve/migrate audit checkpoints;freeze/register r2;reserve Apply
+Follow-up:retention,192 mixed games,fixed/confirmation evaluations remain pending
 Usage:UNKNOWN

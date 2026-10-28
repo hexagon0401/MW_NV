@@ -10,6 +10,8 @@ class CaseProgress:
     def __init__(self,root,mode,seed,swapped,outer):
         self.path=Path(root)/'audit-current.json';self.outer=outer;self.data=dict(case=f'{mode}:{seed}:{int(swapped)}',scenario_id=mode,seed=seed,swapped=swapped,phase='simulation',state='RUNNING',sim_seconds=0.,time_limit_seconds=3600 if mode!='2' else 2700)
         self.stop=threading.Event();self.guard=threading.Lock();self.thread=None
+        from .diagnostic_checkpoint import DiagnosticCheckpoint
+        self.checkpoint=DiagnosticCheckpoint(root,self.data['case'])
     def write(self,**values):
         with self.guard:self.data.update(values);atomic_json(self.path,dict(self.data,updated_at=time.time()))
     def __enter__(self):
@@ -28,15 +30,18 @@ def replay(document,progress):
     # Same journal operations as engine.replay.replay; only observation is additional.
     from engine.version import RULES_VERSION,CATALOG_VERSION
     if document.get('version')!=2 or (document.get('rules_version'),document.get('catalog_version')) not in ((RULES_VERSION,CATALOG_VERSION),('combined-arms-6','combined-arms-3')):raise ValueError('incompatible replay')
-    e=Engine(decode(document['initial']));total=len(document['journal']);last=0.
+    saved=progress.checkpoint.load('replay') if hasattr(progress,'checkpoint') else None
+    if saved and (saved.get('target_checksum')!=document['checksum'] or saved.get('journal_total')!=len(document['journal'])):raise ValueError('diagnostic replay target changed')
+    e=Engine(saved['world'] if saved else decode(document['initial']));total=len(document['journal']);last=0.;start=saved['index'] if saved else 0
     progress.write(phase='replay',journal_completed=0,journal_total=total,sim_seconds=0.)
-    for index,action in enumerate(document['journal'],1):
+    for index,action in enumerate(document['journal'][start:],start+1):
         if action['kind']=='submit':
             try:e.submit(decode(action['value']))
             except OrderError:pass
         elif action['kind']=='step':e.step(action['value'])
         elif action['kind']=='event':e.world.emit(action['value'][0],**action['value'][1])
         else:raise ValueError('invalid replay operation')
+        if hasattr(progress,'checkpoint'):progress.checkpoint.save('replay',e.world,index=index,target_checksum=document['checksum'],journal_total=total)
         if time.monotonic()-last>=2 or index==total:
             progress.write(journal_completed=index,journal_total=total,sim_seconds=e.world.tick*.2);progress('replay');last=time.monotonic()
     if e.world.checksum()!=document['checksum']:raise ValueError('replay checksum mismatch')

@@ -1,0 +1,18 @@
+{
+  "before": {
+    "seconds": 13.824104982999415,
+    "cpu_seconds": 13.782405168,
+    "sim_seconds": 20,
+    "hash": "9e0855064327c2e4e45d754b5c654f836f9928460b241782526c8232e2be4abf"
+  },
+  "after": {
+    "seconds": 14.36118456999975,
+    "cpu_seconds": 11.552580796,
+    "sim_seconds": 20,
+    "hash": "9e0855064327c2e4e45d754b5c654f836f9928460b241782526c8232e2be4abf"
+  },
+  "hash_identical": true,
+  "cpu_speedup": 1.1930152587872018,
+  "wall_speedup": 0.9626019995507693,
+  "scope": "20s of fixed map4 midgame; not a whole-match throughput guarantee"
+}

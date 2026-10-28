@@ -1,7 +1,7 @@
 """Validated integer command boundary; game agents cannot execute code."""
 from dataclasses import fields
 from enum import IntEnum
-from collections.abc import MutableMapping
+from collections.abc import MutableMapping,ItemsView,ValuesView
 from .types import Command, Team, Op
 
 
@@ -74,6 +74,16 @@ def validate(world, command):
     return c
 
 
+class TeamItems(ItemsView):
+    def __iter__(self):
+        for store in self._mapping.by_team.values():yield from store.items()
+
+
+class TeamValues(ValuesView):
+    def __iter__(self):
+        for store in self._mapping.by_team.values():yield from store.values()
+
+
 class TeamMap(MutableMapping):
     """Physically separate team stores behind the engine's indexed interface."""
     def __init__(self):
@@ -86,6 +96,8 @@ class TeamMap(MutableMapping):
     def __iter__(self):
         for store in self.by_team.values():yield from store
     def __len__(self):return sum(map(len,self.by_team.values()))
+    def items(self):return TeamItems(self)
+    def values(self):return TeamValues(self)
 
 
 class CommandQueue:

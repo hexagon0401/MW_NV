@@ -23,6 +23,10 @@ def play(seed,scenario_id,policies=None,swap=False,progress=None,limit=None,reco
     from engine.replay import RecordingEngine
     world=scenario_factory(seed,swap=swap) if scenario_factory else create(seed,swap=swap,scenario_id=scenario_id)
     e=(RecordingEngine if record else Engine)(world);w=e.world;initial=frame(w);history={0:[],1:[]};policies=policies or {};decisions=0
+    checkpoint=getattr(progress,'checkpoint',None) if record else None
+    if checkpoint:
+        saved=checkpoint.restore_simulation()
+        if saved:e,history,decisions=saved;w=e.world
     exploration=any(getattr(p,'contract',None)=='tactics-5' for p in policies.values());view=None
     if exploration:
         from .exploration_env import ExplorationEnv
@@ -47,12 +51,17 @@ def play(seed,scenario_id,policies=None,swap=False,progress=None,limit=None,reco
                     try:e.submit_for(t,command)
                     except OrderError:pass
             before=w.tick;e.step(10);decisions+=1
+            if checkpoint:checkpoint.save_simulation(e,history,decisions)
             if view:view._round()
             activity.update(w.tick)
             if progress:
                 if hasattr(progress,'advance_simulation'):progress.advance_simulation((w.tick-before)*.2)
                 if hasattr(progress,'case_tick'):progress.case_tick(w.tick)
-                progress('evaluation')
+                try:progress('evaluation')
+                except BaseException:
+                    if checkpoint:checkpoint.save_simulation(e,history,decisions,force=True)
+                    raise
+    if checkpoint:checkpoint.save_simulation(e,history,decisions,force=True)
     return e,dict(seed=seed,scenario_id=str(scenario_id),swapped=swap,complete=bool(getattr(w,'ended',False)),winner=None if getattr(w,'winner',None) is None else int(w.winner),scores=[w.teams[t].score for t in (0,1)],tick=w.tick,hash=w.checksum(),metrics=collect(w,initial),failures=dict(Counter(ev['payload'].get('reason','unknown') for ev in w.events if ev['event_kind']=='ORDER_FAILED')))
 
 
@@ -127,6 +136,11 @@ def migration_gate(root,seeds=range(10000,10005),progress=None):
 
 
 def audit(root,count=10,progress=None):
+    import os
+    workers=min(3,max(1,int(os.environ.get('MW_NV_AUDIT_WORKERS','1'))))
+    if workers>1:
+        from .diagnostic_pool import audit as parallel_audit
+        return parallel_audit(root,count,progress,workers)
     root=Path(root);root.mkdir(parents=True,exist_ok=True);path=root/'engine-audit.json';report=json.loads(path.read_text()) if path.exists() else dict(complete=False,results=[]);done={(r['scenario_id'],r['seed']) for r in report['results']}
     for mode in ('2','3','4'):
         for seed in range(count):
@@ -136,6 +150,7 @@ def audit(root,count=10,progress=None):
                 e,result=play(seed,mode,swap=bool(seed%2),progress=observer,record=True)
                 result['replay_hash_verified']=observed_replay(e.document(),observer).checksum()==result['hash']
             report['results'].append(result);atomic_json(path,report)
+            observer.checkpoint.clear()
     report['complete']=True;report['counts']=dict(Counter(r['scenario_id'] for r in report['results']));atomic_json(path,report);return report
 
 def ensure_initial_worker(root,state):

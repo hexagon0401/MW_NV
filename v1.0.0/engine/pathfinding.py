@@ -5,7 +5,13 @@ from .orders import OrderError
 
 def find_path(terrain, start, end, vehicle=False, offsets=((0,0),)):
     offsets=tuple(offsets)
-    def legal(point):return all(terrain.passable(point[0]+dx,point[1]+dy,vehicle) for dx,dy in offsets)
+    # Terrain/footprint/traffic are fixed for this synchronous search. A* asks
+    # about the same neighbour from several parents; evaluate it only once.
+    # This is local derived data, deliberately excluded from world/checkpoints.
+    legality={}
+    def legal(point):
+        if point not in legality:legality[point]=all(terrain.passable(point[0]+dx,point[1]+dy,vehicle) for dx,dy in offsets)
+        return legality[point]
     def clear(a,b):return all(terrain.segment_clear((a[0]+dx,a[1]+dy),(b[0]+dx,b[1]+dy),vehicle) for dx,dy in offsets)
     key = f'{start}:{end}:{vehicle}:{offsets}:{terrain.revision}'
     if key in terrain.cache:
