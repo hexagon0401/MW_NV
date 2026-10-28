@@ -31,6 +31,9 @@ def run(root,legacy):
             if any((root/name).exists() for name in ('engine-audit.json','migration-retention.json')):raise ValueError('validation report belongs to different code; preserve reports and start a new validation directory')
         atomic_json(pin,dict(sha256=identity));report('engine_audit');engine=audit(root,progress=progress)
         if not engine['complete'] or len(engine['results'])!=30 or not all(row.get('complete') and row.get('replay_hash_verified') for row in engine['results']):raise ValueError('engine diagnostic incomplete')
+        if validation.get('release_profile')=='canary':
+            atomic_json(root/'validation-gates.json',dict(approved_for_pilot=True,code_sha256=identity,engine_games=30,source_archive_verified=True,production_apply_required=True,release_profile='canary',retention_verified=False,performance_verified=False))
+            report('candidate_validated',status='validated',mixed_training_started=False,release_profile='canary');return status
         report('migration_retention');retention=migration_gate(root,progress=progress)
         if not retention['retained'] and not any(v['high']<-.10 for v in retention['intervals'].values()):
             report('migration_retention_confirmation');retention=migration_gate(root,seeds=(*range(10000,10005),*range(10040,10060)),progress=progress)

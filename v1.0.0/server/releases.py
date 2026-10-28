@@ -53,7 +53,7 @@ class Registry:
             if isinstance(version,dict):entry['rollback_target']={k:version.get(k) for k in ('rules_version','contract','generation')}
             if journal.get('old_deployment'):entry['rollback_deployment']=journal['old_deployment']
             safe_attempts.append(entry)
-        candidate={k:spec['artifact'].get(k) for k in ('artifact_id','runtime_digest','source_commit')}
+        candidate={k:spec['artifact'].get(k) for k in ('artifact_id','runtime_digest','source_commit','activation')}
         result=dict(**public,candidate=candidate,content_digest=r['digest'],auto_apply=bool(r['auto']),updated_at=r['updated'],**state,attempts=safe_attempts)
         if private:result['spec']=spec
         return result

@@ -13,7 +13,9 @@ export async function releases(content,session,signal){
  p.append(note(`적용 후보 ${item.candidate?.artifact_id??'revision '+item.revision} · 마지막 갱신 ${item.updated_at?new Date(item.updated_at*1000).toLocaleString('ko-KR'):'—'}`));
  if(item.dependencies?.length)p.append(note('의존 업데이트 / '+item.dependencies.map(x=>x.id+' r'+x.revision).join(' · ')));
  const rollback=item.attempts?.find(a=>a.rollback_target||a.rollback_deployment);p.append(note('복구 대상 / '+(rollback?.rollback_deployment??(rollback?.rollback_target?Object.values(rollback.rollback_target).filter(x=>x!=null).join(' / '):'적용 전 현재 운영 버전을 저장·검증합니다.'))));
- p.append(table(['진단','상태','완료 / 목표'],(item.steps??[]).map(s=>[s.title,`[${s.state}]`,s.total==null?(s.completed??'—'):`${s.completed??0} / ${s.total}`])));
+ p.append(table(['진단','상태','완료 / 목표'],(item.steps??[]).map(s=>[s.title+(s.required===false?' · 후속 검증':''),`[${s.state}]`,s.total==null?(s.completed??'—'):`${s.completed??0} / ${s.total}`])));
+ if(item.release_profile==='canary')p.append(note('LIMITED OPERATION / 제한 운영 · 192경기·성능 평가는 후속 검증입니다. 성능 향상 미입증.'));
+ if(item.parallel_cases?.length>1)p.append(note('병렬 진단 / '+item.parallel_cases.map(c=>`${c.case} ${c.phase==='replay'?'해시 검증':'경기'} ${Math.floor((c.sim_seconds??0)/60)}분`).join(' · ')));
  if(item.validation_connection==='offline')p.append(note('VALIDATION WORKER OFFLINE / 마지막 완료 진단은 유지합니다.'));
  if(item.current){const c=item.current;p.append(note(`현재 ${c.case??'—'} · ${c.phase==='replay'?'리플레이 해시 검증':c.phase==='resource_wait'?'CPU·메모리 예산 대기':c.phase==='pilot_evaluation'?'격리 파일럿 평가':c.phase==='pilot'?'격리 파일럿':'경기 실행'} · ${Math.floor((c.sim_seconds??0)/60)}분${c.journal_total?` · 기록 ${c.journal_completed??0}/${c.journal_total}`:''} · ${c.state??'—'}`));}
  if(item.attempts?.length)p.append(table(['적용 이력','동작','실제 단계'],item.attempts.map(a=>[new Date(a.updated*1000).toLocaleString('ko-KR'),a.action+' / '+(a.digest?.slice(0,8)??'—'),a.phase])));

@@ -21,7 +21,7 @@ def definitions(registry,base=BASE):
         spec=dict(row);paths={}
         if row['id']=='mixed-maps':
             validation=base/'data/mission-normalization-v2';pilot=registry.root/'candidates/mixed-maps'/str(row['revision'])
-            paths=dict(validation=str(validation),pilot=str(pilot),activity=str(base/'data/activity'),legacy=str(base/'data/league-v1'),runtime=str(registry.root/'artifacts/mixed-maps'/str(row['revision'])/'runtime'))
+            paths=dict(validation=str(validation),pilot=str(pilot),activity=str(base/'data/activity'),legacy=str(base/'data/league-v1'),runtime=str(registry.root/'artifacts/mixed-maps'/str(row['revision'])/'runtime'),active=str(registry.root/'active.json'))
             spec['artifact']=dict(row['artifact'],runtime_digest=read(validation/'validation-code.json').get('sha256'),policy_sources={str(p.relative_to(validation)):hashlib.sha256(p.read_bytes()).hexdigest() for folder in ('migrated','migration-sources') for p in (validation/folder).glob('ppo*') if p.suffix in ('.zip','.npz')})
         atomic(path,dict(spec=spec,paths=paths));registry.register(spec)
 
@@ -86,16 +86,17 @@ def maybe_pilot(registry):
         pilot=Path(paths['pilot']);pidinfo=read(pilot/'pilot.pid.json')
         if pidinfo.get('pid') and process_start(pidinfo['pid'])==pidinfo.get('start'):
             cmd=Path(f"/proc/{pidinfo['pid']}/cmdline")
-            if cmd.exists() and b'learning.release_pilot' in cmd.read_bytes().split(b'\0'):continue
+            if cmd.exists() and any(m in cmd.read_bytes().split(b'\0') for m in (b'learning.release_pilot',b'learning.canary_initialize')):continue
         state=read(pilot/'state.json');status=read(pilot/'pilot-status.json')
-        if state.get('pause_reason') or status.get('status')=='COMPLETE':continue
+        if state.get('pause_reason') or status.get('status') in ('COMPLETE','CANARY_PREPARED'):continue
         if status.get('status')=='STARTING' and time.time()-status.get('updated_at',0)<60:continue
         if status.get('status')=='WAITING_ARCHIVE' and time.time()-status.get('updated_at',0)<60:continue
         capture(BASE,paths['runtime'],definition['spec']['artifact']['runtime_digest']);pilot.mkdir(parents=True,exist_ok=True)
         atomic(Path(paths['validation'])/'release-staging.json',dict(pilot=str(pilot.resolve()),runtime=paths['runtime']))
         atomic(pilot/'pilot-status.json',dict(status='STARTING',updated_at=time.time()))
         with (pilot/'orchestrator.log').open('ab') as log:
-            process=subprocess.Popen([sys.executable,'-u','-m','learning.release_pilot','--definition',str(definition_path.resolve()),'--registry-root',str(registry.root.resolve()),'--base',str(BASE)],stdout=log,stderr=log,stdin=subprocess.DEVNULL,start_new_session=True)
+            module='learning.canary_initialize' if definition['spec']['artifact'].get('activation')=='canary' else 'learning.release_pilot'
+            process=subprocess.Popen([sys.executable,'-u','-m',module,'--definition',str(definition_path.resolve()),'--registry-root',str(registry.root.resolve()),'--base',str(BASE)],stdout=log,stderr=log,stdin=subprocess.DEVNULL,start_new_session=True)
         atomic(pilot/'pilot.pid.json',dict(pid=process.pid,start=process_start(process.pid)))
 
 
@@ -105,6 +106,8 @@ def run(root):
     while not (registry.root/'STOP').exists():
         try:
             refresh(registry);poll_commands(registry,store);maybe_pilot(registry)
+            from .canary_watch import monitor
+            monitor(registry,BASE)
             worker_info=read(registry.root/'apply-worker.json')
             worker_alive=False
             if worker_info.get('pid') and process_start(worker_info['pid'])==worker_info.get('start'):

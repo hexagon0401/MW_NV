@@ -169,3 +169,6 @@ User approved wheel/pinch zoom + drag pan, real sprites from20%(icons below18%),
 ## T11 multi-mode expansion authorized
 
 User approved all stages in docs/multi-mode/PLAN.md: same independent PPO1/PPO2 across maps2(conquest),3(elimination),4(flag capture+return).96inf/16vehicles new modes,finite resources,60min draws,air+ground flag transport. Preserve live old league until migration/regression checks pass. Stages may continue autonomously with milestone tests/STATE/commit/push. New rules5/catalog3/tactics3 and1600-feature candidate-equivariant policy. No paid/permanent CPU; do not claim universal optimality or unmeasured transfer.
+
+## 2026-10-28 — T24 제한 운영 승인
+사용자는 기존192경기 사전 대기 대신 엔진 진단·복구 검증 후 맵2·3·4 혼합 학습을 제한 운영으로 먼저 적용하고,192경기·성능 검증을 이어가는 방안을 선택했다. 이를mixed-maps revision2(canary)로 분리한다. 엔진30경기와 기록 명령의 상태 해시, 고정 소스·모델·복구본 검증은 적용 전 필수다. 정책 유지/192경기/성능 평가는 완료로 표시하지 않고 후속 검증으로 남긴다. 해당revision2만 준비 후 적용하도록 예약하며, 다른 업데이트의 자동적용 권한은 부여하지 않는다. 실행기 이상은 같은 상태로1회 복구 후 실패하면 기존 학습으로 rollback하고 관리자 정지는 유지한다. 환경 종료 후 상시 실행은 보장하지 않는다.

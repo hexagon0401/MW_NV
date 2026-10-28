@@ -73,7 +73,10 @@ class MixedTraining:
         from .release_artifacts import verify
         verify(self.paths['runtime'],self.spec['artifact']['runtime_digest'])
         root=Path(self.paths['pilot']);state=read(root/'state.json')
-        if state.get('completed_games',0)<192 or state.get('pilot_report',{}).get('pause',True) or not exact_recovery(root):raise ValueError('candidate not verified')
+        canary=self.spec['artifact'].get('activation')=='canary'
+        if canary:
+            if not state.get('canary') or state.get('generation')!=0 or not exact_recovery(root):raise ValueError('canary source not verified')
+        elif state.get('completed_games',0)<192 or state.get('pilot_report',{}).get('pause',True) or not exact_recovery(root):raise ValueError('candidate not verified')
     def prepare(self,journal,notify):
         if 'old_run' not in journal:
             old=read(BASE/'data/control/run.json')
@@ -92,7 +95,7 @@ class MixedTraining:
             notify(old_version={k:old_state.get(k) for k in ('rules_version','contract','generation')},old_run=dict(root=str(root),source=old.get('source'),kind=old.get('kind','legacy'),pilot=old.get('pilot',200),cwd=str(cwd)),old_active=read(self.registry.root/'active.json'))
             journal.update(old_run=dict(root=str(root),source=old.get('source'),kind=old.get('kind','legacy'),pilot=old.get('pilot',200),cwd=str(cwd)))
         marker='release:'+self.spec['id']+':'+str(self.spec['revision'])+'\n';notify(stop_marker=marker)
-        stop_run(journal['old_run']['root'],marker,notify);proof=archive_exact(journal['old_run']['root']);notify(old_recovery=proof)
+        stop_run(journal['old_run']['root'],marker,notify);proof=archive_exact(journal['old_run']['root']);final_state=read(Path(journal['old_run']['root'])/'state.json');notify(old_recovery=proof,old_version={k:final_state.get(k) for k in ('rules_version','contract','generation')})
         candidate=exact_recovery(self.paths['pilot'])
         if not candidate:raise ValueError('candidate source changed')
         notify(candidate_recovery=candidate,new_root=str(self.registry.root.resolve()/'production'/self.spec['id']/str(self.spec['revision'])))

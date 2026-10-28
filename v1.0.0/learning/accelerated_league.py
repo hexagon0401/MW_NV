@@ -306,9 +306,11 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
                     verdict=evaluation.pilot_report(root,state)
                     if verdict['pause']:state['pause_reason']='evaluation_regression';stop['value']=True
             if state['completed_games']>=pilot and not state.get('pilot_report') and not max_updates and not stopped():
-                if not evaluation.initial_complete(root):state['pause_reason']='waiting_initial_evaluation';stop['value']=True
+                if not evaluation.initial_complete(root):
+                    if not state.get('canary'):state['pause_reason']='waiting_initial_evaluation';stop['value']=True
                 else:
-                    verdict=evaluation.pilot_report(root,state);state['pilot_report']=verdict
+                    evaluation_state=dict(state,completed_games=state['last_evaluation']) if state.get('canary') else state
+                    verdict=evaluation.pilot_report(root,evaluation_state);state['pilot_report']=verdict
                     if verdict['pause']:state['pause_reason']='pilot_regression';stop['value']=True
                     elif any(v and v['mean']>0 for v in verdict.get('modes' if kind=='mission' else 'learners',{}).values()):
                         evaluated=True;evaluation.confirm(root,models,state,report)

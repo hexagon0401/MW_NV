@@ -94,3 +94,15 @@ def test_mixed_prepare_uses_registered_runtime_without_proc_cwd(tmp_path,monkeyp
     handler=handlers.MixedTraining(dict(spec=dict(id='mixed',revision=1),paths=dict(legacy=str(root),pilot=str(base/'pilot'))),registry)
     journal={};handler.prepare(journal,lambda **v:journal.update(v))
     assert journal['old_run']['cwd']==str(runtime) and journal['old_version']['generation']==42
+
+
+def test_canary_source_requires_explicit_canary_and_verified_recovery(tmp_path,monkeypatch):
+    import server.release_handlers as handlers
+    import server.release_artifacts as artifacts
+    from types import SimpleNamespace
+    root=tmp_path/'source';root.mkdir();(root/'state.json').write_text(json.dumps(dict(generation=0,canary=True,completed_games=0)))
+    monkeypatch.setattr(artifacts,'verify',lambda *a:True);monkeypatch.setattr(handlers,'exact_recovery',lambda *a:{'verified':True})
+    h=handlers.MixedTraining(dict(spec=dict(artifact=dict(activation='canary',runtime_digest='pinned')),paths=dict(runtime='frozen',pilot=str(root))),SimpleNamespace())
+    h.validate()
+    (root/'state.json').write_text(json.dumps(dict(generation=0,completed_games=0)))
+    with pytest.raises(ValueError,match='canary source'):h.validate()
