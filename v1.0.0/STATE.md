@@ -1,13 +1,12 @@
 # MW-NV v1.0.0 STATE
-Current:T25b administrator session synchronization hotfix
-Changes:await session before render;refresh auth on focus/poll;truthful footer;fail closed on error
-Tests:58 JS/build;Chromium desktop/mobile delayed auth,expiry,cross-tab,failure,retry PASS
-Regression:dashboard delayed-response scroll/content preservation PASS
-Preview:sealed dashboard-admin-session r1 passed session fixtures;no execution POST sent
-Deploy:dashboard-admin-session r1 APPLIED;canonical0bfbc016 and marker verified
-Comparison:policy-progress-comparison r4 READY/manual;200 vs769 snapshots;NOT STARTED by assistant
-Runtime:legacy PPO preserved;mixed-maps remains ROLLED_BACK
-Read:docs/dashboard-refresh/README.md
-Next:user opens comparison card;authenticate then manually start if desired
-Limits:user browser cookies cannot be inspected;real GitHub login requires user browser
+Current:T26 register 10-completed-game map rotation update
+Changes:config/releases.yaml;docs/map-rotation-10.md;DECISIONS.md
+Behavior:planned 2→3→4 rotation;10 unique completed training games each;same PPO1/PPO2
+Validation:manifest schema,PLANNED/manual/no attempts/dependency gate checked in temp registry
+Registry:map-rotation-10 r1 registered;auto=false;no training change/no Apply issued
+Blocker:mixed-maps remains ROLLED_BACK;rotation implementation and recovery checks pending
+Deploy:data-only release catalog update;existing dashboard-admin-session deployment retained
+Read:docs/map-rotation-10.md
+Next:restore mixed-map runner;implement schedule/parallel quota/resume/balance;new revision→READY
+Comparison:separate policy-progress-comparison retained;no comparison command issued in T26
 Usage:UNKNOWN
