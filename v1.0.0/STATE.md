@@ -1,13 +1,12 @@
 # MW-NV v1.0.0 STATE
-Current:T24 optimization/canary workflow deployed;mixed Apply pending technical gates
-Read:docs/diagnostic-acceleration/README.md;DECISIONS.md latest
-Changes:exact nav/A* memo,3-process full audit,simulation/replay resume,truthful liveness
-Tests:full325+38 latest+31 controller(overlap);JS56/build;real sealed-worker Apply/browser passed
-Progress:26/30 full diagnostic games;3 case workers validating;remaining cases resume checkpoints
-Models:latest200-game/gen476 pair archived/loaded/migrated;old checkpoint/runtime retained
-Deploy:canary-status-ui r4 APPLIED(9e6aa519);mixed-maps r2 VALIDATING/AUTO reserved
-Next:finish30 hashes→prepare/verify source recovery→typed Apply;no assistant round trip needed
-Follow-up:retention/192 mixed games/fixed evaluations are nonblocking and NOT passed
-Pending:optional26-game early-start question unanswered;do NOT lower30 without reply
-Startup:start_skill draft saved(needs review/save/Publish);environment shutdown stops CPU
+Current:T25 dashboard refresh stability and manual historical-policy comparison
+Changes:detached refresh commit;scroll/focus/log preservation;isolated comparison handler+replay
+Tests:24 targeted Python;58 JS;Vite build;desktop/mobile delayed refresh and release fixtures PASS
+Comparison:policy-progress-comparison r4 READY;200 vs769 completed-game snapshots;0/80 NOT STARTED
+Comparison rules:combined-arms-4/tactics-2;no NIM/update/promotion;private ledger and completed replay
+Runtime:mixed-maps remains ROLLED_BACK;legacy PPO preserved;comparison requires user start
+Deploy:dashboard-stable-refresh r1 typed Apply requested;check registry and production marker
+Read:docs/dashboard-refresh/README.md
+Next:user starts comparison in READY FOR RELEASE;inspect results without claiming improvement early
+Limits:actual comparison run/upload unverified until started;Mac hardware unverified
 Usage:UNKNOWN

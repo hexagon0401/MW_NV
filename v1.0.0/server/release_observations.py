@@ -103,5 +103,8 @@ def pages(spec,paths,content_digest):
 
 
 def observe(spec,paths,content_digest):
+    if spec.get('handler')=='policy_comparison':
+        from .policy_comparison import observe as comparison
+        return comparison(spec,paths,content_digest)
     if spec.get('planned'):return dict(steps=[step('plan','설계·구현 예정')],blockers=[],connection='online',evidence_digest=None)
     return (mixed if spec['handler']=='mixed_training' else pages)(spec,paths,content_digest)

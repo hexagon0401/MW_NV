@@ -106,6 +106,12 @@ def run(root):
     while not (registry.root/'STOP').exists():
         try:
             refresh(registry);poll_commands(registry,store);maybe_pilot(registry)
+            for comparison in registry.all():
+                if comparison['handler']=='policy_comparison' and comparison['status']=='APPLIED':
+                    definition=read(registry.root/'definitions'/(comparison['id']+'.json'));job=read(Path(definition['paths']['root'])/'job.json')
+                    if job.get('state') in ('QUEUED','RUNNING','WAITING_CPU'):
+                        from .policy_comparison import Comparison
+                        handler=Comparison(definition,registry);handler.validate();handler.switch({},lambda **v:None)
             from .canary_watch import monitor
             monitor(registry,BASE)
             worker_info=read(registry.root/'apply-worker.json')

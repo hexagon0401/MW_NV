@@ -4,7 +4,7 @@ from pathlib import Path
 from contextlib import contextmanager
 
 ACTIONS={'apply','set_auto','rollback'}
-HANDLERS={'mixed_training','pages_site'}
+HANDLERS={'mixed_training','pages_site','policy_comparison'}
 ID=re.compile(r'^[a-z0-9][a-z0-9-]{0,63}$')
 
 
@@ -107,6 +107,7 @@ class Registry:
             if not r or r['digest']!=payload['content_digest']:raise ValueError('stale release revision')
             state=json.loads(r['state']);action=payload['action'];result=dict(request_id=payload['request_id'],status='accepted')
             if action=='set_auto':
+                if payload['enabled'] and json.loads(r['spec'])['handler']=='policy_comparison':raise ValueError('comparison requires manual start')
                 if payload['enabled'] and state['status'] in ('APPLYING','APPLIED','ROLLED_BACK'):raise ValueError('release no longer reservable')
                 prior=c.execute('SELECT at,id FROM intents WHERE release_id=?',(r['id'],)).fetchone()
                 if prior and (prior['at'],prior['id'])>(payload['created_at'],payload['request_id']):raise ValueError('stale authorization intent')

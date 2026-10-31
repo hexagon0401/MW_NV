@@ -46,4 +46,5 @@ def execute(registry,handlers):
 
 if __name__=='__main__':
     from .release_handlers import MixedTraining,PagesSite
-    p=argparse.ArgumentParser();p.add_argument('--root',required=True);a=p.parse_args();execute(Registry(a.root),{'mixed_training':MixedTraining,'pages_site':PagesSite})
+    from .policy_comparison import Comparison
+    p=argparse.ArgumentParser();p.add_argument('--root',required=True);a=p.parse_args();execute(Registry(a.root),{'mixed_training':MixedTraining,'pages_site':PagesSite,'policy_comparison':Comparison})
