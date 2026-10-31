@@ -1,0 +1,21 @@
+{
+  "reason": "Add durable update ledger after first live generation; checked optimizer checkpoint counters and frozen opponent actor identities",
+  "learners": [
+    {
+      "learner": "PPO1",
+      "generation1_steps": 256,
+      "generation1_policy": "043b881f0fc1edb8",
+      "generation2_steps": 124,
+      "total_steps": 380,
+      "inserted": true
+    },
+    {
+      "learner": "PPO2",
+      "generation1_steps": 252,
+      "generation1_policy": "78d32a8de01b80e8",
+      "generation2_steps": 124,
+      "total_steps": 376,
+      "inserted": true
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "python_full": {
+    "passed": 325,
+    "seconds": 404.13,
+    "scope": "snapshot before final local memo/audit CLI adjustments"
+  },
+  "python_final_scope": {
+    "passed": 38,
+    "seconds": 9.14,
+    "overlap": true
+  },
+  "javascript": {
+    "passed": 56,
+    "build": true
+  },
+  "state_hash120s_identical": true,
+  "midgame20s_identical": true,
+  "canary_weights_preserved_without_training": true,
+  "parallel_audit_resume_tested": true,
+  "canary_apply_not_yet_executed": true,
+  "controller_followup": {
+    "passed": 31,
+    "seconds": 0.26,
+    "overlap": true
+  },
+  "real_site_typed_apply": true,
+  "private_audit_backup_verified": true,
+  "restored_training_liveness_correct": true,
+  "start_skill_draft_saved": true,
+  "start_skill_publish_pending": true
+}

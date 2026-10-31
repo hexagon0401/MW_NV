@@ -1,0 +1,96 @@
+{
+  "static_checks_passed": true,
+  "code_sha256": "500a2cb7c11b4418a33db3c18b9597cfa27cacf84dfa0fd4a3b9fc4689269977",
+  "geometry_complete": true,
+  "geometry_seeds_per_mode": 30,
+  "python_full_suite": {
+    "passed": 202,
+    "seconds": 335.73,
+    "scope": "full suite before final scoped contract/display corrections"
+  },
+  "python_final_contract_scope": {
+    "passed": 14
+  },
+  "javascript": {
+    "passed": 31
+  },
+  "browser": {
+    "scene_infantry": 192,
+    "scene_mobile_vehicles": 32,
+    "neutral_emplacements": [
+      4,
+      2
+    ],
+    "dpr": [
+      1,
+      2
+    ],
+    "sizes": [
+      "1440x900",
+      "1024x768",
+      "390x844"
+    ],
+    "report": "browser.json",
+    "synthetic": true
+  },
+  "performance_report": "performance.json",
+  "old_source_archive": "source-archive.json",
+  "long_running_gates": {
+    "engine_games": 30,
+    "migration_retention": "pending",
+    "mixed_pilot": 192,
+    "completed": false
+  },
+  "mac": "unverified",
+  "strategy_improvement": "unproven",
+  "rollout_rollback_tests": {
+    "passed": 2,
+    "legacy_pause_cancelled_on_archive_failure": true
+  },
+  "preview_report": "preview.json",
+  "production_report": "deployment.json",
+  "production_browser_report": "production-browser.json",
+  "heli_interruption_regression": {
+    "passed": 40,
+    "report": "../heli-interruption/verification.json"
+  },
+  "speed_reporting_regression": {
+    "status": "passed",
+    "tests": 29,
+    "engine_rules_changed": false,
+    "report": "../speed-reporting/README.md"
+  },
+  "adaptive_acceleration": {
+    "status": "passed",
+    "full_tests": 234,
+    "focused": 14,
+    "disk_pause": 3,
+    "report": "../adaptive-acceleration/README.md",
+    "engine_hash_unchanged": true,
+    "production_report": "../adaptive-acceleration/production.json"
+  },
+  "adaptive_timing_fix": {
+    "passed": 10,
+    "seconds": 108.52,
+    "engine_rules_unchanged": true
+  },
+  "terminal_dashboard": {
+    "focused_backend_tests": 21,
+    "seconds": 164.48,
+    "gate_tests": 5,
+    "engine_rules_unchanged": true,
+    "dashboard_report": "../dashboard/README.md"
+  },
+  "recent_replays": {
+    "publication_tests": 3,
+    "runtime_unchanged": true,
+    "retained_engine_audit_cases": 13,
+    "report": "../recent-replays/runtime-revalidation.json"
+  },
+  "fast_checkpoints": {
+    "final_tests": 12,
+    "initial_tests": 16,
+    "engine_unchanged": true,
+    "report": "../checkpoint-speed/README.md"
+  }
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "workers": 1,
+    "rounds": 12,
+    "sim_seconds": 120.0,
+    "wall_seconds": 8.468155291004223,
+    "aggregate_speed": 14.170736822395876,
+    "worker_rss_kib": 61808,
+    "cpu_seconds": 8.46,
+    "cpu_cores_average": 0.9990369459789094,
+    "hashes": [
+      "f2689f0ed14b31ed5d78a5b6e8655ddc67b8539f477b30cce27f7fa05a744904"
+    ]
+  },
+  {
+    "workers": 2,
+    "rounds": 12,
+    "sim_seconds": 240.0,
+    "wall_seconds": 10.207560265000211,
+    "aggregate_speed": 23.511984624074618,
+    "worker_rss_kib": 123824,
+    "cpu_seconds": 20.13,
+    "cpu_cores_average": 1.9720677103442585,
+    "hashes": [
+      "f2689f0ed14b31ed5d78a5b6e8655ddc67b8539f477b30cce27f7fa05a744904",
+      "f2689f0ed14b31ed5d78a5b6e8655ddc67b8539f477b30cce27f7fa05a744904"
+    ]
+  },
+  {
+    "workers": 3,
+    "rounds": 12,
+    "sim_seconds": 360.0,
+    "wall_seconds": 11.065687510999851,
+    "aggregate_speed": 32.532998934060075,
+    "worker_rss_kib": 185872,
+    "cpu_seconds": 32.14999999999999,
+    "cpu_cores_average": 2.905377543694531,
+    "hashes": [
+      "f2689f0ed14b31ed5d78a5b6e8655ddc67b8539f477b30cce27f7fa05a744904",
+      "f2689f0ed14b31ed5d78a5b6e8655ddc67b8539f477b30cce27f7fa05a744904",
+      "f2689f0ed14b31ed5d78a5b6e8655ddc67b8539f477b30cce27f7fa05a744904"
+    ]
+  }
+]

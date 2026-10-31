@@ -1,3 +1,4 @@
+from .version import RULES_VERSION,CATALOG_VERSION
 """Versioned JSON checkpoints and command/timing journals, never pickle/eval."""
 import json,random
 from enum import IntEnum
@@ -8,7 +9,7 @@ from .map import Terrain
 from .orders import CommandQueue,TeamMap,OrderError
 from .runtime import Engine
 
-CLASSES={c.__name__:c for c in (GameConfig,WorldState,Terrain,CommandQueue,TeamMap,types.WorldPos,types.Soldier,types.Squad,types.Vehicle,types.Facility,types.TeamState,types.Command)}
+CLASSES={c.__name__:c for c in (GameConfig,WorldState,Terrain,CommandQueue,TeamMap,types.WorldPos,types.Soldier,types.Squad,types.Vehicle,types.Emplacement,types.Facility,types.TeamState,types.Command)}
 
 
 def encode(obj):
@@ -52,11 +53,11 @@ class RecordingEngine(Engine):
         return self.world.emit(kind,**payload)
 
     def document(self):
-        return dict(version=1,initial=self.initial,journal=self.journal,checksum=self.world.checksum())
+        return dict(version=2,rules_version=self.world.rules_version,catalog_version=self.world.catalog_version,initial=self.initial,journal=self.journal,checksum=self.world.checksum())
 
 
 def replay(document):
-    if document['version']!=1:raise ValueError('replay version')
+    if document.get('version')!=2 or (document.get('rules_version'),document.get('catalog_version')) not in ((RULES_VERSION,CATALOG_VERSION),('combined-arms-6','combined-arms-3')):raise ValueError('incompatible replay rules/catalog version')
     engine=Engine(decode(document['initial']))
     for action in document['journal']:
         if action['kind']=='submit':

@@ -1,0 +1,10 @@
+{
+  "seed": 19,
+  "rounds": 24,
+  "sim_seconds": 240.0,
+  "elapsed_seconds": 59.980200625999714,
+  "sim_speed": 4.001320393982924,
+  "hash": "04f1d7e90c6b6b31f892321956ad1feaf3fa1da161f0a613070a05c6d3df4e9d",
+  "rss_kib": 92120,
+  "profile": "         145457938 function calls (136586368 primitive calls) in 61.241 seconds\n\n   Ordered by: cumulative time\n   List reduced from 615 to 15 due to restriction <15>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.002    0.002   61.723   61.723 /workspace/MW_NV/v1.0.0/learning/acceleration_benchmark.py:5(workload)\n       96    0.006    0.000   57.160    0.595 /workspace/MW_NV/v1.0.0/learning/candidate_env.py:42(step)\n       24    0.039    0.002   39.063    1.628 /workspace/MW_NV/v1.0.0/engine/runtime.py:45(step)\n     1200    0.113    0.000   39.024    0.033 /workspace/MW_NV/v1.0.0/engine/runtime.py:62(_tick)\n    17739    0.129    0.000   23.307    0.001 /workspace/MW_NV/v1.0.0/engine/runtime.py:102(_execute)\n8185877/15193    7.063    0.000   14.768    0.001 /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/copy.py:118(deepcopy)\n29949/5082    0.162    0.000   14.717    0.003 /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/copy.py:217(_deepcopy_dict)\n34833/7826    2.314    0.000   14.514    0.002 /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/copy.py:191(_deepcopy_list)\n910801/496457    0.941    0.000   14.513    0.000 {built-in method builtins.all}\n961656/893897    2.865    0.000   14.415    0.000 {built-in method builtins.any}\n       25    0.017    0.001   12.193    0.488 /workspace/MW_NV/v1.0.0/learning/candidate_env.py:25(_round)\n       98    0.001    0.000   12.168    0.124 /workspace/MW_NV/v1.0.0/learning/candidate_env.py:23(raw)\n       98    0.004    0.000   12.167    0.124 /workspace/MW_NV/v1.0.0/engine/runtime.py:99(observe)\n       98    0.030    0.000   12.163    0.124 /workspace/MW_NV/v1.0.0/engine/sensing.py:52(observation)\n   210547    0.801    0.000   11.882    0.000 /workspace/MW_NV/v1.0.0/engine/combat.py:25(engagement_target)\n\n\n"
+}

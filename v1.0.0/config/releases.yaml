@@ -1,0 +1,42 @@
+schema: 1
+releases:
+  - id: mixed-maps
+    revision: 2
+    title: 맵 2·3·4 혼합 학습
+    description: 엔진 30경기·해시·복구 검증 후 제한 운영합니다. 같은 두 PPO가 세 모드를 학습하며 192경기·성능 검증은 적용 후 계속합니다. 성능 향상은 미입증입니다.
+    targets: [engine, scenarios, policies, training]
+    dependencies: []
+    handler: mixed_training
+    artifact: {artifact_id: mixed-canary-r2, activation: canary}
+    validation_plan: [engine-2, engine-3, engine-4, recovery, build]
+    planned: false
+  - id: tactics-5
+    revision: 2
+    title: 경로 탐색·전장 적응 학습
+    description: 새로운 경로 후보와 환경 변형입니다. 혼합 학습 검증 이후 별도 준비합니다.
+    targets: [policies, training]
+    dependencies: [{id: mixed-maps, revision: 2}]
+    handler: mixed_training
+    artifact: {artifact_id: tactics5-r1}
+    validation_plan: [design, implementation, tests, retention, pilot, evaluation]
+    planned: true
+  - id: map-5
+    revision: 2
+    title: 맵 5 · 자유 전장
+    description: 대형 전장·랜덤 스폰의 향후 업데이트입니다. 아직 구현하거나 실행하지 않습니다.
+    targets: [scenarios, engine, policies]
+    dependencies: [{id: mixed-maps, revision: 2}]
+    handler: mixed_training
+    artifact: {artifact_id: map5-r1}
+    validation_plan: [design, implementation, geometry, diagnostics, pilot, evaluation]
+    planned: true
+  - id: map-rotation-10
+    revision: 1
+    title: 맵 2→3→4 · 완료 10경기마다 순환
+    description: 앞으로 적용할 학습 일정 변경입니다. 고지점령 10경기→섬멸 10경기→깃발탈취 10경기를 반복하며 같은 PPO1·PPO2를 유지합니다. 완료 학습 경기만 세고 평가·진단·시범·중단·중복 경기는 제외합니다. 병렬 실행은 배정된 10경기를 모두 마친 뒤 다음 맵을 배정하고, 재시작 시 맵·완료 수를 복구합니다. 혼합 학습 복구와 일정·복구 검증 후 READY로 전환하며 관리자가 수동 Apply합니다. 현재 운영은 바꾸지 않습니다.
+    targets: [training]
+    dependencies: [{id: mixed-maps, revision: 2}]
+    handler: mixed_training
+    artifact: {artifact_id: map-rotation-10-r1}
+    validation_plan: [implementation, schedule, recovery, balance, integration, rollback]
+    planned: true

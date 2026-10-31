@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "fixtures": true,
+  "sizes": [
+    [
+      1440,
+      900
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "page_errors": [],
+  "origin": "https://t11-multi-mode.mw-nv.pages.dev"
+}

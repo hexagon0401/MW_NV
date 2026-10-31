@@ -1,0 +1,49 @@
+# T15 터미널 대시보드와 PPO 관리자 제어
+
+공개 주소: https://mw-nv.pages.dev/dashboard/ . 관전 우측 대시보드 링크는
+새 탭을 연다. 관전에는 현재 경기 정보만 남긴다. 별도 entry는 PixiJS·지도·
+리플레이를 내려받지 않고 활성 메뉴만 폴링한다. 숨겨진 탭은 폴링/렌더링을 쉰다.
+
+Geist Mono1.8.2는 OFL 확인·자체 호스팅, 한글은 기존 NanumSquare다.
+검정/흰색 터미널, 팀 파랑/주황, 접근 가능한 버튼/표/SVG를 사용한다.
+장식 문자는 고정 집합만 사용하며 최초 탭 세션900ms 이내 종료/제거한다. Escape 생략도 Chromium에서 확인했다.
+최대12열240자, 모바일6열120자, Escape/효과 감소로 생략한다.
+
+개요·실행 현황·전체 전적·학습/전술·분석·리소스를 분리했다. PPO1/2는
+실제 팀 배정으로 집계하고 학습과 초기 상대 고정 평가를 구분한다. 전술 선택률은
+기회 수를 분모로 사용한다. 전적은50행 페이지, 학습자/모드/기간/전장 필터와
+정책 버전 상세를 제공한다. 세부 이력은 OPERATIONS.md를 읽는다.
+
+검증:
+- JavaScript45 통과, Vite production build 통과.
+- Python21 통과(164.48초): 집계/보존/익명화/실제 엔진 PPO 저장·재개,
+  독립 병렬 수집/복구/GAE, PPO 정지 중 평가 호출, T11 전환 가드.
+- 추가 fingerprint/제어5검사 통과(위 검사의 일부 재검증).
+- Chromium1440×900/390×844 fixture와 Pages preview 전 메뉴·모바일·CSP 통과.
+  dashboard 방문에 Pixi/지도/리플레이 요청 없음. preview API는 실제 로컬 집계를
+  브리지한 검사이며 Production의 실제 Storage/API 검사는 production.json에 기록한다.
+- 수집0.076초, 전체81개 집계 문서 생성2.587초(당시 부하 기준); 네트워크는
+  PPO 계산 밖이다. 접속 전후35초 관측 중 접속 구간에는 새 처리량 보고 경계가
+  없어 유효한 차이를 계산하지 않았다(overhead.json). 이 수치는 학습 처리량 개선이나
+  전략 향상의 증거가 아니다.
+
+기존58경기/144세대 체크포인트·모델·optimizer/RNG/진행 경기를 보존하고 재개했다.
+이전 T11 진단은 validation-before-dashboard/에 남기고 새 지문으로 검증을 재개했다.
+이관/진단 검증 완료 전 혼합 학습을 시작하지 않는다.
+
+관리자는 서버가 실제 GitHub ID82876856을 확인한다. PKCE, 1시간 HttpOnly
+서명 세션, SameSite/Origin/CSRF/길이/허용 필드, private 버전형 제어 큐를 사용한다.
+셸/PID/경로 입력은 없고 PPO 일시정지/재개만 허용한다. 평가·진단·백업은 계속된다.
+GitHub 제공자 활성화를 확인했고 Production 세션 비밀키·로그인을 설정했다.
+실제 GitHub 소유자82876856의 OAuth 로그인 기록을 서버에서 확인한 후
+PPO 제어를 활성화했다(owner-activation.json). 로그인한 소유자에게만 CONTROL이 보인다.
+
+Production 실제 API5개200, 전체 완료 전적1425건, 비로그인 제어401,
+관리자 미설정 상태를 검증했다. 이전 운영 배포4c7929b0는 복구용으로 보존한다.
+
+GitHub OAuth 설정 후 브라우저 검사에서 로그인 활성화, PKCE→Supabase→GitHub
+리디렉션, Secure/HttpOnly 쿠키, 무효 코드 거부를 확인했다(auth-config.json).
+
+실제 Intel Mac 성능과 장기 자원 추세는 미검증이다. Production PPO를 임의로
+정지하지 않았으며 안전 정지·평가 지속·재개는 격리된 실제 엔진 통합 검사로 확인했다.
+환경 종료 후의 상시 학습 서버를 새로 제공하는 작업이 아니다. 사용량 UNKNOWN.

@@ -1,0 +1,11 @@
+import {chromium} from 'playwright-core';import assert from 'node:assert/strict';import fs from 'node:fs';
+const origin='https://mw-nv.pages.dev',errors=[],requests=[];
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox'],...(process.env.HTTPS_PROXY?{proxy:{server:process.env.HTTPS_PROXY}}:{})});
+try{for(const [width,height] of [[1440,900],[390,844]]){
+ const page=await browser.newPage({viewport:{width,height},reducedMotion:'reduce',ignoreHTTPSErrors:true});page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(r.url()));
+ const r=await page.goto(origin+'/dashboard/#releases?id=mixed-maps');assert.equal(r.status(),200);assert.ok(r.headers()['content-security-policy']?.includes("script-src 'self'"));await page.waitForSelector('.release-terminal');
+ assert.ok((await page.locator('#dash-content').innerText()).includes('맵 2'));assert.ok(await page.locator('#dash-filters').isHidden());assert.equal(await page.getByRole('button',{name:'Apply',exact:true}).count(),0);
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));await page.screenshot({path:`../docs/releases/production-${width}.png`,fullPage:true});
+ if(width===1440){await page.waitForTimeout(1000);let before=requests.length;await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,get:()=>true});document.dispatchEvent(new Event('visibilitychange'));});await page.waitForTimeout(16000);assert.equal(requests.length,before);await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});await page.waitForSelector('.release-terminal');assert.ok(requests.length>before);}
+ await page.close();
+}assert.deepEqual(errors,[]);assert.equal(requests.some(u=>/pixi|\/view\?|demo\.json/.test(u)),false);fs.writeFileSync('../docs/releases/production-browser.json',JSON.stringify({origin,fixtures:false,passed:true,desktop:'1440x900',mobile:'390x844',strict_csp:true,no_map_download:true,hidden_poll_stopped:true,public_apply_not_exposed:true,page_errors:errors},null,2)+'\n');console.log('production release browser passed');}finally{await browser.close();}

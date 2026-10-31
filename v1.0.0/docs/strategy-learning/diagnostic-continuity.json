@@ -1,0 +1,26 @@
+{
+  "engine_agent_config_dependencies_identical": 52,
+  "paired_algorithm_journals": [
+    {
+      "mode": "2",
+      "hash_identical": true,
+      "journal_identical": true,
+      "sim_seconds": 20
+    },
+    {
+      "mode": "3",
+      "hash_identical": true,
+      "journal_identical": true,
+      "sim_seconds": 20
+    },
+    {
+      "mode": "4",
+      "hash_identical": true,
+      "journal_identical": true,
+      "sim_seconds": 20
+    }
+  ],
+  "completed_cases_preserved": 21,
+  "policy_evaluations_reusable": false,
+  "reason": "prefix correction affects policy evaluation,not algorithm-selected commands; history interpretation corrected"
+}

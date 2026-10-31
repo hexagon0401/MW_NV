@@ -22,5 +22,13 @@
     "license": "OFL-1.1",
     "sha256": "9dd2e4b7cf6c8eec828dfec4ae87f64fdc361de1b86733ea4c305855bc10cb61",
     "source": "https://registry.npmjs.org/typeface-nanum-square/-/typeface-nanum-square-1.1.0.tgz"
+  },
+  {
+    "file": "GeistMono.woff2",
+    "package": "geist",
+    "version": "1.8.2",
+    "license": "SIL OPEN FONT LICENSE",
+    "sha256": "55419aa06f58adcd7f145c6c920e56936416f17e528f60efc6032ffa4269972b",
+    "source": "https://registry.npmjs.org/geist/-/geist-1.8.2.tgz"
   }
 ]

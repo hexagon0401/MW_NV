@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {refreshStats,stats} from './src/stats.js';
+test('durable stats distinguishes empty results from an unavailable ledger',async()=>{const node={textContent:''};global.document={querySelector:()=>node};await refreshStats(async()=>({ok:true,json:async()=>({total_matches:0,teams:{}})}));assert.match(node.textContent,/완료 0경기/);assert.equal(stats().total_matches,0);await refreshStats(async()=>({ok:false}));assert.equal(node.textContent,'누적 —');assert.equal(stats(),null);});

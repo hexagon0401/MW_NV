@@ -5,6 +5,11 @@
   "r2_enabled": false,
   "r2_endpoint": "https://6974fa0dd5aeb87d1c8a95cd4e85e27d.r2.cloudflarestorage.com",
   "access_configured": false,
-  "visibility": "private",
-  "storage_provider": "supabase-private"
+  "visibility": "public-completed-matches",
+  "storage_provider": "supabase-private",
+  "site_url": "https://mw-nv.pages.dev",
+  "deployment_url": "https://0bfbc016.mw-nv.pages.dev",
+  "cloudflare_deploy_status": "success; dashboard-admin-session r1 typed Apply verified",
+  "production_branch": "dev/v1.0.0",
+  "rollback_deployment": "89d88264-b01f-4f9c-83e8-51d4f373f58c"
 }

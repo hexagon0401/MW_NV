@@ -1,0 +1,38 @@
+{
+  "url": "https://mw-nv.pages.dev",
+  "deployment": "e476d696",
+  "rollback": "26a4f36e",
+  "checks": {
+    "/dashboard/": {
+      "http": 200,
+      "html_bytes": 2340
+    },
+    "/api/training": {
+      "http": 200,
+      "status": "running",
+      "games": 166,
+      "contract": "tactics-2"
+    },
+    "/api/admin/session": {
+      "http": 200,
+      "configured": true,
+      "authenticated": false
+    },
+    "/api/insights?learner=PPO1": {
+      "http": 200,
+      "drilldown": {
+        "complete": true,
+        "scope": "all_recorded_completed_learner_appearances",
+        "games": 294
+      }
+    },
+    "/api/insights?learner=PPO1&generation=0": {
+      "http": 200,
+      "drilldown": {
+        "complete": true,
+        "scope": "all_recorded_completed_learner_appearances",
+        "games": 0
+      }
+    }
+  }
+}

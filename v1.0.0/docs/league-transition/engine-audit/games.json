@@ -1,0 +1,953 @@
+{
+  "complete": true,
+  "mode": "algorithm evaluation; no PPO/NIM",
+  "rules_version": "combined-arms-4",
+  "map_id": "river-districts",
+  "map_version": "2",
+  "deterministic_reexecution": true,
+  "total_wall_seconds": 947.44,
+  "results": [
+    {
+      "seed": 20000,
+      "swapped": false,
+      "winner": 0,
+      "scores": [
+        102,
+        49
+      ],
+      "sim_seconds": 1440.0,
+      "wall_seconds": 95.32,
+      "checksum": "d6088da9534b77bfe7f2c6b7338ea652ca78131e149a5afd85a82a2e69525f60",
+      "shots": 721,
+      "hits": 424,
+      "tank_impacts": 63,
+      "artillery_impacts": 31,
+      "splash_damage": 2038,
+      "friendly_damage": 0,
+      "order_failures": {
+        "ILLEGAL_STATE": 8,
+        "EXPIRED": 9,
+        "TRAFFIC_TIMEOUT": 35,
+        "FORMATION_UNREACHABLE": 2,
+        "INSUFFICIENT_SUPPLY": 2,
+        "INVALID_TARGET": 1,
+        "UNOBSERVED_TARGET": 1
+      },
+      "traffic_waits": 176,
+      "events": {
+        "SUPPLY_CHANGED": 204,
+        "MATCH_STARTED": 1,
+        "ORDER_ACCEPTED": 382,
+        "EMBARK_STARTED": 19,
+        "UNIT_MOVED": 230640,
+        "SCORE_TICK": 48,
+        "EMBARK_DONE": 124,
+        "VEHICLE_WAITING": 176,
+        "ORDER_COMPLETED": 219,
+        "VEHICLE_YIELDED": 63,
+        "VEHICLE_REPLANNED": 7,
+        "UNIT_SPOTTED": 207,
+        "UNIT_ARRIVED": 623,
+        "UNIT_DAMAGED": 997,
+        "TANK_IMPACT": 63,
+        "ABSTRACT_ATTACK": 721,
+        "ORDER_CANCELLED": 94,
+        "DISEMBARK_DONE": 100,
+        "INFANTRY_DISABLED": 120,
+        "DEPLOYMENT_CHANGED": 14,
+        "VEHICLE_DISABLED": 9,
+        "ARTILLERY_FIRED": 31,
+        "CAPTURE_PROGRESS": 1495,
+        "ARTILLERY_IMPACT": 31,
+        "UNIT_SPAWNED": 67,
+        "FORMATION_REPLAN": 40,
+        "FORMATION_COLUMN": 48,
+        "FORMATION_ARRIVED": 28,
+        "ORDER_FAILED": 58,
+        "OBJECTIVE_CAPTURED": 9,
+        "UNIT_TASK_CHANGED": 666,
+        "UNIT_HEALED": 13,
+        "OBJECTIVE_NEUTRALIZED": 6,
+        "UNIT_REPAIRED": 10,
+        "MATCH_ENDED": 1
+      },
+      "stationary_120s": [
+        {
+          "unit": 10201,
+          "seconds": 600.0
+        },
+        {
+          "unit": 20210,
+          "seconds": 240.0
+        }
+      ],
+      "living": {
+        "0": {
+          "infantry": 48,
+          "vehicles": 8
+        },
+        "1": {
+          "infantry": 24,
+          "vehicles": 6
+        }
+      }
+    },
+    {
+      "seed": 20000,
+      "swapped": true,
+      "winner": 1,
+      "scores": [
+        73,
+        100
+      ],
+      "sim_seconds": 2310.0,
+      "wall_seconds": 102.14,
+      "checksum": "17fd76ac47f2d36ec083cc0c719f5f07d798d79dfde16fe933f91c3dddd4965b",
+      "shots": 810,
+      "hits": 502,
+      "tank_impacts": 63,
+      "artillery_impacts": 59,
+      "splash_damage": 2611,
+      "friendly_damage": 0,
+      "order_failures": {
+        "ILLEGAL_STATE": 16,
+        "EXPIRED": 11,
+        "INSUFFICIENT_SUPPLY": 2,
+        "UNOBSERVED_TARGET": 2,
+        "TRAFFIC_TIMEOUT": 56,
+        "NO_FUEL": 2,
+        "FORMATION_UNREACHABLE": 4,
+        "INVALID_TARGET": 1
+      },
+      "traffic_waits": 153,
+      "events": {
+        "SUPPLY_CHANGED": 235,
+        "MATCH_STARTED": 1,
+        "ORDER_ACCEPTED": 609,
+        "EMBARK_STARTED": 25,
+        "UNIT_MOVED": 315027,
+        "SCORE_TICK": 77,
+        "EMBARK_DONE": 165,
+        "VEHICLE_WAITING": 153,
+        "ORDER_COMPLETED": 312,
+        "VEHICLE_YIELDED": 84,
+        "VEHICLE_REPLANNED": 8,
+        "UNIT_SPOTTED": 314,
+        "UNIT_ARRIVED": 98,
+        "UNIT_DAMAGED": 1178,
+        "TANK_IMPACT": 63,
+        "ABSTRACT_ATTACK": 810,
+        "ORDER_CANCELLED": 198,
+        "DISEMBARK_DONE": 162,
+        "INFANTRY_DISABLED": 166,
+        "DEPLOYMENT_CHANGED": 24,
+        "VEHICLE_DISABLED": 11,
+        "CAPTURE_PROGRESS": 3418,
+        "ARTILLERY_FIRED": 59,
+        "ORDER_FAILED": 94,
+        "UNIT_HEALED": 24,
+        "ARTILLERY_IMPACT": 59,
+        "UNIT_SPAWNED": 66,
+        "UNIT_TASK_CHANGED": 1190,
+        "FORMATION_ARRIVED": 48,
+        "OBJECTIVE_CAPTURED": 20,
+        "OBJECTIVE_NEUTRALIZED": 17,
+        "FORMATION_REPLAN": 91,
+        "FORMATION_COLUMN": 98,
+        "VEHICLE_OUT_OF_FUEL": 2,
+        "MATCH_ENDED": 1
+      },
+      "stationary_120s": [
+        {
+          "unit": 20047,
+          "seconds": 240.0
+        },
+        {
+          "unit": 20042,
+          "seconds": 210.0
+        },
+        {
+          "unit": 20045,
+          "seconds": 210.0
+        },
+        {
+          "unit": 20046,
+          "seconds": 210.0
+        }
+      ],
+      "living": {
+        "0": {
+          "infantry": 4,
+          "vehicles": 4
+        },
+        "1": {
+          "infantry": 22,
+          "vehicles": 7
+        }
+      }
+    },
+    {
+      "seed": 20001,
+      "swapped": false,
+      "winner": 0,
+      "scores": [
+        100,
+        93
+      ],
+      "sim_seconds": 1860.0,
+      "wall_seconds": 83.6,
+      "checksum": "e018756edc3c5386c4cdaadfe1f2d3e1d4c333758015fcd4cfac1e281e2abfc2",
+      "shots": 1364,
+      "hits": 745,
+      "tank_impacts": 61,
+      "artillery_impacts": 51,
+      "splash_damage": 2009,
+      "friendly_damage": 0,
+      "order_failures": {
+        "EXPIRED": 9,
+        "ILLEGAL_STATE": 10,
+        "UNOBSERVED_TARGET": 5,
+        "INSUFFICIENT_SUPPLY": 4,
+        "TRAFFIC_TIMEOUT": 47,
+        "FORMATION_UNREACHABLE": 4,
+        "NO_FUEL": 1,
+        "INVALID_TARGET": 1
+      },
+      "traffic_waits": 207,
+      "events": {
+        "SUPPLY_CHANGED": 245,
+        "MATCH_STARTED": 1,
+        "ORDER_ACCEPTED": 490,
+        "EMBARK_STARTED": 22,
+        "UNIT_MOVED": 249020,
+        "SCORE_TICK": 62,
+        "EMBARK_DONE": 153,
+        "VEHICLE_WAITING": 207,
+        "ORDER_COMPLETED": 275,
+        "VEHICLE_YIELDED": 82,
+        "VEHICLE_REPLANNED": 7,
+        "UNIT_SPOTTED": 276,
+        "UNIT_ARRIVED": 71,
+        "UNIT_DAMAGED": 1665,
+        "TANK_IMPACT": 61,
+        "ABSTRACT_ATTACK": 1364,
+        "ORDER_CANCELLED": 127,
+        "DISEMBARK_DONE": 147,
+        "DEPLOYMENT_CHANGED": 22,
+        "INFANTRY_DISABLED": 160,
+        "VEHICLE_DISABLED": 12,
+        "CAPTURE_PROGRESS": 2381,
+        "ARTILLERY_FIRED": 51,
+        "ARTILLERY_IMPACT": 51,
+        "UNIT_SPAWNED": 66,
+        "UNIT_HEALED": 48,
+        "UNIT_TASK_CHANGED": 760,
+        "ORDER_FAILED": 81,
+        "FORMATION_REPLAN": 53,
+        "FORMATION_COLUMN": 63,
+        "OBJECTIVE_CAPTURED": 14,
+        "FORMATION_ARRIVED": 28,
+        "OBJECTIVE_NEUTRALIZED": 11,
+        "VEHICLE_OUT_OF_FUEL": 1,
+        "MATCH_ENDED": 1
+      },
+      "stationary_120s": [
+        {
+          "unit": 10201,
+          "seconds": 480.0
+        },
+        {
+          "unit": 10046,
+          "seconds": 120.0
+        },
+        {
+          "unit": 10048,
+          "seconds": 120.0
+        }
+      ],
+      "living": {
+        "0": {
+          "infantry": 3,
+          "vehicles": 5
+        },
+        "1": {
+          "infantry": 29,
+          "vehicles": 5
+        }
+      }
+    },
+    {
+      "seed": 20001,
+      "swapped": true,
+      "winner": 1,
+      "scores": [
+        11,
+        102
+      ],
+      "sim_seconds": 1350.0,
+      "wall_seconds": 72.96,
+      "checksum": "774810cb0ba5300d7129830a2250a7b156ccc6202c93119e8eb2d351f4535357",
+      "shots": 995,
+      "hits": 529,
+      "tank_impacts": 62,
+      "artillery_impacts": 35,
+      "splash_damage": 2015,
+      "friendly_damage": 1,
+      "order_failures": {
+        "ILLEGAL_STATE": 9,
+        "EXPIRED": 8,
+        "UNOBSERVED_TARGET": 4,
+        "TRAFFIC_TIMEOUT": 27,
+        "FORMATION_UNREACHABLE": 2,
+        "NO_FUEL": 1
+      },
+      "traffic_waits": 109,
+      "events": {
+        "SUPPLY_CHANGED": 175,
+        "MATCH_STARTED": 1,
+        "ORDER_ACCEPTED": 358,
+        "EMBARK_STARTED": 15,
+        "UNIT_MOVED": 186766,
+        "SCORE_TICK": 45,
+        "EMBARK_DONE": 102,
+        "VEHICLE_WAITING": 109,
+        "ORDER_COMPLETED": 218,
+        "VEHICLE_YIELDED": 71,
+        "VEHICLE_REPLANNED": 7,
+        "UNIT_SPOTTED": 209,
+        "UNIT_ARRIVED": 2381,
+        "UNIT_DAMAGED": 1280,
+        "TANK_IMPACT": 62,
+        "ABSTRACT_ATTACK": 995,
+        "ORDER_CANCELLED": 83,
+        "DISEMBARK_DONE": 95,
+        "DEPLOYMENT_CHANGED": 12,
+        "INFANTRY_DISABLED": 151,
+        "VEHICLE_DISABLED": 9,
+        "CAPTURE_PROGRESS": 908,
+        "ARTILLERY_FIRED": 35,
+        "ARTILLERY_IMPACT": 35,
+        "ORDER_FAILED": 51,
+        "UNIT_SPAWNED": 66,
+        "FORMATION_REPLAN": 33,
+        "FORMATION_COLUMN": 38,
+        "OBJECTIVE_CAPTURED": 6,
+        "UNIT_TASK_CHANGED": 555,
+        "OBJECTIVE_NEUTRALIZED": 4,
+        "FORMATION_ARRIVED": 45,
+        "VEHICLE_OUT_OF_FUEL": 1,
+        "MATCH_ENDED": 1
+      },
+      "stationary_120s": [
+        {
+          "unit": 20201,
+          "seconds": 480.0
+        },
+        {
+          "unit": 20218,
+          "seconds": 360.0
+        },
+        {
+          "unit": 20002,
+          "seconds": 210.0
+        },
+        {
+          "unit": 20005,
+          "seconds": 150.0
+        },
+        {
+          "unit": 20006,
+          "seconds": 150.0
+        },
+        {
+          "unit": 20211,
+          "seconds": 150.0
+        },
+        {
+          "unit": 20214,
+          "seconds": 150.0
+        },
+        {
+          "unit": 20216,
+          "seconds": 150.0
+        }
+      ],
+      "living": {
+        "0": {
+          "infantry": 22,
+          "vehicles": 6
+        },
+        "1": {
+          "infantry": 19,
+          "vehicles": 7
+        }
+      }
+    },
+    {
+      "seed": 20002,
+      "swapped": false,
+      "winner": 1,
+      "scores": [
+        30,
+        101
+      ],
+      "sim_seconds": 1560.0,
+      "wall_seconds": 66.66,
+      "checksum": "0e3bea504aa09cd2234f1816b09f54914e065cbd3077f3a67c53a8658ed1e911",
+      "shots": 729,
+      "hits": 431,
+      "tank_impacts": 83,
+      "artillery_impacts": 29,
+      "splash_damage": 2947,
+      "friendly_damage": 0,
+      "order_failures": {
+        "ILLEGAL_STATE": 13,
+        "EXPIRED": 7,
+        "INSUFFICIENT_SUPPLY": 2,
+        "TRAFFIC_TIMEOUT": 29,
+        "UNOBSERVED_TARGET": 5
+      },
+      "traffic_waits": 41,
+      "events": {
+        "SUPPLY_CHANGED": 215,
+        "MATCH_STARTED": 1,
+        "ORDER_ACCEPTED": 414,
+        "EMBARK_STARTED": 16,
+        "UNIT_MOVED": 197151,
+        "SCORE_TICK": 52,
+        "EMBARK_DONE": 109,
+        "VEHICLE_WAITING": 41,
+        "ORDER_COMPLETED": 229,
+        "VEHICLE_YIELDED": 3,
+        "VEHICLE_REPLANNED": 6,
+        "UNIT_SPOTTED": 243,
+        "UNIT_ARRIVED": 73,
+        "UNIT_DAMAGED": 1048,
+        "TANK_IMPACT": 83,
+        "ABSTRACT_ATTACK": 729,
+        "ORDER_CANCELLED": 123,
+        "DISEMBARK_DONE": 100,
+        "INFANTRY_DISABLED": 137,
+        "DEPLOYMENT_CHANGED": 18,
+        "VEHICLE_DISABLED": 10,
+        "CAPTURE_PROGRESS": 1413,
+        "ARTILLERY_FIRED": 29,
+        "ARTILLERY_IMPACT": 29,
+        "UNIT_SPAWNED": 66,
+        "ORDER_FAILED": 56,
+        "UNIT_TASK_CHANGED": 710,
+        "UNIT_HEALED": 32,
+        "OBJECTIVE_CAPTURED": 9,
+        "FORMATION_ARRIVED": 27,
+        "OBJECTIVE_NEUTRALIZED": 6,
+        "FORMATION_REPLAN": 72,
+        "FORMATION_COLUMN": 76,
+        "MATCH_ENDED": 1
+      },
+      "stationary_120s": [
+        {
+          "unit": 10045,
+          "seconds": 420.0
+        },
+        {
+          "unit": 10044,
+          "seconds": 360.0
+        },
+        {
+          "unit": 10046,
+          "seconds": 360.0
+        },
+        {
+          "unit": 10048,
+          "seconds": 360.0
+        },
+        {
+          "unit": 20201,
+          "seconds": 210.0
+        },
+        {
+          "unit": 20274,
+          "seconds": 180.0
+        },
+        {
+          "unit": 20230,
+          "seconds": 150.0
+        },
+        {
+          "unit": 20232,
+          "seconds": 150.0
+        },
+        {
+          "unit": 20234,
+          "seconds": 150.0
+        },
+        {
+          "unit": 20236,
+          "seconds": 150.0
+        }
+      ],
+      "living": {
+        "0": {
+          "infantry": 25,
+          "vehicles": 6
+        },
+        "1": {
+          "infantry": 30,
+          "vehicles": 6
+        }
+      }
+    },
+    {
+      "seed": 20002,
+      "swapped": true,
+      "winner": 1,
+      "scores": [
+        7,
+        101
+      ],
+      "sim_seconds": 1140.0,
+      "wall_seconds": 52.19,
+      "checksum": "d4bb8f91bbfb2b5935ae8b29f48368abb3fe87ce07ab2a229e40c76747155584",
+      "shots": 596,
+      "hits": 364,
+      "tank_impacts": 80,
+      "artillery_impacts": 21,
+      "splash_damage": 2861,
+      "friendly_damage": 0,
+      "order_failures": {
+        "ILLEGAL_STATE": 9,
+        "EXPIRED": 6,
+        "UNOBSERVED_TARGET": 3,
+        "INSUFFICIENT_SUPPLY": 1,
+        "TRAFFIC_TIMEOUT": 8
+      },
+      "traffic_waits": 21,
+      "events": {
+        "SUPPLY_CHANGED": 178,
+        "MATCH_STARTED": 1,
+        "ORDER_ACCEPTED": 300,
+        "EMBARK_STARTED": 13,
+        "UNIT_MOVED": 162070,
+        "SCORE_TICK": 38,
+        "EMBARK_DONE": 104,
+        "VEHICLE_WAITING": 21,
+        "ORDER_COMPLETED": 188,
+        "VEHICLE_YIELDED": 3,
+        "VEHICLE_REPLANNED": 6,
+        "UNIT_SPOTTED": 194,
+        "UNIT_ARRIVED": 37,
+        "UNIT_DAMAGED": 843,
+        "TANK_IMPACT": 80,
+        "ABSTRACT_ATTACK": 596,
+        "ORDER_CANCELLED": 81,
+        "DISEMBARK_DONE": 104,
+        "DEPLOYMENT_CHANGED": 24,
+        "INFANTRY_DISABLED": 112,
+        "VEHICLE_DISABLED": 9,
+        "ARTILLERY_FIRED": 21,
+        "ORDER_FAILED": 27,
+        "UNIT_HEALED": 15,
+        "ARTILLERY_IMPACT": 21,
+        "CAPTURE_PROGRESS": 702,
+        "OBJECTIVE_CAPTURED": 5,
+        "UNIT_SPAWNED": 60,
+        "UNIT_TASK_CHANGED": 545,
+        "FORMATION_ARRIVED": 13,
+        "FORMATION_REPLAN": 16,
+        "FORMATION_COLUMN": 18,
+        "OBJECTIVE_NEUTRALIZED": 2,
+        "MATCH_ENDED": 1
+      },
+      "stationary_120s": [
+        {
+          "unit": 20041,
+          "seconds": 120.0
+        },
+        {
+          "unit": 20042,
+          "seconds": 120.0
+        },
+        {
+          "unit": 20043,
+          "seconds": 120.0
+        },
+        {
+          "unit": 20044,
+          "seconds": 120.0
+        },
+        {
+          "unit": 20045,
+          "seconds": 120.0
+        },
+        {
+          "unit": 20046,
+          "seconds": 120.0
+        },
+        {
+          "unit": 20047,
+          "seconds": 120.0
+        },
+        {
+          "unit": 20048,
+          "seconds": 120.0
+        }
+      ],
+      "living": {
+        "0": {
+          "infantry": 15,
+          "vehicles": 4
+        },
+        "1": {
+          "infantry": 61,
+          "vehicles": 7
+        }
+      }
+    },
+    {
+      "seed": 20003,
+      "swapped": false,
+      "winner": 1,
+      "scores": [
+        16,
+        103
+      ],
+      "sim_seconds": 1140.0,
+      "wall_seconds": 52.49,
+      "checksum": "aa4af68f6d0f08a16d0f076c43c9ed6d5a06987ec85db0c749cd326225a81be0",
+      "shots": 608,
+      "hits": 327,
+      "tank_impacts": 59,
+      "artillery_impacts": 33,
+      "splash_damage": 1522,
+      "friendly_damage": 0,
+      "order_failures": {
+        "ILLEGAL_STATE": 5,
+        "EXPIRED": 8,
+        "INSUFFICIENT_SUPPLY": 1,
+        "TRAFFIC_TIMEOUT": 29,
+        "UNOBSERVED_TARGET": 1,
+        "FORMATION_UNREACHABLE": 3
+      },
+      "traffic_waits": 43,
+      "events": {
+        "SUPPLY_CHANGED": 202,
+        "MATCH_STARTED": 1,
+        "ORDER_ACCEPTED": 302,
+        "EMBARK_STARTED": 14,
+        "UNIT_MOVED": 154259,
+        "SCORE_TICK": 38,
+        "EMBARK_DONE": 105,
+        "VEHICLE_WAITING": 43,
+        "ORDER_COMPLETED": 187,
+        "VEHICLE_YIELDED": 3,
+        "VEHICLE_REPLANNED": 6,
+        "UNIT_SPOTTED": 194,
+        "UNIT_ARRIVED": 39,
+        "UNIT_DAMAGED": 853,
+        "ABSTRACT_ATTACK": 608,
+        "TANK_IMPACT": 59,
+        "ORDER_CANCELLED": 64,
+        "DISEMBARK_DONE": 98,
+        "DEPLOYMENT_CHANGED": 11,
+        "INFANTRY_DISABLED": 101,
+        "VEHICLE_DISABLED": 9,
+        "CAPTURE_PROGRESS": 919,
+        "ARTILLERY_FIRED": 33,
+        "ORDER_FAILED": 47,
+        "ARTILLERY_IMPACT": 33,
+        "OBJECTIVE_CAPTURED": 6,
+        "UNIT_SPAWNED": 62,
+        "UNIT_TASK_CHANGED": 414,
+        "UNIT_HEALED": 37,
+        "FORMATION_ARRIVED": 16,
+        "OBJECTIVE_NEUTRALIZED": 3,
+        "FORMATION_REPLAN": 20,
+        "FORMATION_COLUMN": 20,
+        "MATCH_ENDED": 1
+      },
+      "stationary_120s": [
+        {
+          "unit": 20201,
+          "seconds": 450.0
+        }
+      ],
+      "living": {
+        "0": {
+          "infantry": 40,
+          "vehicles": 5
+        },
+        "1": {
+          "infantry": 49,
+          "vehicles": 6
+        }
+      }
+    },
+    {
+      "seed": 20003,
+      "swapped": true,
+      "winner": 1,
+      "scores": [
+        41,
+        102
+      ],
+      "sim_seconds": 1770.0,
+      "wall_seconds": 78.44,
+      "checksum": "a2d8be847a30fe64903ef6ae80dccccf34ca7ea5e0f0a3da30463ca5612d8d5a",
+      "shots": 961,
+      "hits": 531,
+      "tank_impacts": 62,
+      "artillery_impacts": 49,
+      "splash_damage": 2055,
+      "friendly_damage": 7,
+      "order_failures": {
+        "ILLEGAL_STATE": 13,
+        "EXPIRED": 9,
+        "TRAFFIC_TIMEOUT": 41,
+        "INSUFFICIENT_SUPPLY": 1,
+        "NO_FUEL": 2,
+        "UNOBSERVED_TARGET": 1
+      },
+      "traffic_waits": 192,
+      "events": {
+        "SUPPLY_CHANGED": 206,
+        "MATCH_STARTED": 1,
+        "ORDER_ACCEPTED": 468,
+        "EMBARK_STARTED": 20,
+        "UNIT_MOVED": 247109,
+        "SCORE_TICK": 59,
+        "EMBARK_DONE": 130,
+        "VEHICLE_WAITING": 192,
+        "ORDER_COMPLETED": 270,
+        "VEHICLE_YIELDED": 73,
+        "VEHICLE_REPLANNED": 6,
+        "UNIT_SPOTTED": 279,
+        "UNIT_ARRIVED": 5977,
+        "UNIT_DAMAGED": 1263,
+        "ABSTRACT_ATTACK": 961,
+        "TANK_IMPACT": 62,
+        "ORDER_CANCELLED": 123,
+        "DISEMBARK_DONE": 127,
+        "DEPLOYMENT_CHANGED": 20,
+        "INFANTRY_DISABLED": 138,
+        "VEHICLE_DISABLED": 10,
+        "ARTILLERY_FIRED": 49,
+        "ARTILLERY_IMPACT": 49,
+        "ORDER_FAILED": 67,
+        "CAPTURE_PROGRESS": 2090,
+        "UNIT_SPAWNED": 66,
+        "UNIT_TASK_CHANGED": 783,
+        "OBJECTIVE_CAPTURED": 13,
+        "FORMATION_ARRIVED": 43,
+        "OBJECTIVE_NEUTRALIZED": 10,
+        "FORMATION_REPLAN": 30,
+        "FORMATION_COLUMN": 31,
+        "UNIT_HEALED": 15,
+        "VEHICLE_OUT_OF_FUEL": 2,
+        "MATCH_ENDED": 1
+      },
+      "stationary_120s": [
+        {
+          "unit": 20201,
+          "seconds": 420.0
+        }
+      ],
+      "living": {
+        "0": {
+          "infantry": 6,
+          "vehicles": 4
+        },
+        "1": {
+          "infantry": 48,
+          "vehicles": 8
+        }
+      }
+    },
+    {
+      "seed": 20004,
+      "swapped": false,
+      "winner": 0,
+      "scores": [
+        101,
+        15
+      ],
+      "sim_seconds": 1350.0,
+      "wall_seconds": 123.96,
+      "checksum": "9aec24bcb867d3ebdccad0bce5a389be13f351ad83a834383f324c6388080c82",
+      "shots": 733,
+      "hits": 421,
+      "tank_impacts": 64,
+      "artillery_impacts": 39,
+      "splash_damage": 2311,
+      "friendly_damage": 0,
+      "order_failures": {
+        "ILLEGAL_STATE": 9,
+        "EXPIRED": 8,
+        "TRAFFIC_TIMEOUT": 28,
+        "NO_FUEL": 1,
+        "INSUFFICIENT_SUPPLY": 1,
+        "UNOBSERVED_TARGET": 1
+      },
+      "traffic_waits": 108,
+      "events": {
+        "SUPPLY_CHANGED": 202,
+        "MATCH_STARTED": 1,
+        "ORDER_ACCEPTED": 358,
+        "EMBARK_STARTED": 16,
+        "UNIT_MOVED": 191454,
+        "SCORE_TICK": 45,
+        "EMBARK_DONE": 99,
+        "VEHICLE_WAITING": 108,
+        "ORDER_COMPLETED": 224,
+        "VEHICLE_YIELDED": 71,
+        "VEHICLE_REPLANNED": 6,
+        "UNIT_SPOTTED": 228,
+        "UNIT_ARRIVED": 57,
+        "UNIT_DAMAGED": 1006,
+        "ABSTRACT_ATTACK": 733,
+        "TANK_IMPACT": 64,
+        "ORDER_CANCELLED": 79,
+        "DISEMBARK_DONE": 90,
+        "DEPLOYMENT_CHANGED": 16,
+        "INFANTRY_DISABLED": 123,
+        "VEHICLE_DISABLED": 10,
+        "ARTILLERY_FIRED": 39,
+        "ARTILLERY_IMPACT": 39,
+        "ORDER_FAILED": 48,
+        "UNIT_SPAWNED": 67,
+        "FORMATION_REPLAN": 15,
+        "FORMATION_COLUMN": 22,
+        "CAPTURE_PROGRESS": 1410,
+        "UNIT_TASK_CHANGED": 519,
+        "UNIT_HEALED": 25,
+        "OBJECTIVE_CAPTURED": 9,
+        "FORMATION_ARRIVED": 26,
+        "OBJECTIVE_NEUTRALIZED": 6,
+        "VEHICLE_OUT_OF_FUEL": 1,
+        "MATCH_ENDED": 1
+      },
+      "stationary_120s": [
+        {
+          "unit": 10201,
+          "seconds": 480.0
+        },
+        {
+          "unit": 20210,
+          "seconds": 390.0
+        },
+        {
+          "unit": 20212,
+          "seconds": 390.0
+        },
+        {
+          "unit": 20214,
+          "seconds": 390.0
+        },
+        {
+          "unit": 20216,
+          "seconds": 390.0
+        },
+        {
+          "unit": 20215,
+          "seconds": 270.0
+        }
+      ],
+      "living": {
+        "0": {
+          "infantry": 53,
+          "vehicles": 7
+        },
+        "1": {
+          "infantry": 16,
+          "vehicles": 6
+        }
+      }
+    },
+    {
+      "seed": 20004,
+      "swapped": true,
+      "winner": 0,
+      "scores": [
+        101,
+        24
+      ],
+      "sim_seconds": 1380.0,
+      "wall_seconds": 80.02,
+      "checksum": "0d1fb94c5f5f2c0f0b372d234094c4ecd55eb6f35366b74640529e4873bfd5a8",
+      "shots": 877,
+      "hits": 507,
+      "tank_impacts": 69,
+      "artillery_impacts": 32,
+      "splash_damage": 2506,
+      "friendly_damage": 0,
+      "order_failures": {
+        "ILLEGAL_STATE": 9,
+        "INVALID_TARGET": 1,
+        "EXPIRED": 7,
+        "INSUFFICIENT_SUPPLY": 2,
+        "TRAFFIC_TIMEOUT": 30,
+        "UNOBSERVED_TARGET": 2,
+        "FORMATION_UNREACHABLE": 2,
+        "NO_FUEL": 1
+      },
+      "traffic_waits": 127,
+      "events": {
+        "SUPPLY_CHANGED": 214,
+        "MATCH_STARTED": 1,
+        "ORDER_ACCEPTED": 366,
+        "EMBARK_STARTED": 15,
+        "UNIT_MOVED": 199309,
+        "SCORE_TICK": 46,
+        "EMBARK_DONE": 102,
+        "VEHICLE_WAITING": 127,
+        "ORDER_COMPLETED": 203,
+        "VEHICLE_YIELDED": 82,
+        "VEHICLE_REPLANNED": 6,
+        "UNIT_SPOTTED": 311,
+        "UNIT_ARRIVED": 44,
+        "UNIT_DAMAGED": 1222,
+        "ABSTRACT_ATTACK": 877,
+        "TANK_IMPACT": 69,
+        "ORDER_CANCELLED": 102,
+        "DISEMBARK_DONE": 100,
+        "DEPLOYMENT_CHANGED": 15,
+        "INFANTRY_DISABLED": 159,
+        "VEHICLE_DISABLED": 9,
+        "CAPTURE_PROGRESS": 928,
+        "ORDER_FAILED": 54,
+        "ARTILLERY_FIRED": 32,
+        "ARTILLERY_IMPACT": 32,
+        "UNIT_SPAWNED": 67,
+        "UNIT_HEALED": 31,
+        "UNIT_TASK_CHANGED": 726,
+        "OBJECTIVE_CAPTURED": 6,
+        "FORMATION_ARRIVED": 23,
+        "UNIT_REPAIRED": 5,
+        "OBJECTIVE_NEUTRALIZED": 3,
+        "FORMATION_REPLAN": 34,
+        "FORMATION_COLUMN": 43,
+        "VEHICLE_OUT_OF_FUEL": 1,
+        "MATCH_ENDED": 1
+      },
+      "stationary_120s": [
+        {
+          "unit": 10201,
+          "seconds": 270.0
+        },
+        {
+          "unit": 20247,
+          "seconds": 210.0
+        }
+      ],
+      "living": {
+        "0": {
+          "infantry": 7,
+          "vehicles": 6
+        },
+        "1": {
+          "infantry": 26,
+          "vehicles": 8
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "events": 30000,
+  "baseline_seconds": 1.106310832023155,
+  "optimized_seconds": 0.4639999660139438,
+  "speedup": 2.3842907608961097,
+  "before_bytes": 307574,
+  "after_bytes": 371309,
+  "decoded_equal": true,
+  "scope": "representative event snapshot writer, not end-to-end training throughput"
+}

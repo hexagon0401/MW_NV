@@ -1,0 +1,10 @@
+{
+  "owner_verified": true,
+  "actor_id": "82876856",
+  "login": "hexagon0401",
+  "verified_at": 1793018920.619,
+  "identity_source": "github-user-api",
+  "oauth_tokens_stored_in_browser": false,
+  "control_enabled": true,
+  "production_pause_test": "fixture integration passed; production learner not deliberately paused"
+}

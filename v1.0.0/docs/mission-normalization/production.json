@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "url": "https://mw-nv.pages.dev",
+  "deployment": "ef723b5c",
+  "dashboard": true,
+  "replay": true,
+  "admin_auth_preserved": true,
+  "status": 200,
+  "page_errors": [],
+  "final_statuses": {
+    "/dashboard/": 200,
+    "/api/matches": 200,
+    "/api/admin/session": 200,
+    "/api/dashboard/history?range=all&kind=demonstration&scenario=all&learner=all": 200
+  }
+}

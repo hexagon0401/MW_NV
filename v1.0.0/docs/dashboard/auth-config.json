@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "github_provider_enabled": true,
+  "auth_configured": true,
+  "control_enabled": true,
+  "pkce_to_supabase": true,
+  "supabase_redirects_to_github": true,
+  "secure_http_only_pkce": true,
+  "invalid_code_denied": true,
+  "real_owner_login": "verified via private owner-activation.json",
+  "anonymous_control_denied": true,
+  "oauth_tokens_logged": false
+}

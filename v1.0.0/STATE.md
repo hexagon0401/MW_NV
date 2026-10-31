@@ -1,14 +1,12 @@
 # MW-NV v1.0.0 STATE
-Current task: D03 design and local live integration
-Status: PASS (functional); deployment deferred by user
-Completed: D01 Swiss UI/fonts, D02 pixel battlefield, D03 local snapshot/SSE
-Changed: viewer/, engine/viewer_export.py, server/live.py, server/app.py, tests/, docs/design/
-Verified: 89 Python tests, 9 JS tests, production build PASS
-Browser: desktop/mobile/fonts/hover/tap/real casualties/server restart reconnect PASS
-Physics: observed and unobserved RuleHQ game checksums match
-Performance: 500 infantry, SwiftShader 13–17 FPS; Intel Mac GPU unverified
-Visual evidence: docs/design/desktop.png, mobile.png, live.png, verification.json
-Run: python -m server.live --hq rules --port 8000; viewer npm run dev → 진행 경기
-Git branch: dev/v1.0.0
-Next: user review; external release requirements remain in RELEASE_STATUS.md
-Remaining Plus quota: UNKNOWN
+Current:T26 register 10-completed-game map rotation update
+Changes:config/releases.yaml;docs/map-rotation-10.md;DECISIONS.md
+Behavior:planned 2→3→4 rotation;10 unique completed training games each;same PPO1/PPO2
+Validation:manifest schema,PLANNED/manual/no attempts/dependency gate checked in temp registry
+Registry:map-rotation-10 r1 registered;auto=false;no training change/no Apply issued
+Blocker:mixed-maps remains ROLLED_BACK;rotation implementation and recovery checks pending
+Deploy:data-only release catalog update;existing dashboard-admin-session deployment retained
+Read:docs/map-rotation-10.md
+Next:restore mixed-map runner;implement schedule/parallel quota/resume/balance;new revision→READY
+Comparison:separate policy-progress-comparison retained;no comparison command issued in T26
+Usage:UNKNOWN

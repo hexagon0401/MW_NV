@@ -1,0 +1,98 @@
+{
+  "code_sha256": "27519ac7e9f28da6a81d5510773a753ce7a03a10c90d56073b12b19cef72d0ef",
+  "static_checks_passed": true,
+  "geometry_complete": true,
+  "geometry_seeds_per_mode": 30,
+  "python_full_suite": {
+    "passed": 266,
+    "seconds": 439.76
+  },
+  "python_final_scopes": [
+    {
+      "passed": 28,
+      "scope": "adaptive/self-play/new mission coach supply staging scoring"
+    },
+    {
+      "passed": 12,
+      "scope": "mission policy/support/teacher boundaries"
+    },
+    {
+      "passed": 11,
+      "scope": "coach and rollout safety"
+    }
+  ],
+  "javascript": {
+    "passed": 48,
+    "build": true
+  },
+  "browser": {
+    "passed": true,
+    "fixtures": true,
+    "dpr": 2,
+    "rows": [
+      {
+        "mode": "3",
+        "width": 1440,
+        "height": 900,
+        "mission": "MAP 3 \u00b7 \uc12c\uba78 \u00b7 \uc804\ud22c \ud2f0\ucf13 \uc18c\uc9c4 / 60\ubd84 \uc794\uc5ec \ube44\uc728 \ud310\uc815"
+      },
+      {
+        "mode": "3",
+        "width": 390,
+        "height": 844,
+        "mission": "MAP 3 \u00b7 \uc12c\uba78 \u00b7 \uc804\ud22c \ud2f0\ucf13 \uc18c\uc9c4 / 60\ubd84 \uc794\uc5ec \ube44\uc728 \ud310\uc815"
+      },
+      {
+        "mode": "4",
+        "width": 1440,
+        "height": 900,
+        "mission": "MAP 4 \u00b7 \uae43\ubc1c \ud0c8\ucde8\u00b7\uadc0\ud658 \u00b7 A \uae43\ubc1c \ubcf8\uc9c4 / B \uae43\ubc1c \ubcf8\uc9c4 \u00b7 \ud0c8\ucde8 2\uc810 \ub610\ub294 \ubc18\ub0a9 \uc2dc \uc2b9\ub9ac"
+      },
+      {
+        "mode": "4",
+        "width": 390,
+        "height": 844,
+        "mission": "MAP 4 \u00b7 \uae43\ubc1c \ud0c8\ucde8\u00b7\uadc0\ud658 \u00b7 A \uae43\ubc1c \ubcf8\uc9c4 / B \uae43\ubc1c \ubcf8\uc9c4 \u00b7 \ud0c8\ucde8 2\uc810 \ub610\ub294 \ubc18\ub0a9 \uc2dc \uc2b9\ub9ac"
+      }
+    ],
+    "page_errors": []
+  },
+  "rules": "combined-arms-6",
+  "contract": "tactics-4",
+  "strategic_improvement_established": false,
+  "python_last_scope": {
+    "passed": 18,
+    "seconds": 31.92
+  },
+  "last_telemetry_archive_compat_scope": {
+    "passed": 11
+  },
+  "last_dashboard_scope": {
+    "passed": 7
+  },
+  "final_statistics_scope": {
+    "passed": 11,
+    "seconds": 4.56
+  },
+  "source_commit": "bad7b5f",
+  "final_routing_scope": {
+    "passed": 14,
+    "seconds": 33.12
+  },
+  "final_coach_scope": {
+    "passed": 6,
+    "seconds": 5.15
+  },
+  "final_study_scope": {
+    "passed": 9,
+    "seconds": 5.58
+  },
+  "teacher_recovery_tests": {
+    "scopes": [
+      16,
+      12,
+      5
+    ],
+    "overlap": true
+  }
+}

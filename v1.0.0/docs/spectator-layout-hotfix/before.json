@@ -1,0 +1,52 @@
+{
+  "reproduced": true,
+  "regression_test_failed": true,
+  "layout": {
+    "width": 1440,
+    "height": 900,
+    "dpr": 1,
+    "app": {
+      "top": 0,
+      "bottom": 900,
+      "width": 1440,
+      "height": 900
+    },
+    "main": {
+      "top": 143,
+      "bottom": 227,
+      "width": 1440,
+      "height": 84
+    },
+    "field": {
+      "top": 143,
+      "bottom": 227,
+      "width": 920,
+      "height": 84
+    },
+    "footer": {
+      "top": 227,
+      "bottom": 852,
+      "width": 1440,
+      "height": 625
+    },
+    "status": {
+      "top": 60,
+      "bottom": 143,
+      "width": 1440,
+      "height": 83
+    },
+    "header": {
+      "top": 0,
+      "bottom": 60,
+      "width": 1440,
+      "height": 60
+    },
+    "tabs": {
+      "top": 0,
+      "bottom": 0,
+      "width": 0,
+      "height": 0
+    },
+    "rows": "60px 83px 84px 625px 48px"
+  }
+}

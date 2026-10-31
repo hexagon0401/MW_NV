@@ -1,3 +1,4 @@
+from .version import RULES_VERSION
 """Deterministic state, including RNG state in clones and checksums."""
 from dataclasses import asdict
 from copy import deepcopy
@@ -5,7 +6,7 @@ import hashlib
 import json
 import random
 from .config import GameConfig
-from .catalog import load_units, load_vehicles
+from .catalog import load_units, load_vehicles, load_weapons
 from .map import Terrain, alpha_terrain
 from .types import Soldier, Team, TeamState, WorldPos, Facility
 
@@ -15,6 +16,12 @@ class WorldState:
         self.config = config or GameConfig(128, 128, 0.2)
         self.unit_specs = load_units()
         self.vehicle_specs = load_vehicles()
+        self.weapon_specs=load_weapons()
+        self.rules_version=RULES_VERSION
+        from .version import CATALOG_VERSION
+        self.catalog_version=CATALOG_VERSION
+        self.artillery_rng=random.Random(seed ^ 0xA47111)
+        self.projectiles=[]
         self.seed = seed
         self.rng = random.Random(seed)
         self.map_sample = [self.rng.randrange(10) for _ in range(16)]

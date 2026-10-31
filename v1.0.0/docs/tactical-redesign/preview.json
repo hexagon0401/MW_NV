@@ -1,0 +1,7 @@
+{
+  "url": "https://3944e5db.mw-nv.pages.dev",
+  "cloudflare_stage": "success",
+  "remote_http": "CONNECT403; preview subdomain not in current network allowlist",
+  "local_same_build": "Chromium/JS22/build PASS",
+  "production_unchanged_until_next_deploy": true
+}

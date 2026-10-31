@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {replayChoices,isNewReplay} from './src/latest-replay.js';
+const e=(n,latest=false)=>({id:latest?'training-latest':'training-replay-'+n,sha256:String(n),scores:[n,0]});
+test('recent catalog slides 123 to234 to345 with stable historical IDs',()=>{assert.deepEqual(replayChoices([e(3,true),e(2),e(1)]).map(x=>x.sha256),['3','2','1']);assert.deepEqual(replayChoices([e(4,true),e(3),e(2)]).map(x=>x.sha256),['4','3','2']);assert.deepEqual(replayChoices([e(5,true),e(4),e(3),e(2)]).map(x=>x.sha256),['5','4','3']);});
+test('duplicates and unrelated records never fill recent slots; reading remains pinned',()=>{assert.deepEqual(replayChoices([e(3,true),e(3),{id:'demo'},e(2),e(1)]).map(x=>x.sha256),['3','2','1']);const pinned='2';assert.equal(isNewReplay(pinned,[e(3,true),e(2)]),true);assert.equal(pinned,'2');});

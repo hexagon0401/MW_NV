@@ -1,0 +1,29 @@
+{
+  "full_python": {
+    "passed": 234,
+    "seconds": 457.42
+  },
+  "focused_python": {
+    "passed": 14,
+    "seconds": 6.89
+  },
+  "disk_pause": {
+    "passed": 3,
+    "seconds": 6.4
+  },
+  "publication_teacher": {
+    "passed": 7,
+    "seconds": 2.56
+  },
+  "javascript": {
+    "passed": 33
+  },
+  "browser": "browser.json",
+  "baseline_hash_equal": true,
+  "scaling_hash_equal": true,
+  "scaling": "scaling.json",
+  "scaling_startup_torch_io_excluded": true,
+  "strategic_improvement_claimed": false,
+  "mac_verified": false,
+  "usage": "UNKNOWN"
+}
