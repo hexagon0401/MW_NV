@@ -1,12 +1,13 @@
 # MW-NV v1.0.0 STATE
-Current:T25 dashboard refresh stability and manual historical-policy comparison
-Changes:detached refresh commit;scroll/focus/log preservation;isolated comparison handler+replay
-Tests:24 targeted Python;58 JS;Vite build;desktop/mobile delayed refresh and release fixtures PASS
-Comparison:policy-progress-comparison r4 READY;200 vs769 completed-game snapshots;0/80 NOT STARTED
-Comparison rules:combined-arms-4/tactics-2;no NIM/update/promotion;private ledger and completed replay
-Runtime:mixed-maps remains ROLLED_BACK;legacy PPO preserved;comparison requires user start
-Deploy:dashboard-stable-refresh r1 APPLIED;production89d88264 marker verified;rollback9e6aa519
+Current:T25b administrator session synchronization hotfix
+Changes:await session before render;refresh auth on focus/poll;truthful footer;fail closed on error
+Tests:58 JS/build;Chromium desktop/mobile delayed auth,expiry,cross-tab,failure,retry PASS
+Regression:dashboard delayed-response scroll/content preservation PASS
+Preview:sealed dashboard-admin-session r1 passed session fixtures;no execution POST sent
+Deploy:typed production Apply requested;verify marker and canonical deployment before final
+Comparison:policy-progress-comparison r4 READY/manual;200 vs769 snapshots;NOT STARTED by assistant
+Runtime:legacy PPO preserved;mixed-maps remains ROLLED_BACK
 Read:docs/dashboard-refresh/README.md
-Next:user starts comparison in READY FOR RELEASE;inspect results without claiming improvement early
-Limits:actual comparison run/upload unverified until started;Mac hardware unverified
+Next:user opens comparison card;authenticate then manually start if desired
+Limits:user browser cookies cannot be inspected;real GitHub login requires user browser
 Usage:UNKNOWN

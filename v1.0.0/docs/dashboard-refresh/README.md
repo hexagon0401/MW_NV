@@ -13,3 +13,9 @@ READY FOR RELEASE entry `policy-progress-comparison`, revision 4, freezes the 20
 The evaluation never updates weights or invokes NIM. Its ledger, activity, reports and completed replay pointer are isolated from training. One CPU is reserved, the job waits for capacity, completed reports resume on restart, and a global lock prevents simultaneous comparison jobs. The first completed replay opens via the comparison card; only completed matches are published. Upload failures preserve the previous verified pointer. Old comparison replays retain three objects.
 
 Current limitation: no live incomplete-match stream. Replay publication, actual long-run CPU behavior and real-match results are unverified until the user starts the comparison. Existing mixed-map rollback is retained; this feature does not reapply it.
+
+## Administrator session synchronization hotfix
+
+The page previously rendered release controls before the asynchronous session request completed and never rerendered them on authentication completion. It also kept the initial session indefinitely, and the footer always claimed READ-ONLY. The refreshed page now awaits a deduplicated session request before rendering, checks again on polling/manual refresh/tab focus, and labels checking/admin/read-only/unavailable states explicitly. Authentication failures remove local admin actions; server-side session/Origin/CSRF enforcement is unchanged.
+
+`viewer/scripts/dashboard-session-smoke.mjs` exercises delayed authenticated responses, expiry, returning after cross-tab login, failure and retry on desktop/mobile. It asserts the manual comparison button becomes enabled only after authenticated data, disappears when unauthenticated, and never submits an execution request. Existing scroll preservation regression remains passing. 58 JS tests and Vite build passed.
