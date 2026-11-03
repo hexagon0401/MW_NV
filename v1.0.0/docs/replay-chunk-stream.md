@@ -9,3 +9,7 @@
 학습기와 저장된 경기는 재실행하지 않는다. 고정된 별도 publication runtime으로 발행 프로세스만 교체하며 기존 release agent가 검증된 override를 복구한다. 복구용 모델과A′/B′는 변경하지 않는다.
 
 검증:Python replay4 PASS;JS61/build PASS;valid/corrupt/path traversal/legacy streaming tests;sealed preview history fixture PASS. 실제 깃발전 발행·완료API 확인 결과는 STATE 참조.
+
+운영 확인: 최신 index가 capture_flag/무승부/manifest 형식으로 갱신됐고 최근3개 보존. 과거 고지점령 실행의 잔여 publisher를 종료해 공유 발행 경로 경쟁을 없앴다. 관리 프로세스 복구는 PID/start identity로 확인하며 /proc/cwd 권한에 의존하지 않는다. 반복 ensure가 동일 살아 있는 publisher PID를 유지하는 실검증도 완료.
+
+최종 실검증: 실제 Pages API 응답 전체를 다운로드·JSON 디코딩해 summary.ended=true, final.mission.mode=capture_flag, sim_seconds=3600을 확인했다. publication header도 최신 manifest checksum과 일치했다.
