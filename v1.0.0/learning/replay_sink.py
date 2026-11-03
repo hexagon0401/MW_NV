@@ -10,6 +10,27 @@ def publish_latest(engine,initial,metadata=None):
         fcntl.flock(lock,fcntl.LOCK_EX)
         return _publish(engine,initial,metadata)
 
+CHUNK_SIZE=524288
+
+def upload_replay(store,body,digest):
+    prefix='object/'+store.bucket+'/'
+    key='training-replays/'+digest+'.view.json.gz'
+    if len(body)<=CHUNK_SIZE:
+        store._request(prefix+key,'PUT',body)
+        if hashlib.sha256(store._request('object/authenticated/'+store.bucket+'/'+key)).hexdigest()!=digest:raise ValueError('replay checksum')
+        return key
+    if len(body)>40*CHUNK_SIZE:raise ValueError('replay exceeds streaming chunk limit')
+    chunks=[]
+    for n,start in enumerate(range(0,len(body),CHUNK_SIZE)):
+        part=body[start:start+CHUNK_SIZE];name='training-replays/'+digest+f'.part{n:04d}'
+        sha=hashlib.sha256(part).hexdigest()
+        store._request(prefix+name,'PUT',part)
+        if hashlib.sha256(store._request('object/authenticated/'+store.bucket+'/'+name)).hexdigest()!=sha:raise ValueError('replay chunk checksum')
+        chunks.append(dict(key=name,sha256=sha,size=len(part)))
+    key='training-replays/'+digest+'.manifest.json'
+    store._request(prefix+key,'PUT',json.dumps(dict(schema=1,encoding='gzip',ended=True,sha256=digest,size=len(body),chunks=chunks)).encode())
+    return key
+
 def _publish(engine,initial,metadata=None):
     doc=export_view(engine,initial);now=time.time();completed_at=(metadata or {}).get('completed_at',now)
     if metadata and metadata.get('league'):
@@ -18,10 +39,8 @@ def _publish(engine,initial,metadata=None):
     store=PrivateStorage(os.environ['SUPABASE_URL'],os.environ['SUPABASE_SERVICE_ROLE_KEY']);prefix='object/authenticated/'+store.bucket+'/'
     entries=json.loads(store._request(prefix+'index.json'));previous=next((e for e in entries if e['id']=='training-latest'),None)
     if previous and previous.get('completed_at',0)>completed_at:return False
-    key='training-replays/'+digest+'.view.json.gz'
-    store._request('object/'+store.bucket+'/'+key,'PUT',body)
-    if hashlib.sha256(store._request(prefix+key)).hexdigest()!=digest:raise ValueError('replay checksum')
-    entry=dict(id='training-latest',scores=doc['summary']['scores'],winner=doc['summary']['winner'],policy_version=doc['rules_version'],replay_uri='supabase://'+store.bucket+'/'+key,sha256=digest,mode='training',completed_at=completed_at)
+    key=upload_replay(store,body,digest)
+    entry=dict(id='training-latest',scores=doc['summary']['scores'],winner=doc['summary']['winner'],policy_version=doc['rules_version'],replay_uri='supabase://'+store.bucket+'/'+key,sha256=digest,mode='training',game_mode=doc.get('final',{}).get('mission',{}).get('mode'),combat_tickets=doc.get('final',{}).get('mission',{}).get('combat_tickets'),completed_at=completed_at)
     # Keep exactly three distinct training replays. Historical IDs never change meaning.
     recent=[];seen={digest}
     for old in entries:
@@ -44,7 +63,14 @@ def _publish(engine,initial,metadata=None):
         if item['key'] in protected:item.pop('retired_at',None)
         else:item.setdefault('retired_at',now)
     obsolete=[e['key'] for e in history if e['key'] not in protected and now-e['retired_at']>=600]
-    if obsolete:store._request('object/'+store.bucket,'DELETE',json.dumps(dict(prefixes=obsolete)).encode())
+    if obsolete:
+        cleanup=list(obsolete)
+        for expired in obsolete:
+            if expired.endswith('.manifest.json'):
+                manifest=json.loads(store._request(prefix+expired))
+                stem=expired.removesuffix('.manifest.json')
+                cleanup.extend(c['key'] for c in manifest.get('chunks',[]) if c['key'].startswith(stem+'.part'))
+        store._request('object/'+store.bucket,'DELETE',json.dumps(dict(prefixes=cleanup)).encode())
     history=[e for e in history if e['key'] not in obsolete]
     store._request('object/'+store.bucket+'/training-replay-retention.json','PUT',json.dumps(history).encode())
     return True

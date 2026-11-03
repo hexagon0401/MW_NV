@@ -103,7 +103,7 @@ def run(root,lane):
                     publish();last_db=stamp;stats_at=time.monotonic()+60
             target=folder/(lane+'-status.json');temp=target.with_suffix('.partial');temp.write_text(json.dumps(dict(status='ok',last_success=time.time())));temp.replace(target)
         except Exception as exc:
-            (folder/(lane+'-status.json')).write_text(json.dumps(dict(status='retry',error=type(exc).__name__,updated_at=time.time())))
+            (folder/(lane+'-status.json')).write_text(json.dumps(dict(status='retry',error=type(exc).__name__,http_status=getattr(exc,'code',None),updated_at=time.time())))
             retry=time.monotonic()+30
         time.sleep(1)
 

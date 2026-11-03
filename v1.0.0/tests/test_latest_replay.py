@@ -51,3 +51,14 @@ def test_duplicate_publication_keeps_unique_three_and_old_aliases(store,monkeypa
     for i in (1,2,3,3):replay_sink.publish_latest(i,None);now[0]+=1
     entries=json.loads(store.objects['index.json']);assert len(entries)==3
     assert entries[0]['id']=='training-latest' and len({e['sha256'] for e in entries})==3
+
+def test_large_replay_verified_chunks_and_no_pointer_on_failure(store,monkeypatch):
+    import hashlib
+    monkeypatch.setattr(replay_sink,'CHUNK_SIZE',16)
+    data=b'large replay payload'*10;sha=hashlib.sha256(data).hexdigest()
+    key=replay_sink.upload_replay(store,data,sha);manifest=json.loads(store.objects[key])
+    assert manifest['ended'] and b''.join(store.objects[c['key']] for c in manifest['chunks'])==data
+    assert all(c['size']<=16 for c in manifest['chunks'])
+    previous=store.objects['index.json'];store.corrupt=True
+    with pytest.raises(ValueError,match='chunk'):replay_sink.upload_replay(store,data,sha)
+    assert store.objects['index.json']==previous

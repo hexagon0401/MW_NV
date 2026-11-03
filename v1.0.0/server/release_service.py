@@ -105,6 +105,8 @@ def run(root):
     definitions(registry);store=PrivateStorage(os.environ['SUPABASE_URL'],os.environ['SUPABASE_SERVICE_ROLE_KEY']);restore_authorizations(registry,store);last=0.;worker=None
     while not (registry.root/'STOP').exists():
         try:
+            from .publication_runtime import ensure
+            ensure(BASE)
             refresh(registry);poll_commands(registry,store);maybe_pilot(registry)
             for comparison in registry.all():
                 if comparison['handler']=='policy_comparison' and comparison['status']=='APPLIED':
