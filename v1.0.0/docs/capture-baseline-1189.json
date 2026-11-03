@@ -9,5 +9,11 @@
     "ppo2.npz": "04cb42f9e5ec7080f6c60ac84ff5274629a63f07d389d4677a0536d89e501244",
     "ppo1.npz": "4c042b237ff07e55d0699c1c7f81009632df6040b041ca213a82026379b2fd21",
     "ppo1.zip": "53287e17aa97739acb750002f67a6d8463efde4e0435e83258817795b53c8635"
+  },
+  "full_recovery": {
+    "release": "training-2026-11-004",
+    "sha256": "eb3cfb4d41cf51c314b3d8d911b8b34d7e51a61b4750629fc75c2728b02b4304",
+    "games": 1189,
+    "generation": 2748
   }
 }
