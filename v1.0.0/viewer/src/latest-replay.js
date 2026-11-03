@@ -1,9 +1,12 @@
+import {winnerLabel,scoreLabel,viewResult} from './result.js';
+const results=new Map();
+export function rememberReplayResult(doc){if(doc.publication_id)results.set(doc.publication_id,viewResult(doc));}
 // Downloaded timelines stay pinned while the recent-three catalog moves forward.
 export function isNewReplay(current,matches){const latest=matches.find(m=>m.id==='training-latest');return !!(current&&latest?.sha256&&current!==latest.sha256);}
 export function replayChoices(matches){const seen=new Set();return matches.filter(m=>m.id==='training-latest'||m.id.startsWith('training-replay-')).filter(m=>{const key=m.sha256??m.id;if(seen.has(key))return false;seen.add(key);return true;}).slice(0,3);}
 export function renderReplayOptions(select,matches,{publication,currentId,local=false}={}){
  const choices=replayChoices(matches);select.replaceChildren();if(local){const demo=document.createElement('option');demo.value='';demo.textContent='데모 경기';select.append(demo);}
- choices.forEach((m,i)=>{const o=document.createElement('option'),s=m.summary??m;o.value=m.id;const at=m.completed_at?new Date(m.completed_at*1000).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'';o.textContent=`${i===0?'최신 경기':`${i+1}번째 최근 경기`} · ${s.scores?.[0]??'—'}:${s.scores?.[1]??'—'} ${at}`;select.append(o);});
+ choices.forEach((m,i)=>{const o=document.createElement('option'),s=results.get(m.sha256)??m.summary??m;o.value=m.id;const at=m.completed_at?new Date(m.completed_at*1000).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):'';o.textContent=`${i===0?'최신 경기':`${i+1}번째 최근 경기`} · ${winnerLabel(s)} · ${scoreLabel(s)} ${at}`;select.append(o);});
  const current=publication?choices.find(m=>m.sha256===publication):choices.find(m=>m.id===currentId);if(current)select.value=current.id;else if(publication){const o=document.createElement('option');o.value='pinned';o.textContent='현재 재생 중 · 최근 3경기 밖';o.disabled=true;select.append(o);select.value=o.value;}else select.value=currentId??(local?'':'training-latest');
 }
 export function watchLatestReplay(publication){
