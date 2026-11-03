@@ -103,6 +103,14 @@ def pages(spec,paths,content_digest):
 
 
 def observe(spec,paths,content_digest):
+    if spec.get('handler')=='rotation_training' and not spec.get('planned'):
+        proof=read(Path(paths['proof']))
+        from .release_artifacts import verify
+        valid=False
+        try:valid=verify(paths['runtime'],spec['artifact']['runtime_digest'])
+        except (OSError,ValueError,KeyError):pass
+        checks=[step(k,title,'PASS' if valid and proof.get(k) else 'WAIT') for k,title in [('schedule','10경기 경계·섬멸 시작'),('recovery','원격 복구본 검증'),('integration','단일 실행·체크포인트 통합'),('engine','기존 30경기 엔진 증거 일치')]]
+        return dict(steps=checks,blockers=[],connection='online',evidence_digest=content_digest if valid else None)
     if spec.get('handler')=='policy_comparison':
         from .policy_comparison import observe as comparison
         return comparison(spec,paths,content_digest)

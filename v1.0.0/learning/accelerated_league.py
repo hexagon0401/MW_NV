@@ -81,7 +81,10 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             if kind=='mission':m.save(root/'baseline'/f'ppo{i+1}.zip')
         backend.save(root,models,env,buffers,query,generators,state)
     from .mission_coach import MissionCoach
-    coach=MissionCoach(root) if kind=='mission' and teacher_enabled and os.environ.get('MW_NV_MISSION_TEACHER_BASELINE')!='1' and os.environ.get('MW_NV_DISABLE_MISSION_COACH')!='1' else None
+    coach=MissionCoach(root) if not state.get('map_rotation') and kind=='mission' and teacher_enabled and os.environ.get('MW_NV_MISSION_TEACHER_BASELINE')!='1' and os.environ.get('MW_NV_DISABLE_MISSION_COACH')!='1' else None
+    if state.get('map_rotation'):
+        if kind!='mission':raise ValueError('rotation requires mission backend')
+        fixed_workers=1
     state['pilot']=pilot;state['teacher_enabled']=teacher_enabled
     control.register(root,source,kind,pilot,state['run'],state.get('control_desired'))
     state.setdefault('last_policy_update',state['generation']);state.setdefault('last_full_update',state['generation'])
@@ -115,6 +118,9 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
     def begin(index):
         nonlocal next_episode
         slot=slots[index];block_size=96 if kind=='mission' else 32;descriptor=backend.schedule(next_episode//block_size)[next_episode%block_size]
+        if state.get('map_rotation'):
+            from .mission_schedule import rotation_descriptor
+            descriptor=rotation_descriptor(state['completed_games'],state['map_rotation']['origin'])
         assignment=backend.assignments(descriptor);fixed=None
         if descriptor['kind']=='past':
             picker=random.Random(4903+next_episode) if kind=='mission' else random

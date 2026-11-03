@@ -112,6 +112,10 @@ class MixedTraining:
             # Candidate ledger is preserved privately, never merged into production.
             (temporary/'results.sqlite').unlink(missing_ok=True)
             folder=temporary/read(temporary/'current.json')['path'];state=read(folder/'state.json');state.update(run=state['run']+'-release-'+self.spec['id']+'-'+str(self.spec['revision']),operational_start_games=state['completed_games'],release_id=self.spec['id'],release_revision=self.spec['revision'])
+            if self.spec['handler']=='rotation_training':
+                state.update(map_rotation=dict(origin=state['completed_games'],order=['3','4','2'],batch=10),active=False)
+                (folder/'environments.json.gz').unlink(missing_ok=True)
+                atomic(temporary/'validation-gates.json',dict(approved_for_pilot=True,code_sha256=self.spec['artifact']['runtime_digest'],engine_games=30,production_apply_required=True,performance_verified=False))
             from .ppo_control import state as control_state
             state['control_desired']=control_state(BASE/'data/control')['desired'];atomic(folder/'state.json',state);atomic(temporary/'state.json',state);temporary.rename(root)
         notify(new_root=str(root))
@@ -215,3 +219,12 @@ class PagesSite:
 
 
 def digest_files(manifest):return hashlib.sha256(json.dumps(manifest,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+
+
+class RotationTraining(MixedTraining):
+    def validate(self):
+        from .release_artifacts import verify
+        verify(self.paths['runtime'],self.spec['artifact']['runtime_digest'])
+        proof=exact_recovery(self.paths['pilot'])
+        if not proof or proof.get('generation')!=self.spec['artifact']['generation']:raise ValueError('rotation source recovery changed')
+        if read(Path(self.paths['pilot'])/'state.json').get('contract')!='tactics-4':raise ValueError('rotation policy contract')

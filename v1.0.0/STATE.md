@@ -1,12 +1,12 @@
 # MW-NV v1.0.0 STATE
-Current:T26 register 10-completed-game map rotation update
-Changes:config/releases.yaml;docs/map-rotation-10.md;DECISIONS.md
-Behavior:planned 2→3→4 rotation;10 unique completed training games each;same PPO1/PPO2
-Validation:manifest schema,PLANNED/manual/no attempts/dependency gate checked in temp registry
-Registry:map-rotation-10 r1 registered;auto=false;no training change/no Apply issued
-Blocker:mixed-maps remains ROLLED_BACK;rotation implementation and recovery checks pending
-Deploy:data-only release catalog update;existing dashboard-admin-session deployment retained
-Read:docs/map-rotation-10.md
-Next:restore mixed-map runner;implement schedule/parallel quota/resume/balance;new revision→READY
-Comparison:separate policy-progress-comparison retained;no comparison command issued in T26
+Current:T26r2 WIP rotation3→4→2 and latest capture-policy preservation
+Changes:mission_schedule rotation_descriptor;serial collector;RotationTraining typed handler
+Tests:rotation boundaries/resume/480game balance2 PASS;release21 PASS;integration running
+Runtime:legacy STOP release:map-rotation-10:2 requested at safe boundary;archive task active
+Baseline:waiting data/rotation-baseline.json;must preserve latest A′/B′ on GitHub before mixed Apply
+Source:DO NOT use old mixed63-generation policy;user requires latest capture-policy distillation
+Smoke:/tmp/mw-rotation-smoke.log; /tmp/mw-rotation-regression.log
+Next:verify baseline archive→distill each tactics2→4→prepare verified candidate→READY→Apply
+Pending:no release rotation READY or Apply yet;config r2 not live registered
+Safety:legacy stopped intentionally for baseline;resume if migration/archiving cannot finish
 Usage:UNKNOWN
