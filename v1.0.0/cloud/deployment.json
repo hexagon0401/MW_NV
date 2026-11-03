@@ -8,8 +8,8 @@
   "visibility": "public-completed-matches",
   "storage_provider": "supabase-private",
   "site_url": "https://mw-nv.pages.dev",
-  "deployment_url": "https://0bfbc016.mw-nv.pages.dev",
-  "cloudflare_deploy_status": "success; dashboard-admin-session r1 typed Apply verified",
+  "deployment_url": "https://ee58a943.mw-nv.pages.dev",
+  "cloudflare_deploy_status": "success; elimination-result-label r1 typed Apply verified",
   "production_branch": "dev/v1.0.0",
-  "rollback_deployment": "89d88264-b01f-4f9c-83e8-51d4f373f58c"
+  "rollback_deployment": "0bfbc016-e0c1-47bb-af05-4101a566bc0c"
 }
