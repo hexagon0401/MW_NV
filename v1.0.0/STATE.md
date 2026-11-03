@@ -1,12 +1,12 @@
 # MW-NV v1.0.0 STATE
-Current:T26r2 WIP rotation3→4→2 and latest capture-policy preservation
-Changes:mission_schedule rotation_descriptor;serial collector;RotationTraining typed handler
-Tests:rotation boundaries/resume/480game balance2 PASS;release21 PASS;integration running
-Runtime:legacy STOP release:map-rotation-10:2 requested at safe boundary;archive task active
-Baseline:waiting data/rotation-baseline.json;must preserve latest A′/B′ on GitHub before mixed Apply
-Source:DO NOT use old mixed63-generation policy;user requires latest capture-policy distillation
-Smoke:/tmp/mw-rotation-smoke.log; /tmp/mw-rotation-regression.log
-Next:verify baseline archive→distill each tactics2→4→prepare verified candidate→READY→Apply
-Pending:no release rotation READY or Apply yet;config r2 not live registered
-Safety:legacy stopped intentionally for baseline;resume if migration/archiving cannot finish
+Current:T26r2 typed Apply rotation3→4→2;baseline preserved
+Tests:21 rotation/release+13 regression PASS;actual map3 PPO update+resume smoke PASS
+Baseline:A′/B′1189games/g2748 verified download+checksum;GitHub capture-specialists-1189-g2748
+Migration:each latest capture actor independently distilled tactics2→4;critic/optimizer fresh
+Candidate:map-rotation-10/2 generation0;full remote recovery verified;not old mixed63 source
+Runtime:serial collector;10 completed games/map;ordinary NIM on;demonstration coach off
+Apply:READY→typed Apply requested5f0761dc;waiting old recovery verification and actual health
+Read:docs/map-rotation-10.md;docs/capture-baseline-1189.md
+Next:verify APPLIED/current map3 heartbeat;record final production state and push
+Limits:retention/performance not proven;no claim new-rule strategic improvement
 Usage:UNKNOWN
