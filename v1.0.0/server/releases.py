@@ -4,7 +4,7 @@ from pathlib import Path
 from contextlib import contextmanager
 
 ACTIONS={'apply','set_auto','rollback'}
-HANDLERS={'mixed_training','pages_site','policy_comparison','rotation_training'}
+HANDLERS={'mixed_training','pages_site','policy_comparison','rotation_training','runtime_management'}
 ID=re.compile(r'^[a-z0-9][a-z0-9-]{0,63}$')
 
 

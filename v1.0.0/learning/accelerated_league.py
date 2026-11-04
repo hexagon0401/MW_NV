@@ -104,7 +104,10 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
     reporter=Reporter(root,state['generation'],sum(m.num_timesteps for m in models))
     publish=os.environ.get('MW_NV_PUBLISH_TRAINING')=='1'
     if publish:io.start(root)
-    def stopped():return stop['value'] or (root/'STOP').exists()
+    def leased():
+        from server.runtime_lease import lease_valid
+        return lease_valid(root)
+    def stopped():return stop['value'] or (root/'STOP').exists() or not leased()
     def add_slot(bundle=None):
         index=len(slots);worker=ProcessEnv(kind)
         gs=[torch.Generator().manual_seed(902+i+100003*index) for i in range(2)]
@@ -280,6 +283,7 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             if not total_rounds:
                 if (control.paused() or resource_paused()) and not stopped():continue
                 break
+            if not leased():break
             # Each trajectory gets its own terminal/bootstrap GAE before flattening.
             teacher.drain()
             for i,model in enumerate(models):
@@ -298,9 +302,10 @@ def run(root,source,kind='legacy',pilot=200,max_updates=0,teacher_enabled=True,f
             # Counters and all environments become durable before remote enqueue.
             path=checkpoint()
             policy_due=state['completed_games']-state['last_policy_archive']>=10 or state['generation']-state.get('last_policy_update',state['generation'])>=24
-            full_due=state['completed_games']-state['last_full_archive']>=50 or state['generation']-state.get('last_full_update',state['generation'])>=120
+            from server.runtime_lease import hourly_backup_due
+            full_due=hourly_backup_due(state) or state['completed_games']-state['last_full_archive']>=50 or state['generation']-state.get('last_full_update',state['generation'])>=120
             if policy_due:archive_checkpoint(path,False);state.update(last_policy_archive=state['completed_games']//10*10,last_policy_update=state['generation'])
-            if full_due:archive_checkpoint(path,True);state.update(last_full_archive=state['completed_games']//50*50,last_full_update=state['generation'])
+            if full_due:archive_checkpoint(path,True);state['last_full_request_at']=time.time();state.update(last_full_archive=state['completed_games']//50*50,last_full_update=state['generation'])
             if state['completed_games']//evaluation_step>state.get('last_evaluation',0)//evaluation_step and not stopped():
                 evaluated=True;evaluation_games=state['completed_games']
                 report('evaluation',True);evaluation.evaluate(root,models,state,report)

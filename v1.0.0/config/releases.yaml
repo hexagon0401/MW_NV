@@ -84,3 +84,14 @@ releases:
   - integration
   - engine
   planned: false
+
+- id: runtime-continuity
+  revision: 2
+  title: Codex 장시간 학습 유지·복구
+  description: 임대 기반 단일 학습기, 내부 자동 복구, Cloudflare 외부 감시, 원격 코드·저장본 복원. 환경 전체 종료 후 외부 자동 재기동은 지원하지 않습니다. 무료 플랜·D1 권한·실제 heartbeat 검증 후 적용합니다.
+  targets: [runtime, training, monitoring]
+  dependencies: []
+  handler: runtime_management
+  artifact: {artifact_id: runtime-continuity-r2}
+  validation_plan: [tests, recovery, monitor]
+  planned: false

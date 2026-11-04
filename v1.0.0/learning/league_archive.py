@@ -137,6 +137,8 @@ def _publish_pending(root):
                 sha=json.loads(gh('api',f'repos/{REPO}/git/ref/heads/dev/v1.0.0'))['object']['sha'];gh('api',f'repos/{REPO}/git/refs','--method','POST','--input','-',data={'ref':'refs/heads/training/checkpoints','sha':sha})
             gh('api',remote,'--method','PUT','--input','-',data=payload)
             dest=root/'archive-verified';dest.mkdir(exist_ok=True);atomic_json(dest/manifest.name,metadata)
+            from server.runtime_recovery import publish_pointer
+            publish_pointer(root,metadata)
             path.unlink();manifest.unlink()
         except Exception as exc:
             failures.append(dict(asset=path.name,error=type(exc).__name__,detail=str(exc)[:300]));break

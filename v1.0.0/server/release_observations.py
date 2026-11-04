@@ -103,6 +103,13 @@ def pages(spec,paths,content_digest):
 
 
 def observe(spec,paths,content_digest):
+    if spec.get('handler')=='runtime_management':
+        proof=read(paths['proof']);expected=spec['artifact'].get('runtime_digest')
+        try:
+            from .release_artifacts import verify
+            valid=verify(paths['runtime'],expected)
+        except (OSError,ValueError,KeyError):valid=False
+        return dict(steps=[step(k,title,'PASS' if valid and proof.get(k) else 'WAIT') for k,title in [('tests','인증·임대·자동 복구 검사'),('recovery','원격 코드·전체 저장본 복구 검증'),('monitor','Cloudflare 무료 플랜·D1·실제 heartbeat 확인')]],blockers=[] if proof.get('monitor') else ['CLOUDFLARE_D1_AUTH_AND_FREE_PLAN_REQUIRED'],connection='online',evidence_digest=content_digest if valid else None)
     if spec.get('handler')=='rotation_training' and not spec.get('planned'):
         proof=read(Path(paths['proof']))
         from .release_artifacts import verify

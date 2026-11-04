@@ -25,7 +25,7 @@ def register(run_root,source,kind,pilot,run_id,restored_desired=None):
             row=conn.execute('SELECT version FROM desired WHERE id=1').fetchone()
             if row and row[0]==0:
                 conn.execute("UPDATE desired SET mode='paused' WHERE id=1");current=state(root);atomic(root/'state.json',dict(current,desired='paused'))
-    atomic(root/'run.json',dict(registered_at=time.time(),root=str(Path(run_root).resolve()),source=str(Path(source).resolve()),kind=kind,pilot=pilot,run_id=run_id,pid=os.getpid(),process_start=process_start(os.getpid())))
+    atomic(root/'run.json',dict(registered_at=time.time(),boot_id=Path('/proc/sys/kernel/random/boot_id').read_text().strip(),root=str(Path(run_root).resolve()),source=str(Path(source).resolve()),kind=kind,pilot=pilot,run_id=run_id,pid=os.getpid(),process_start=process_start(os.getpid())))
 
 def initialize(root):
     root=Path(root);root.mkdir(parents=True,exist_ok=True)
@@ -83,6 +83,8 @@ def resume_if_needed(root,base):
     active_path=base/'data/releases/active.json'
     active=json.loads(active_path.read_text()) if active_path.exists() else {}
     if active.get('root') and Path(active['root']).resolve().is_relative_to(base/'data/releases/production'):allowed.add(Path(active['root']).resolve())
+    from .runtime_lease import lease_valid
+    if not lease_valid(run_root,base):raise ValueError('valid runtime lease required')
     if run_root not in allowed or not source.is_relative_to(base/'data') or spec['kind'] not in ('legacy','mission') or type(spec['pilot'])is not int or not 1<=spec['pilot']<=100000:raise ValueError('unregistered runner')
     if process_start(spec['pid'])==spec.get('process_start') and spec.get('process_start') is not None:return
     try:

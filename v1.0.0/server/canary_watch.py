@@ -8,9 +8,12 @@ from .telemetry import atomic,process_start
 def monitor(registry,base,now=None):
     now=time.time() if now is None else now;base=Path(base);active=read(registry.root/'active.json')
     if not active:return
+    if (base/'data/runtime/config.json').exists():return
     item=registry.get(active['release_id'],private=True)
     if item['status']!='APPLIED' or item['spec']['artifact'].get('activation')!='canary':return
-    root=Path(active['root']);path=registry.root/'canary-health.json';health=read(path)
+    root=Path(active['root'])
+    if (base/'data/runtime/config.json').exists():return  # bounded supervisor owns managed recovery
+    path=registry.root/'canary-health.json';health=read(path)
     if health.get('root')!=str(root):health=dict(root=str(root),attempted_resume=False)
     try:
         pid=int((root/'runner.pid').read_text());alive=worker_alive(dict(pid=pid,start=process_start(pid)),'learning.accelerated_league')
