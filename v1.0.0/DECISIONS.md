@@ -190,3 +190,8 @@ User approved all stages in docs/multi-mode/PLAN.md: same independent PPO1/PPO2 
 - 180초 원자적 임대/30초 heartbeat/15초 내부 검사. 90초 STALE·5분 HOST_OFFLINE. 복구 최대3회/15분. 관리자 정지·소유자STOP·평가퇴보·진행Apply를 덮어쓰지 않는다.
 - 코드와 전체 복구본을 함께 원격 보존. 기존10/50경기 보존과 별개로60분 이후 안전한 업데이트 경계에서 전체 복구를 예약한다.
 - 무료 플랜과 D1 권한·외부 임대를 실제 확인하기 전에는 관리형 PPO를 시작하지 않는다. 누락을 가짜 READY나 실행 상태로 표현하지 않는다.
+
+## T30 — 외부 Workers 보류, 기존 실행 즉시 재개 (사용자 지시)
+- 2026-11-04 사용자는 Workers 도입을 보류하고 현재 Codex 환경의 기존 학습 재개를 요청했다.
+- runtime-continuity는 적용하지 않는다. 승인된 map-rotation-10 r2 고정 실행 코드와 기존 저장본을 그대로 재개한다.
+- 이 지시는 이전 시작 지침의 외부 임대 도입 전제보다 우선한다. 관리자 정지·STOP·평가 퇴보·중복 실행은 계속 존중한다.
