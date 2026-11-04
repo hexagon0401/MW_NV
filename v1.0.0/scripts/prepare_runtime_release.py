@@ -13,7 +13,7 @@ def main():
     spec=next(row for row in yaml.safe_load((base/'config/releases.yaml').read_text())['releases'] if row['id']=='runtime-continuity');spec['artifact'].update(runtime_digest=stage['runtime_digest'])
     cfg=dict(root=str(root),runtime=stage['runtime'],runtime_digest=stage['runtime_digest'],monitor_url=deployment.get('url',''),key_file=deployment.get('key_file',str(folder/'monitor.key')),release_id=spec['id'])
     atomic(folder/'pending-config.json',cfg)
-    restore=read(folder/'restore-verification.json');checks=read(folder/'checks.json');proof=dict(tests=bool(checks.get('tests_passed') and checks.get('runtime_digest')==stage['runtime_digest']),recovery=bool(restore.get('passed') and exact_recovery(root)),monitor=False)
+    restore=read(folder/'restore-verification.json');checks=read(folder/'checks.json');code=read(folder/'code-proof.json');remote=exact_recovery(root);proof=dict(tests=bool(checks.get('tests_passed') and checks.get('runtime_digest')==stage['runtime_digest']),recovery=bool(restore.get('passed') and remote and restore.get('checkpoint_sha256')==remote['sha256'] and code.get('verified') and code.get('runtime_digest')==stage['runtime_digest']),monitor=False)
     if deployment.get('free_confirmed'):
         from server.runtime_lease import Client
         client=Client(base,cfg);state=read(root/'state.json');client.send('acquire',state['run'],dict(state='STARTING'));client.send('release',state['run'],dict(state='OFFLINE'));proof['monitor']=True
