@@ -1,5 +1,7 @@
 # MW-NV
 
+한국어 | [English](README.en.md)
+
 MW-NV는 결정론적 전장 시뮬레이션, AI 지휘, 강화학습과 픽셀아트 관전을 결합한 실험 프로젝트입니다. 두 진영이 병력·차량·수송·보급을 운용하며, 엔진이 이동과 전투를 처리하고 AI는 관측 가능한 정보로 지휘 후보를 선택합니다.
 
 [관전 사이트](https://mw-nv.pages.dev/) · [운영 대시보드](https://mw-nv.pages.dev/dashboard/) · [현재 작업 상태](v1.0.0/STATE.md) · [설계 결정](v1.0.0/DECISIONS.md)
