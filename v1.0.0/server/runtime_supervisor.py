@@ -24,6 +24,13 @@ def find_running(module,args):
         except OSError:pass
     return None
 
+def observed_learner(base,root):
+    run=read(Path(base)/'data/control/run.json')
+    info=dict(pid=run.get('pid'),start=run.get('process_start'),boot_id=run.get('boot_id'))
+    if alive(info,'learning.accelerated_league',('--root',root)):return True,False
+    # Loading a large checkpoint precedes register(); do not count this as a failed restart.
+    return (True,True) if find_running('learning.accelerated_league',('--root',root)) else (False,False)
+
 def restart_allowed(history,now):return len([t for t in history if now-900<t<=now])<3
 
 def spawn(base,key,module,args):
@@ -51,11 +58,10 @@ def supervise(base):
     if previous.get('boot_id')==boot_id():histories=previous.get('attempts',{})
     while not (folder/'STOP').exists():
         started=time.monotonic();training=read(root/'training-status.json');run=read(base/'data/control/run.json');deny=blocked(base,root)
-        info=dict(pid=run.get('pid'),start=run.get('process_start'),boot_id=run.get('boot_id'))
-        running=alive(info,'learning.accelerated_league',('--root',root))
+        running,starting=observed_learner(base,root)
         stamp=(training.get('round'),training.get('games'),training.get('phase'),training.get('operation_elapsed_seconds'))
-        if running and stamp!=last_stamp:last_progress=time.time();last_stamp=stamp
-        state='PAUSED' if deny=='administrator_paused' else 'RECOVERY_BLOCKED' if deny else 'RUNNING' if running else 'STARTING'
+        if running and not starting and training.get('run_id')==run.get('run_id') and stamp!=last_stamp:last_progress=time.time();last_stamp=stamp
+        state='PAUSED' if deny=='administrator_paused' else 'RECOVERY_BLOCKED' if deny else 'RUNNING' if running and not starting else 'STARTING'
         health=dict(state=state,last_progress=last_progress,last_backup=last_backup(root),recovery_count=sum(len(h) for h in histories.values()))
         if started-last_heartbeat>=30:
             try:client.send('renew' if lease_valid(root,base) else 'acquire',run.get('run_id','unknown'),health);last_heartbeat=started
@@ -63,7 +69,11 @@ def supervise(base):
         valid=lease_valid(root,base)
         if not valid:
             health['state']='LEASE_LOST'
-            if running:os.kill(run['pid'],signal.SIGTERM)
+            if running:
+                target=find_running('learning.accelerated_league',('--root',root))
+                if target and target['pid']>1:
+                    try:os.kill(target['pid'],signal.SIGTERM)
+                    except ProcessLookupError:pass
         if read(base/'data/releases/active.json').get('root')!=str(root):deny='approved_runtime_changed';health['state']='RECOVERY_BLOCKED'
         for key,module,args in [('release','server.release_service',['--root',str(base/'data/releases')]),*[(lane,'server.dashboard_service',['--lane',lane,'--root',str(base/'data/dashboard'),'--db',str(base/'data/results.sqlite'),'--control-root',str(base/'data/control')]) for lane in ('control','collect','publish')]]:
             candidate=read(folder/(key+'.json'));history=histories.setdefault(key,[])

@@ -101,3 +101,18 @@ def test_expired_lease_prevents_actual_ppo_update(tmp_path,monkeypatch):
     state=run(tmp_path/'run',actor,max_updates=1,teacher_enabled=False,fixed_workers=1,collection_rounds=1)
     assert state['generation']==0 and state['rounds']==0
     assert 'ppo1_last_update' not in state and 'ppo2_last_update' not in state
+
+def test_real_starting_learner_is_not_mistaken_for_a_failed_restart(tmp_path):
+    import os,signal,time
+    from server.runtime_supervisor import spawn,observed_learner
+    (tmp_path/'data/runtime').mkdir(parents=True);(tmp_path/'data/control').mkdir();(tmp_path/'learning').mkdir();(tmp_path/'learning/__init__.py').write_text('')
+    (tmp_path/'learning/accelerated_league.py').write_text('import time\ntime.sleep(60)\n')
+    root=tmp_path/'data/releases/production/test';root.mkdir(parents=True)
+    (tmp_path/'data/control/run.json').write_text('{"pid":0,"process_start":null,"boot_id":"previous"}')
+    info=spawn(tmp_path,'fixture-learner','learning.accelerated_league',['--root',str(root)])
+    try:
+        for _ in range(30):
+            if observed_learner(tmp_path,root)==(True,True):break
+            time.sleep(.02)
+        assert observed_learner(tmp_path,root)==(True,True)
+    finally:os.kill(info['pid'],signal.SIGTERM)
