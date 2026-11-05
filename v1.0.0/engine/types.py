@@ -22,6 +22,15 @@ class Op(IntEnum):
     RETREAT = 10
     PURCHASE = 11
     CANCEL = 12
+    ATTACK_TARGET = 13
+    FIRE_MISSION = 14
+    DEPLOY = 15
+    PACK_UP = 16
+    REPAIR = 17
+    ENTER_BUILDING = 18
+    INTERACT_OBJECTIVE = 19
+    OPERATE_EMPLACEMENT = 20
+    LEAVE_EMPLACEMENT = 21
 
 
 def natural(value, name, minimum=0):
@@ -70,7 +79,7 @@ class Soldier(Entity):
 
     def __post_init__(self):
         super().__post_init__()
-        if self.type_id not in ('INF', 'REC', 'SUP', 'MED', 'ENG'):
+        if self.type_id not in ('INF', 'REC', 'SUP', 'MED', 'ENG', 'AT'):
             raise ValueError('type_id')
         natural(self.hp, 'hp')
         natural(self.ammo, 'ammo')
@@ -82,7 +91,7 @@ class Squad(Entity):
 
     def __post_init__(self):
         super().__post_init__()
-        if not 1 <= len(self.member_ids) <= 5 or len(set(self.member_ids)) != len(self.member_ids):
+        if not 1 <= len(self.member_ids) <= 12 or len(set(self.member_ids)) != len(self.member_ids):
             raise ValueError('members')
         for member in self.member_ids:
             natural(member, 'member', 1)
@@ -95,11 +104,30 @@ class Vehicle(Entity):
     passenger_ids: list[int] = field(default_factory=list)
     cargo_supply: int = 0
     task_state: str = 'IDLE'
+    hp: int | None = None
+    alive: bool = True
+    ammo: int | None = None
+    target_id: int | None = None
+    cooldown_ms: int = 0
+    turret_heading: float = 0.0
+    deployment: str = 'PACKED'
+    deployment_ms: int = 0
+    needs_parking: bool = False
 
     def __post_init__(self):
         super().__post_init__()
-        if self.type_id not in ('LUV', 'APC', 'IFV', 'HEL', 'TRK'):
-            raise ValueError('type_id')
+        # Direct constructors and purchased vehicles use the same catalog defaults.
+        from .catalog import load_vehicles
+        specs=load_vehicles()
+        if self.type_id not in specs:
+            from .catalog import expanded_catalog
+            specs=expanded_catalog()[1]
+        if self.type_id not in specs:raise ValueError('type_id')
+        spec=specs[self.type_id]
+        if self.hp is None:self.hp=spec['hp']
+        if self.ammo is None:self.ammo=spec['ammo']
+        natural(self.hp,'hp');natural(self.ammo,'ammo')
+        if self.type_id not in specs:raise ValueError('type_id')
 
 
 @dataclass
@@ -135,3 +163,20 @@ class Command:
     ttl: int = 600
     priority: int = 0
     v: int = 1
+
+
+@dataclass
+class Emplacement(Vehicle):
+    type_id: str = 'AA_SITE'
+    crew_id: int | None = None
+    capture_team: Team | None = None
+    capture_ms: int = 0
+    occupied_tick: int = 0
+    recapture_after_tick: int = 0
+    def __post_init__(self):
+        natural(self.id,'id',1)
+        if self.team is not None and not isinstance(self.team,Team):raise ValueError('team')
+        from .catalog import expanded_catalog
+        spec=expanded_catalog()[1][self.type_id]
+        if self.hp is None:self.hp=spec['hp']
+        if self.ammo is None:self.ammo=spec['ammo']

@@ -14,6 +14,7 @@ class Tile(IntEnum):
     BRIDGE=7
     OBJECTIVE=8
     OBSTACLE=9
+    HQ_FLOOR=10
 
 
 class Terrain:
@@ -42,10 +43,26 @@ class Terrain:
     def passable(self, x, y, vehicle=False):
         if not self.inside(x,y):
             return False
-        allowed = (0,1,7,8) if vehicle else (0,1,2,4,5,7,8)
+        allowed = (0,1,7,8) if vehicle else (0,1,2,4,5,7,8,10)
+        value=self.cells[y//400][x//400]
+        # Valid cells are already integers; avoid constructing an enum and
+        # checking the same bounds again for every navigation probe.
+        if 0<=value<=10:return value in allowed
         return self.tile(x,y) in allowed
 
     def segment_clear(self, start, end, vehicle=False):
+        # Specialized terrain may override passability (vehicle footprint/traffic).
+        if type(self) is Terrain:
+            if not self.inside(*start) or not self.inside(*end):return False
+            allowed=(0,1,7,8) if vehicle else (0,1,2,4,5,7,8,10)
+            x0,x1=sorted((start[0]//400,end[0]//400));y0,y1=sorted((start[1]//400,end[1]//400))
+            # Every cell on an axis-aligned segment is visited by the original
+            # <=50cm samples. Inspect each once, preserving the exact verdict.
+            if start[1]==end[1]:return all(self.cells[y0][x] in allowed for x in range(x0,x1+1))
+            if start[0]==end[0]:return all(self.cells[y][x0] in allowed for y in range(y0,y1+1))
+            # If the complete small bounding rectangle is legal, every sampled
+            # point is legal. Mixed/blocked rectangles retain the original sampler.
+            if (x1-x0+1)*(y1-y0+1)<=9 and all(self.cells[y][x] in allowed for y in range(y0,y1+1) for x in range(x0,x1+1)):return True
         n = max(1, ceil(hypot(end[0]-start[0], end[1]-start[1])/50))
         return all(self.passable(round(start[0]+(end[0]-start[0])*i/n),
                                  round(start[1]+(end[1]-start[1])*i/n),vehicle)

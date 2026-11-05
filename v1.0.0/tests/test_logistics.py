@@ -16,7 +16,7 @@ def test_atomic_debit_and_truck_conservation():
     assert t.supply==180 and w.vehicles[20].cargo_supply==120
     transfer_cargo(w,20,-120)
     assert t.supply==300 and w.vehicles[20].cargo_supply==0
-    with pytest.raises(OrderError):transfer_cargo(w,20,121)
+    with pytest.raises(OrderError):transfer_cargo(w,20,241)
 
 
 def test_resupply_timing_insufficient_and_healing_cap():

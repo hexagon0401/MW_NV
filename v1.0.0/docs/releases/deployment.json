@@ -1,0 +1,10 @@
+{
+  "production": "https://39dc74b5.mw-nv.pages.dev",
+  "preview": "https://30707ad2.mw-nv.pages.dev",
+  "rollback": "e476d696-2448-41dd-aca3-4f44f4e8970b",
+  "bootstrap_authorized": true,
+  "mixed_apply_performed": false,
+  "all_auto_reservations_disabled": true,
+  "preview_browser_fixtures": true,
+  "production_api_actual": true
+}

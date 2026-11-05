@@ -1,0 +1,13 @@
+{
+  "source_rules": "combined-arms-2",
+  "target_rules": "combined-arms-3",
+  "contract": "tactics-1",
+  "source_sha256": "4316ab640eca33dd505859774dde645c2e8345e7b2a96f69b2aa5fac755ccf63",
+  "policy_id": "215497643c160a46",
+  "actor_only": true,
+  "critic": "fresh",
+  "optimizer": "fresh",
+  "policy_steps": 0,
+  "map_id": "river-districts",
+  "map_version": "2"
+}

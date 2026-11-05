@@ -1,0 +1,48 @@
+{
+  "windows_seconds": 35,
+  "closed": {
+    "start": {
+      "at": 1793018370.814,
+      "phase": "learning",
+      "workers": 1,
+      "sim_seconds": 410,
+      "round": 145,
+      "games": 59,
+      "updated_at": "2026-10-26T12:39:16.881618+00:00"
+    },
+    "end": {
+      "at": 1793018405.828,
+      "phase": "learning",
+      "workers": 1,
+      "sim_seconds": 630,
+      "round": 145,
+      "games": 59,
+      "updated_at": "2026-10-26T12:39:48.426247+00:00"
+    },
+    "sim_s_per_wall_s": 6.283200973481017
+  },
+  "open": {
+    "start": {
+      "at": 1793018412.794,
+      "phase": "learning",
+      "workers": 1,
+      "sim_seconds": 630,
+      "round": 145,
+      "games": 59,
+      "updated_at": "2026-10-26T12:39:48.426247+00:00"
+    },
+    "end": {
+      "at": 1793018447.798,
+      "phase": "learning",
+      "workers": 1,
+      "sim_seconds": 630,
+      "round": 145,
+      "games": 59,
+      "updated_at": "2026-10-26T12:39:48.426247+00:00"
+    },
+    "sim_s_per_wall_s": null,
+    "coverage": "No new reporter boundary in the open window; throughput unknown, not zero"
+  },
+  "interpretation": "35-second observational windows. Closed window6.28sim s/s; open window has no new reporting boundary, so no valid before/after conclusion. Startup/checkpoint work and concurrent diagnostics confound comparison.",
+  "dashboard_only_no_replay": true
+}

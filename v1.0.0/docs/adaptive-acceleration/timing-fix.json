@@ -1,0 +1,11 @@
+{
+  "tests_passed": 10,
+  "seconds": 108.52,
+  "evaluation_and_initialization_excluded_from_trials": true,
+  "workers_preserved_at_evaluation_boundary": true,
+  "restored_generation": 125,
+  "completed_games": 52,
+  "diagnostics_preserved": 1,
+  "preserved_validation": "validation-before-timing-window",
+  "models_reset": false
+}

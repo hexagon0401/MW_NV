@@ -1,0 +1,133 @@
+{
+  "verified_at_kst": "2026-10-26T09:51:08.706526+09:00",
+  "http": 200,
+  "coverage": {
+    "matches": 680,
+    "recorded": 1,
+    "missing": 679
+  },
+  "points": {
+    "201": {
+      "matches": 1,
+      "uncaptured": 0,
+      "initially_owned": 0,
+      "first": {
+        "A": {
+          "n": 1,
+          "wins": 1,
+          "losses": 0,
+          "draws": 0,
+          "first_at_s_sum": 171.4,
+          "first_stint_s_sum": 368,
+          "hold_s_sum": 411.8,
+          "final_margin_sum": 75,
+          "lost_n": 1,
+          "lost_wins": 1,
+          "regained_n": 1,
+          "regained_wins": 1,
+          "score_context_n": 1,
+          "score_margin_at_first_sum": 1,
+          "army_context_n": 1,
+          "infantry_margin_at_first_sum": -2,
+          "vehicle_margin_at_first_sum": 0,
+          "opponent_retake_n": 1,
+          "opponent_retake_wins": 1
+        }
+      }
+    },
+    "202": {
+      "matches": 1,
+      "uncaptured": 0,
+      "initially_owned": 0,
+      "first": {
+        "A": {
+          "n": 1,
+          "wins": 1,
+          "losses": 0,
+          "draws": 0,
+          "first_at_s_sum": 171.2,
+          "first_stint_s_sum": 938.8,
+          "hold_s_sum": 938.8,
+          "final_margin_sum": 75,
+          "lost_n": 0,
+          "lost_wins": 0,
+          "regained_n": 0,
+          "regained_wins": 0,
+          "score_context_n": 1,
+          "score_margin_at_first_sum": 1,
+          "army_context_n": 1,
+          "infantry_margin_at_first_sum": -2,
+          "vehicle_margin_at_first_sum": 0,
+          "opponent_retake_n": 0,
+          "opponent_retake_wins": 0
+        }
+      }
+    },
+    "203": {
+      "matches": 1,
+      "uncaptured": 0,
+      "initially_owned": 0,
+      "first": {
+        "A": {
+          "n": 1,
+          "wins": 1,
+          "losses": 0,
+          "draws": 0,
+          "first_at_s_sum": 141.4,
+          "first_stint_s_sum": 968.6,
+          "hold_s_sum": 968.6,
+          "final_margin_sum": 75,
+          "lost_n": 0,
+          "lost_wins": 0,
+          "regained_n": 0,
+          "regained_wins": 0,
+          "score_context_n": 1,
+          "score_margin_at_first_sum": 0,
+          "army_context_n": 1,
+          "infantry_margin_at_first_sum": 0,
+          "vehicle_margin_at_first_sum": 0,
+          "opponent_retake_n": 0,
+          "opponent_retake_wins": 0
+        }
+      }
+    }
+  },
+  "combinations": {
+    "201+202": {
+      "A": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    "201+203": {
+      "A": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    "202+203": {
+      "A": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      }
+    },
+    "201+202+203": {
+      "A": {
+        "n": 1,
+        "wins": 1,
+        "losses": 0,
+        "draws": 0
+      }
+    }
+  },
+  "filters": {
+    "mode": "training",
+    "rules_version": "combined-arms-3"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "units": 500,
+  "zoom": 0.2,
+  "renderer": "Chromium SwiftShader cloud CPU",
+  "p50_ms": 83.30000000000109,
+  "p95_ms": 100.10000000000036,
+  "mean_fps": 11.688918904878175,
+  "errors": [],
+  "mac": "unverified",
+  "syntheticFixture": true
+}

@@ -1,0 +1,33 @@
+{
+  "recorded_at": "2026-10-26T13:39:16.662593+09:00",
+  "run": "league-7be9acf574df",
+  "generation": 20,
+  "completed_training_games": 7,
+  "policy_steps": 7864,
+  "teacher": {
+    "paired": 382,
+    "skipped": 24,
+    "requests": 784,
+    "last_error": "ValueError"
+  },
+  "initial_evaluation_cases": 33,
+  "initial_evaluation_total": 80,
+  "initial_evaluation_parallel": true,
+  "backup": "verified",
+  "code_commit": "e20e908955345022a7015fa89c9bd9ebbd5a040f",
+  "first_training_result": {
+    "scores": [
+      24,
+      101
+    ],
+    "assignments": {
+      "A": "PPO2",
+      "B": "PPO1"
+    },
+    "winner": "PPO1"
+  },
+  "improvement_proven": false,
+  "permanent_hosting": false,
+  "initial_evaluation_complete": false,
+  "deployment": "https://41371462.mw-nv.pages.dev"
+}

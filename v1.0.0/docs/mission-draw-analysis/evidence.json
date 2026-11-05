@@ -1,0 +1,653 @@
+{
+  "scope": "algorithm-only engine audit; not PPO self-play or NIM teacher evaluation",
+  "modes": {
+    "3": {
+      "cases": 10,
+      "events": {
+        "SCENARIO_STARTED": 10,
+        "ORDER_ACCEPTED": 23694,
+        "EMBARK_STARTED": 267,
+        "UNIT_MOVED": 9609154,
+        "SUPPLY_CHANGED": 2048,
+        "UNIT_SPAWNED": 1455,
+        "ORDER_COMPLETED": 18317,
+        "EMBARK_DONE": 1232,
+        "UNIT_TASK_CHANGED": 9786,
+        "ORDER_FAILED": 2082,
+        "LANDING_DIVERTED": 60,
+        "VEHICLE_REPLANNED": 554,
+        "VEHICLE_WAITING": 2076,
+        "VEHICLE_YIELDED": 774,
+        "UNIT_SPOTTED": 12849,
+        "UNIT_ARRIVED": 9654,
+        "ORDER_CANCELLED": 3250,
+        "DISEMBARK_DONE": 3255,
+        "UNIT_DAMAGED": 34631,
+        "ABSTRACT_ATTACK": 31628,
+        "INFANTRY_DISABLED": 2829,
+        "UNIT_HEALED": 414,
+        "VEHICLE_DISABLED": 441,
+        "FORMATION_REPLAN": 2583,
+        "TANK_IMPACT": 2019,
+        "FORMATION_COLUMN": 3311,
+        "FORMATION_ARRIVED": 8210,
+        "EMPLACEMENT_CAPTURED": 2059,
+        "EMPLACEMENT_LEFT": 2037,
+        "EMPLACEMENT_INACTIVE": 8,
+        "DEPLOYMENT_CHANGED": 60,
+        "ARTILLERY_FIRED": 213,
+        "ARTILLERY_IMPACT": 213,
+        "VEHICLE_OUT_OF_FUEL": 56,
+        "MATCH_ENDED": 10,
+        "UNIT_REPAIRED": 71
+      },
+      "failures": {
+        "PATH_NOT_FOUND": 26,
+        "LANDING_INVALID": 119,
+        "ILLEGAL_STATE": 676,
+        "INVALID_TARGET": 16,
+        "TRAFFIC_TIMEOUT": 271,
+        "FORMATION_UNREACHABLE": 639,
+        "UNOBSERVED_TARGET": 153,
+        "BLOCKED": 37,
+        "EXPIRED": 67,
+        "NO_DISEMBARK_SPACE": 1,
+        "NO_FUEL": 56,
+        "INSUFFICIENT_SUPPLY": 17,
+        "OUT_OF_RANGE": 4
+      },
+      "cases_summary": [
+        {
+          "seed": 0,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 131.0,
+          "teams": {
+            "0": {
+              "loss_value": 7416,
+              "aircraft_losses": 7,
+              "remaining": {
+                "credits": 72,
+                "tickets": 0,
+                "supply": 1180
+              },
+              "alive_armed": 29
+            },
+            "1": {
+              "loss_value": 9735,
+              "aircraft_losses": 6,
+              "remaining": {
+                "credits": 62,
+                "tickets": 0,
+                "supply": 1286
+              },
+              "alive_armed": 13
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 5,
+            "traffic_timeouts": 38,
+            "blocked_orders": 8
+          }
+        },
+        {
+          "seed": 1,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 133.8,
+          "teams": {
+            "0": {
+              "loss_value": 8198,
+              "aircraft_losses": 6,
+              "remaining": {
+                "credits": 15,
+                "tickets": 0,
+                "supply": 1239
+              },
+              "alive_armed": 20
+            },
+            "1": {
+              "loss_value": 8103,
+              "aircraft_losses": 7,
+              "remaining": {
+                "credits": 27,
+                "tickets": 0,
+                "supply": 1283
+              },
+              "alive_armed": 17
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 4,
+            "traffic_timeouts": 43,
+            "blocked_orders": 1
+          }
+        },
+        {
+          "seed": 2,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 131.0,
+          "teams": {
+            "0": {
+              "loss_value": 8071,
+              "aircraft_losses": 8,
+              "remaining": {
+                "credits": 78,
+                "tickets": 0,
+                "supply": 1211
+              },
+              "alive_armed": 14
+            },
+            "1": {
+              "loss_value": 8506,
+              "aircraft_losses": 6,
+              "remaining": {
+                "credits": 51,
+                "tickets": 0,
+                "supply": 1118
+              },
+              "alive_armed": 23
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 5,
+            "traffic_timeouts": 25,
+            "blocked_orders": 9
+          }
+        },
+        {
+          "seed": 3,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 134.0,
+          "teams": {
+            "0": {
+              "loss_value": 7787,
+              "aircraft_losses": 6,
+              "remaining": {
+                "credits": 24,
+                "tickets": 0,
+                "supply": 1286
+              },
+              "alive_armed": 18
+            },
+            "1": {
+              "loss_value": 8673,
+              "aircraft_losses": 6,
+              "remaining": {
+                "credits": 46,
+                "tickets": 0,
+                "supply": 1121
+              },
+              "alive_armed": 13
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 3,
+            "traffic_timeouts": 32,
+            "blocked_orders": 3
+          }
+        },
+        {
+          "seed": 4,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 132.0,
+          "teams": {
+            "0": {
+              "loss_value": 8040,
+              "aircraft_losses": 7,
+              "remaining": {
+                "credits": 83,
+                "tickets": 0,
+                "supply": 1337
+              },
+              "alive_armed": 11
+            },
+            "1": {
+              "loss_value": 7020,
+              "aircraft_losses": 6,
+              "remaining": {
+                "credits": 33,
+                "tickets": 0,
+                "supply": 1178
+              },
+              "alive_armed": 43
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 5,
+            "traffic_timeouts": 88,
+            "blocked_orders": 3
+          }
+        },
+        {
+          "seed": 5,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 134.0,
+          "teams": {
+            "0": {
+              "loss_value": 9917,
+              "aircraft_losses": 6,
+              "remaining": {
+                "credits": 26,
+                "tickets": 0,
+                "supply": 1150
+              },
+              "alive_armed": 7
+            },
+            "1": {
+              "loss_value": 7642,
+              "aircraft_losses": 7,
+              "remaining": {
+                "credits": 40,
+                "tickets": 0,
+                "supply": 1093
+              },
+              "alive_armed": 16
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 1,
+            "traffic_timeouts": 0,
+            "blocked_orders": 1
+          }
+        },
+        {
+          "seed": 6,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 131.0,
+          "teams": {
+            "0": {
+              "loss_value": 8415,
+              "aircraft_losses": 6,
+              "remaining": {
+                "credits": 61,
+                "tickets": 0,
+                "supply": 1287
+              },
+              "alive_armed": 10
+            },
+            "1": {
+              "loss_value": 8102,
+              "aircraft_losses": 7,
+              "remaining": {
+                "credits": 47,
+                "tickets": 0,
+                "supply": 1204
+              },
+              "alive_armed": 42
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 3,
+            "traffic_timeouts": 41,
+            "blocked_orders": 5
+          }
+        },
+        {
+          "seed": 7,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 131.0,
+          "teams": {
+            "0": {
+              "loss_value": 7941,
+              "aircraft_losses": 7,
+              "remaining": {
+                "credits": 55,
+                "tickets": 0,
+                "supply": 1118
+              },
+              "alive_armed": 30
+            },
+            "1": {
+              "loss_value": 8464,
+              "aircraft_losses": 7,
+              "remaining": {
+                "credits": 52,
+                "tickets": 0,
+                "supply": 1256
+              },
+              "alive_armed": 7
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 3,
+            "traffic_timeouts": 0,
+            "blocked_orders": 3
+          }
+        },
+        {
+          "seed": 8,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 131.0,
+          "teams": {
+            "0": {
+              "loss_value": 8051,
+              "aircraft_losses": 7,
+              "remaining": {
+                "credits": 45,
+                "tickets": 0,
+                "supply": 1113
+              },
+              "alive_armed": 26
+            },
+            "1": {
+              "loss_value": 9318,
+              "aircraft_losses": 6,
+              "remaining": {
+                "credits": 41,
+                "tickets": 0,
+                "supply": 1278
+              },
+              "alive_armed": 13
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 2,
+            "traffic_timeouts": 3,
+            "blocked_orders": 2
+          }
+        },
+        {
+          "seed": 9,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 129.0,
+          "teams": {
+            "0": {
+              "loss_value": 7974,
+              "aircraft_losses": 6,
+              "remaining": {
+                "credits": 33,
+                "tickets": 0,
+                "supply": 1243
+              },
+              "alive_armed": 29
+            },
+            "1": {
+              "loss_value": 7769,
+              "aircraft_losses": 7,
+              "remaining": {
+                "credits": 81,
+                "tickets": 0,
+                "supply": 1324
+              },
+              "alive_armed": 26
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 5,
+            "traffic_timeouts": 1,
+            "blocked_orders": 2
+          }
+        }
+      ],
+      "matched_aa_capture_leave_pairs": 2037,
+      "aa_capture_to_leave_median_s": 2.2
+    },
+    "4": {
+      "cases": 3,
+      "events": {
+        "SCENARIO_STARTED": 3,
+        "ORDER_ACCEPTED": 5650,
+        "EMBARK_STARTED": 30,
+        "UNIT_MOVED": 4652325,
+        "SUPPLY_CHANGED": 551,
+        "UNIT_SPAWNED": 391,
+        "ORDER_COMPLETED": 3719,
+        "EMBARK_DONE": 240,
+        "FORMATION_REPLAN": 1779,
+        "FORMATION_COLUMN": 1951,
+        "UNIT_SPOTTED": 1383,
+        "UNIT_DAMAGED": 5155,
+        "ABSTRACT_ATTACK": 4596,
+        "INFANTRY_DISABLED": 557,
+        "ORDER_CANCELLED": 1381,
+        "UNIT_TASK_CHANGED": 5974,
+        "ORDER_FAILED": 532,
+        "UNIT_HEALED": 129,
+        "DEPLOYMENT_CHANGED": 142,
+        "ARTILLERY_FIRED": 118,
+        "ARTILLERY_IMPACT": 118,
+        "FORMATION_ARRIVED": 2904,
+        "TANK_IMPACT": 47,
+        "UNIT_ARRIVED": 2920,
+        "MATCH_ENDED": 3,
+        "VEHICLE_DISABLED": 1,
+        "UNIT_REPAIRED": 5
+      },
+      "failures": {
+        "FORMATION_UNREACHABLE": 224,
+        "ILLEGAL_STATE": 152,
+        "UNOBSERVED_TARGET": 148,
+        "BLOCKED": 2,
+        "INSUFFICIENT_SUPPLY": 3,
+        "INVALID_TARGET": 1,
+        "EXPIRED": 2
+      },
+      "cases_summary": [
+        {
+          "seed": 0,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 696.0,
+          "teams": {
+            "0": {
+              "loss_value": 1653,
+              "aircraft_losses": 0,
+              "remaining": {
+                "credits": 1225,
+                "tickets": 0,
+                "supply": 1361
+              },
+              "alive_armed": 88
+            },
+            "1": {
+              "loss_value": 2349,
+              "aircraft_losses": 0,
+              "remaining": {
+                "credits": 1293,
+                "tickets": 0,
+                "supply": 1381
+              },
+              "alive_armed": 61
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 4,
+            "traffic_timeouts": 0,
+            "blocked_orders": 1
+          }
+        },
+        {
+          "seed": 1,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 696.0,
+          "teams": {
+            "0": {
+              "loss_value": 2257,
+              "aircraft_losses": 0,
+              "remaining": {
+                "credits": 1293,
+                "tickets": 0,
+                "supply": 1355
+              },
+              "alive_armed": 63
+            },
+            "1": {
+              "loss_value": 2166,
+              "aircraft_losses": 0,
+              "remaining": {
+                "credits": 1109,
+                "tickets": 0,
+                "supply": 1354
+              },
+              "alive_armed": 73
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 5,
+            "traffic_timeouts": 0,
+            "blocked_orders": 1
+          }
+        },
+        {
+          "seed": 2,
+          "winner": null,
+          "termination": "TIME_LIMIT_DRAW",
+          "first_fight_s": 696.0,
+          "teams": {
+            "0": {
+              "loss_value": 1943,
+              "aircraft_losses": 0,
+              "remaining": {
+                "credits": 1238,
+                "tickets": 0,
+                "supply": 1366
+              },
+              "alive_armed": 76
+            },
+            "1": {
+              "loss_value": 2487,
+              "aircraft_losses": 0,
+              "remaining": {
+                "credits": 1311,
+                "tickets": 0,
+                "supply": 1388
+              },
+              "alive_armed": 52
+            }
+          },
+          "diagnostics": {
+            "empty_ammo_units": 3,
+            "traffic_timeouts": 0,
+            "blocked_orders": 0
+          }
+        }
+      ],
+      "matched_aa_capture_leave_pairs": 0,
+      "aa_capture_to_leave_median_s": null
+    }
+  },
+  "seed0_ctf_probe": [
+    {
+      "team": 0,
+      "hq_infantry_passable": true,
+      "hq_vehicle_passable": false,
+      "at_hq": {
+        "LUV": null,
+        "APC": null,
+        "IFV": null,
+        "MBT": null,
+        "SPH": null,
+        "HEL": null,
+        "BH": null,
+        "LB": null,
+        "TRK": null
+      },
+      "at_exterior_staging": {
+        "LUV": [
+          2116,
+          756
+        ],
+        "APC": [
+          2140,
+          780
+        ],
+        "IFV": [
+          2116,
+          768
+        ],
+        "MBT": [
+          2128,
+          780
+        ],
+        "SPH": [
+          2140,
+          756
+        ],
+        "HEL": [
+          2140,
+          780
+        ],
+        "BH": [
+          2116,
+          768
+        ],
+        "LB": [
+          2140,
+          768
+        ],
+        "TRK": [
+          2128,
+          780
+        ]
+      },
+      "individual_column_paths": "feasible (planning only; no full movement assertion)"
+    },
+    {
+      "team": 1,
+      "hq_infantry_passable": true,
+      "hq_vehicle_passable": false,
+      "at_hq": {
+        "LUV": null,
+        "APC": null,
+        "IFV": null,
+        "MBT": null,
+        "SPH": null,
+        "HEL": null,
+        "BH": null,
+        "LB": null,
+        "TRK": null
+      },
+      "at_exterior_staging": {
+        "LUV": [
+          188,
+          756
+        ],
+        "APC": [
+          164,
+          780
+        ],
+        "IFV": [
+          188,
+          768
+        ],
+        "MBT": [
+          176,
+          780
+        ],
+        "SPH": [
+          164,
+          756
+        ],
+        "HEL": [
+          164,
+          780
+        ],
+        "BH": [
+          188,
+          768
+        ],
+        "LB": [
+          164,
+          768
+        ],
+        "TRK": [
+          176,
+          780
+        ]
+      },
+      "individual_column_paths": "feasible (planning only; no full movement assertion)"
+    }
+  ],
+  "engine_or_training_modified": false,
+  "analyzed_at_kst": "2026-10-27T09:08:01.927178+09:00"
+}

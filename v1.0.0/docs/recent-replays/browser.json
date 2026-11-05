@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "catalog_slides": true,
+  "historical_choice": true,
+  "manual_refresh_preserves_time_camera": true,
+  "evicted_playback_kept": true,
+  "new_game_returns_to_latest": true,
+  "mobile_controls_within_viewport": true,
+  "page_errors": []
+}

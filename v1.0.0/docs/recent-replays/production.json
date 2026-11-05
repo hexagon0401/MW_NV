@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "actual_recent_replays": [
+    {
+      "id": "training-latest",
+      "scores": {
+        "0": 100,
+        "1": 34
+      },
+      "sha256": "6d325afd50ecd66e171a3422dda957a7e27e334b98bc12bc9d7466b7492ae419"
+    },
+    {
+      "id": "training-replay-ae4d900c30579b0de0340903",
+      "scores": {
+        "0": 101,
+        "1": 60
+      },
+      "sha256": "ae4d900c30579b0de034090303903d0df8f2b5e912b99d6ebbf53c97869bc009"
+    },
+    {
+      "id": "training-replay-8d5002bf1d860629123b3705",
+      "scores": {
+        "0": 67,
+        "1": 100
+      },
+      "sha256": "8d5002bf1d860629123b3705987688040083ccdeabea386338cfc6b6066a088a"
+    }
+  ],
+  "recent_count": 3,
+  "previous_replay_loaded": true,
+  "manual_refresh_keeps_time": true,
+  "mobile_refresh_visible": true,
+  "page_errors": [],
+  "deployment_id": "1e288a6a-08ee-4ff1-8069-d1b214bad28f",
+  "rollback_deployment": "1a7c28c4-9cea-46da-9392-65f5801c3cbb"
+}

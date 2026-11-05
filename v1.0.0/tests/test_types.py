@@ -14,7 +14,7 @@ def test_entity_serialization_and_independent_members():
     lambda: Soldier(1, 2, WorldPos(0, 0)),
     lambda: Soldier(0, Team.A, WorldPos(0, 0)),
     lambda: Squad(1, Team.A, WorldPos(0, 0), [2, 2]),
-    lambda: Squad(1, Team.A, WorldPos(0, 0), list(range(2, 8))),
+    lambda: Squad(1, Team.A, WorldPos(0, 0), list(range(2, 15))),
 ])
 def test_invalid_entity(create):
     with pytest.raises(ValueError):

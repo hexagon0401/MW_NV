@@ -1,0 +1,107 @@
+[
+  {
+    "unit": 20206,
+    "type": "MBT",
+    "position": [
+      83120,
+      56200
+    ],
+    "goal": [
+      51200,
+      51200
+    ],
+    "static_start": true,
+    "static_goal": true,
+    "static_route": true
+  },
+  {
+    "unit": 10207,
+    "type": "SPH",
+    "position": [
+      17800,
+      51866
+    ],
+    "goal": [
+      29200,
+      51200
+    ],
+    "static_start": true,
+    "static_goal": true,
+    "static_route": true
+  },
+  {
+    "unit": 10207,
+    "type": "SPH",
+    "position": [
+      23000,
+      51860
+    ],
+    "goal": [
+      29200,
+      51200
+    ],
+    "static_start": true,
+    "static_goal": true,
+    "static_route": true
+  },
+  {
+    "unit": 20206,
+    "type": "MBT",
+    "position": [
+      79000,
+      51904
+    ],
+    "goal": [
+      51200,
+      51200
+    ],
+    "static_start": true,
+    "static_goal": true,
+    "static_route": true
+  },
+  {
+    "unit": 10207,
+    "type": "SPH",
+    "position": [
+      23000,
+      51860
+    ],
+    "goal": [
+      29200,
+      51200
+    ],
+    "static_start": true,
+    "static_goal": true,
+    "static_route": true
+  },
+  {
+    "unit": 20204,
+    "type": "IFV",
+    "position": [
+      76730,
+      51400
+    ],
+    "goal": [
+      52800,
+      51200
+    ],
+    "static_start": true,
+    "static_goal": true,
+    "static_route": true
+  },
+  {
+    "unit": 20202,
+    "type": "APC",
+    "position": [
+      77550,
+      51400
+    ],
+    "goal": [
+      52800,
+      51200
+    ],
+    "static_start": true,
+    "static_goal": true,
+    "static_route": true
+  }
+]

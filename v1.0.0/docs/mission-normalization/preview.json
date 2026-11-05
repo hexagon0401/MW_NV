@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "url": "https://t11-multi-mode.mw-nv.pages.dev",
+  "deployment": "2445b037",
+  "assets": "preview",
+  "api_source": "production read-only requests through test routing; preview has no copied production secret",
+  "page_errors": [],
+  "history_verified": true
+}

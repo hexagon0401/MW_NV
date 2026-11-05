@@ -1,13 +1,13 @@
 """Actual local endpoint benchmark; does not infer model speed from mocks."""
 import argparse,json,time,statistics,subprocess
 from pathlib import Path
-from .local_hq import LocalHQ
+from .hybrid_hq import HybridHQ
 from engine.runtime import Engine
-from engine.scenario import create_match
+from engine.scenario import create_release_match
 
 
 def benchmark(endpoint,model,count=50,server_pid=None):
-    policy=LocalHQ(endpoint,model);e=Engine(create_match());latencies=[];valid=0
+    policy=HybridHQ(endpoint,model);e=Engine(create_release_match());latencies=[];valid=0
     for i in range(count):
         obs=e.observe(i%2);start=time.perf_counter();policy.observe_and_issue(obs)
         latencies.append(time.perf_counter()-start);valid+=policy.last_decision['source']=='llm';e.step(.2)

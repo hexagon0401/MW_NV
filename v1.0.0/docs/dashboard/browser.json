@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "fixtures": true,
+  "no_replay_or_pixi_requests": true,
+  "session_intro_once": true,
+  "escape_skip": true,
+  "desktop_characters_max": 240,
+  "mobile_characters_max": 120,
+  "reduced_motion": true,
+  "desktop": "1440x900",
+  "mobile": "390x844",
+  "page_errors": []
+}

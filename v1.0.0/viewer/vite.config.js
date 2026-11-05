@@ -1,1 +1,1 @@
-import {defineConfig} from 'vite';export default defineConfig({base:"./",server:{proxy:{'/api':{target:'http://127.0.0.1:8000',rewrite:p=>p.replace(/^\/api/,'')}}}});
+import {defineConfig} from 'vite';export default defineConfig({base:"/",build:{rollupOptions:{input:{spectator:new URL("./index.html",import.meta.url).pathname,dashboard:new URL("./dashboard/index.html",import.meta.url).pathname}}},server:{proxy:{'/api':{target:'http://127.0.0.1:8000',rewrite:p=>p.replace(/^\/api/,'')}}}});

@@ -1,0 +1,10 @@
+import {chromium} from 'playwright-core';import fs from 'node:fs';import assert from 'node:assert/strict';
+const browser=await chromium.launch({executablePath:'/usr/bin/chromium',headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+try{
+ const page=await browser.newPage({viewport:{width:1500,height:980}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const d=JSON.parse(fs.readFileSync('public/demo.json','utf8'));d.events=[];d.initial.orders=[{team:0,unit:10100,cmd_id:1,op:3,target:202,status:'RUNNING',accepted_tick:0}];d.initial.decisions={0:{source:'PPO 지휘',reasons:[{unit:10100,reason:'중앙 거점 접근·병력 집중'}]}};d.final={...d.initial,tick:3000};
+ await page.route('**/demo.json',r=>r.fulfill({json:d}));await page.goto('http://127.0.0.1:18141/viewer/');await page.waitForFunction(()=>document.querySelector('#count-a')?.textContent==='64');await page.click('#pause');await page.click('#fit');await page.waitForTimeout(300);
+ assert.ok(await page.locator('.command-card').count());assert.match(await page.locator('.decision-card').first().textContent(),/중앙/);
+ await page.screenshot({path:'../docs/command-clarity/overview.png'});await page.click('#history-open');await page.waitForSelector('.result-row');assert.ok(await page.locator('.winner-a,.winner-b,.draw').count());const count=await page.locator('.result-row').count();if(await page.locator('#history-more').isVisible()){await page.click('#history-more');await page.waitForFunction(n=>document.querySelectorAll('.result-row').length>n,count);}await page.screenshot({path:'../docs/command-clarity/history.png'});await page.keyboard.press('Escape');assert.equal(await page.locator('#history-dialog').isVisible(),false);
+ await page.setViewportSize({width:390,height:844});await page.screenshot({path:'../docs/command-clarity/mobile.png'});assert.ok((await page.locator('#field').boundingBox()).height>100);assert.deepEqual(errors,[]);console.log('Commands/history modal/overview/mobile PASS');
+}finally{await browser.close();}

@@ -1,7 +1,7 @@
 """Validated integer command boundary; game agents cannot execute code."""
 from dataclasses import fields
 from enum import IntEnum
-from collections.abc import MutableMapping
+from collections.abc import MutableMapping,ItemsView,ValuesView
 from .types import Command, Team, Op
 
 
@@ -49,14 +49,39 @@ def validate(world, command):
     unit = world.soldiers.get(c.unit) or world.squads.get(c.unit) or world.vehicles.get(c.unit)
     if unit is None:
         raise OrderError('INVALID_TARGET')
+    if not getattr(unit,'alive',True):raise OrderError('ILLEGAL_STATE')
     if unit.team != c.team:
         raise OrderError('FOREIGN_UNIT')
-    if c.op in (Op.MOVE, Op.RETREAT, Op.TRANSPORT, Op.DISEMBARK):
+    if c.op in (Op.MOVE, Op.RETREAT, Op.TRANSPORT, Op.DISEMBARK, Op.FIRE_MISSION):
         if not (0 <= c.arg0 < world.config.map_width_m and 0 <= c.arg1 < world.config.map_height_m):
             raise OrderError('OUT_OF_BOUNDS')
     if c.op in (Op.CAPTURE, Op.DEFEND, Op.RESUPPLY) and c.target not in world.facilities and not (c.op==Op.RESUPPLY and c.target in world.vehicles):
         raise OrderError('INVALID_TARGET')
+    if c.op in (Op.DEPLOY,Op.PACK_UP,Op.FIRE_MISSION) and (c.unit not in world.vehicles or unit.type_id!='SPH'):raise OrderError('INVALID_TARGET')
+    if c.op==Op.REPAIR:
+        target=world.vehicles.get(c.target)
+        if c.unit not in world.soldiers or unit.type_id!='ENG' or target is None or not target.alive or target.team!=c.team:raise OrderError('INVALID_TARGET')
+    if c.op==Op.ATTACK_TARGET:
+        target=world.soldiers.get(c.target) or world.vehicles.get(c.target)
+        if target is None or not target.alive or target.team==c.team:raise OrderError('INVALID_TARGET')
+        if c.target not in getattr(world,'visible',{}).get(c.team,[]):raise OrderError('UNOBSERVED_TARGET')
+        from .sensing import can_see
+        from .combat import spec,multiplier
+        from math import hypot
+        weapon=spec(world,unit)['attack']
+        if unit.ammo<=0:raise OrderError('NO_AMMO')
+        if not weapon or not can_see(world,unit,target) or hypot(unit.pos.x_cm-target.pos.x_cm,unit.pos.y_cm-target.pos.y_cm)>weapon['range_m']*100 or multiplier(world,unit,target)<=0:raise OrderError('OUT_OF_RANGE')
     return c
+
+
+class TeamItems(ItemsView):
+    def __iter__(self):
+        for store in self._mapping.by_team.values():yield from store.items()
+
+
+class TeamValues(ValuesView):
+    def __iter__(self):
+        for store in self._mapping.by_team.values():yield from store.values()
 
 
 class TeamMap(MutableMapping):
@@ -71,6 +96,8 @@ class TeamMap(MutableMapping):
     def __iter__(self):
         for store in self.by_team.values():yield from store
     def __len__(self):return sum(map(len,self.by_team.values()))
+    def items(self):return TeamItems(self)
+    def values(self):return TeamValues(self)
 
 
 class CommandQueue:
@@ -95,6 +122,19 @@ class CommandQueue:
             return
         self.status[key] = status
         c = self.commands[key]
+        if status in ('FAILED','CANCELLED'):
+            ids=world.squads[c.unit].member_ids if c.unit in world.squads else [c.unit]
+            for uid in ids:
+                soldier=world.soldiers.get(uid)
+                if soldier is not None and soldier.alive and soldier.task_state in ('MOVING','PATH_PENDING'):
+                    soldier.task_state='HOLD';world.emit('UNIT_TASK_CHANGED',unit=uid,task_state='HOLD')
+        actor=world.vehicles.get(c.unit)
+        if status in ('FAILED','CANCELLED') and actor is not None and actor.alive and actor.task_state in ('MOVING','TAKEOFF','LANDING','PATHING','DEPLOYING','PACKING','WAITING_TRAFFIC'):
+            if actor.deployment=='DEPLOYING':actor.deployment='PACKED'
+            elif actor.deployment=='PACKING':actor.deployment='DEPLOYED'
+            from .capabilities import airborne
+            actor.task_state='HOVERING' if airborne(world,actor) else 'READY'
+            world.emit('UNIT_TASK_CHANGED',unit=actor.id,task_state=actor.task_state,deployment=actor.deployment)
         world.emit('ORDER_' + status, team=int(c.team), cmd_id=c.cmd_id, reason=reason)
 
     def ready(self, world):

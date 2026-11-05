@@ -1,0 +1,17 @@
+{
+  "artifact_sha256": "ea9f7106352b7ce65d23fb4aeedf77c7c5b81eeb467bfec2fc27d5a3f9b6c2d4",
+  "tests": true,
+  "build": true,
+  "preview": true,
+  "rollback": true,
+  "validation": {
+    "js_tests": 56,
+    "preview_marker_matches": true,
+    "preview_browser_fixtures": true,
+    "strict_csp": true,
+    "real_preview_worker_api": true,
+    "rollback_preflight": "previous successful canonical deployment available; real rollback not invoked",
+    "previous_deployment": "39dc74b5-1387-43d7-b229-506ff050fe1c",
+    "bundled_worker_directory": true
+  }
+}

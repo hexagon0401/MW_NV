@@ -1,0 +1,30 @@
+{
+  "results": [
+    {
+      "mode": "3",
+      "dpr": 1,
+      "units": 228,
+      "errors": []
+    },
+    {
+      "mode": "3",
+      "dpr": 2,
+      "units": 228,
+      "errors": []
+    },
+    {
+      "mode": "4",
+      "dpr": 1,
+      "units": 226,
+      "errors": []
+    },
+    {
+      "mode": "4",
+      "dpr": 2,
+      "units": 226,
+      "errors": []
+    }
+  ],
+  "syntheticInitialState": true,
+  "mac": "unverified"
+}

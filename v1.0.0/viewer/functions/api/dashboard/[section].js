@@ -1,0 +1,2 @@
+import {dashboardData} from '../../../src/dashboard-data.js';
+export async function onRequestGet({env,request,params}){try{return Response.json(await dashboardData(env,new URL(request.url),params.section),{headers:{'Cache-Control':'no-store'}});}catch(e){const invalid=String(e.message).startsWith('invalid_')||e.message==='unknown_section';return Response.json({error:invalid?'invalid_query':'dashboard_unavailable'},{status:invalid?400:503,headers:{'Cache-Control':'no-store'}});}}
