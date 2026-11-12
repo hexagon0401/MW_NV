@@ -1,0 +1,11 @@
+{
+  "fixture": true,
+  "samples": {
+    "tank-origin": 5,
+    "tank-travel": 9,
+    "artillery-flight": 5,
+    "artillery-impact": 1
+  },
+  "pausedSeekRewind": true,
+  "errors": []
+}

@@ -1,0 +1,2 @@
+import {releaseData} from '../../../src/release-data.js';
+export async function onRequestGet({env,request,params}){try{return Response.json(await releaseData(env,new URL(request.url),(params.path??[]).toString().replaceAll(',','/')),{headers:{'Cache-Control':'no-store'}});}catch(e){return new Response('Release data unavailable',{status:e.message==='not_found'?404:e.message.startsWith('invalid_')?400:503});}}

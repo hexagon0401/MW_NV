@@ -1,0 +1,68 @@
+{
+  "sources": [
+    {
+      "repository": "openai/multi-agent-emergence-environments",
+      "commit": "bafaf1e11e6398624116761f91ae7c93b136f395",
+      "file": "mae_envs/envs/hide_and_seek.py",
+      "url": "https://github.com/openai/multi-agent-emergence-environments/blob/bafaf1e11e6398624116761f91ae7c93b136f395/mae_envs/envs/hide_and_seek.py",
+      "sha256": "c151b34d1030e7bcb3412db893e438ceedaa7c6b6f8836d3d04d5257b80514df",
+      "license": "MIT",
+      "license_sha256": "4682c2fef4e38ad3eaafd0ce6a2058f80892e308caa453923acc5283b559278a",
+      "copied_code": false
+    },
+    {
+      "repository": "Stable-Baselines-Team/stable-baselines3-contrib",
+      "commit": "a8af63682070df0bda9707400b2e971055600910",
+      "file": "sb3_contrib/ppo_mask/ppo_mask.py",
+      "url": "https://github.com/Stable-Baselines-Team/stable-baselines3-contrib/blob/a8af63682070df0bda9707400b2e971055600910/sb3_contrib/ppo_mask/ppo_mask.py",
+      "sha256": "28b2f811f6b358553c4a9ebc8969a96fa3788dc6256e138ed94448a08f6be541",
+      "license": "MIT",
+      "license_sha256": "b76bbab0bd3d0182611f19ed6a4593408787084e9b024c7d9dd1d0295c2bf3a8",
+      "copied_code": false
+    },
+    {
+      "repository": "vwxyzjn/cleanrl",
+      "commit": "fe8d8a03c41a7ef5b523e2e354bd01c363e786bb",
+      "file": "cleanrl/ppo.py",
+      "url": "https://github.com/vwxyzjn/cleanrl/blob/fe8d8a03c41a7ef5b523e2e354bd01c363e786bb/cleanrl/ppo.py",
+      "sha256": "d8dfbb7ac0b21e747b77d6e6673e566db4d6cdacc83bcebcd19cf87ad0e459ae",
+      "license": "MIT",
+      "license_sha256": "c6c269472eecb009754856b5fe1029ee53b99b986f57bf22ad7c747b04799c69",
+      "copied_code": false
+    },
+    {
+      "repository": "google-deepmind/open_spiel",
+      "commit": "0760b5a7d584a6bb69e1dc1cc693d494d8d31e77",
+      "file": "open_spiel/python/algorithms/psro_v2/meta_strategies.py",
+      "url": "https://github.com/google-deepmind/open_spiel/blob/0760b5a7d584a6bb69e1dc1cc693d494d8d31e77/open_spiel/python/algorithms/psro_v2/meta_strategies.py",
+      "sha256": "066b5630731c906b16ca659f7714b3d6bc061df1db730bd8bf8338f48fe9b799",
+      "license": "Apache-2.0",
+      "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "copied_code": false
+    },
+    {
+      "repository": "openai/baselines",
+      "commit": "ea25b9e8b234e6ee1bca43083f8f3cf974143998",
+      "file": "baselines/common/running_mean_std.py",
+      "url": "https://github.com/openai/baselines/blob/ea25b9e8b234e6ee1bca43083f8f3cf974143998/baselines/common/running_mean_std.py",
+      "sha256": "7b8c395c17ef6f6ef12c74a19e3edc6193ec66c36eb9c7097a94617a399c7a4d",
+      "license": "MIT",
+      "license_sha256": "fd85a61f2f086d9da85b5d3cbb1a5f49665fc7fe9fed5f799cb5753ad766f710",
+      "copied_code": false
+    },
+    {
+      "repository": "DLR-RM/stable-baselines3",
+      "commit": "0cdcd200deef06b9ad0af72f6ddfb07c06c6df39",
+      "file": "stable_baselines3/common/running_mean_std.py",
+      "url": "https://github.com/DLR-RM/stable-baselines3/blob/0cdcd200deef06b9ad0af72f6ddfb07c06c6df39/stable_baselines3/common/running_mean_std.py",
+      "sha256": "39f3ac4243d10fd7375deb9c43db1b94e6f878bf53bc5e633b6dcf12917c21d1",
+      "license": "MIT",
+      "license_sha256": "2d8fbeee75e0acd13e75b30470b3521b12fb55c26c90c2060c6bd525345870a9",
+      "copied_code": false
+    }
+  ],
+  "installed": {
+    "stable-baselines3": "2.7.0",
+    "sb3-contrib": "2.7.0"
+  }
+}

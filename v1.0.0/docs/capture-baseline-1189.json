@@ -1,0 +1,19 @@
+{
+  "release": "capture-specialists-1189-g2748",
+  "sha256": "98d8fd4582270e6bfb85ffb3b7ef52943644b7f98270583a466f851094040253",
+  "verified": true,
+  "games": 1189,
+  "generation": 2748,
+  "policies": {
+    "ppo2.zip": "7eb0f36afe905b59ae15a03988a2e88487a7ab9ba0c445d8ddc7ced1b6ea8e29",
+    "ppo2.npz": "04cb42f9e5ec7080f6c60ac84ff5274629a63f07d389d4677a0536d89e501244",
+    "ppo1.npz": "4c042b237ff07e55d0699c1c7f81009632df6040b041ca213a82026379b2fd21",
+    "ppo1.zip": "53287e17aa97739acb750002f67a6d8463efde4e0435e83258817795b53c8635"
+  },
+  "full_recovery": {
+    "release": "training-2026-11-004",
+    "sha256": "eb3cfb4d41cf51c314b3d8d911b8b34d7e51a61b4750629fc75c2728b02b4304",
+    "games": 1189,
+    "generation": 2748
+  }
+}

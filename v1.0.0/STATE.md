@@ -1,14 +1,13 @@
 # MW-NV v1.0.0 STATE
-Current task: D03 design and local live integration
-Status: PASS (functional); deployment deferred by user
-Completed: D01 Swiss UI/fonts, D02 pixel battlefield, D03 local snapshot/SSE
-Changed: viewer/, engine/viewer_export.py, server/live.py, server/app.py, tests/, docs/design/
-Verified: 89 Python tests, 9 JS tests, production build PASS
-Browser: desktop/mobile/fonts/hover/tap/real casualties/server restart reconnect PASS
-Physics: observed and unobserved RuleHQ game checksums match
-Performance: 500 infantry, SwiftShader 13–17 FPS; Intel Mac GPU unverified
-Visual evidence: docs/design/desktop.png, mobile.png, live.png, verification.json
-Run: python -m server.live --hq rules --port 8000; viewer npm run dev → 진행 경기
-Git branch: dev/v1.0.0
-Next: user review; external release requirements remain in RELEASE_STATUS.md
-Remaining Plus quota: UNKNOWN
+Current:T32 approved Codex-only runtime RESUMED after environment reconnection
+Runtime:map-rotation-10 r2 fixed code verified;PID116609;192games/g657 checkpoint restored
+Verified:running/evaluation;current evaluation simulation0→140seconds;106/240 cases already complete
+Public:api/training stale=false;updated2026-11-09T16:48:45Z;games192
+Method:ppo_control.resume_if_needed;models/optimizer/RNG/ongoing game retained;completed evaluations reused
+Services:release agent/control/collect/publish restarted;publisher override retained
+Safety:desired running;no STOP/pause reason/pending Apply;no duplicate learner
+Workers:deferred perT30;runtime-continuity remains unapplied;no Worker/D1/Cron started
+Baseline:A′/B′1189games/g2748 remote preserved;rotation3→4→2 per10 completions unchanged
+Next:finish192-game fixed evaluation;respect any recorded regression gate before further training
+Limits:host shutdown stops execution;no24-hour availability guarantee
+Usage:UNKNOWN

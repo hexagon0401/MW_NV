@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "fixtures": true,
+  "origin": "https://t11-multi-mode.mw-nv.pages.dev",
+  "sizes": [
+    [
+      1440,
+      900
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "page_errors": [],
+  "no_map_download": true,
+  "manual_apply_locked": true,
+  "typed_auto_intent": true,
+  "scrolled_log_not_jumped": true
+}

@@ -1,0 +1,16 @@
+{
+  "site": {
+    "status": "running",
+    "phase": "learning",
+    "games": 53,
+    "workers": 2,
+    "cpu_budget": 4,
+    "sim_speed": 12.8,
+    "updated_at": "2026-10-26T11:23:31.079362+00:00"
+  },
+  "backend_pid": 131572,
+  "checkpoint_generation": 127,
+  "validation_stage": "engine_audit",
+  "mixed_pilot_started": false,
+  "training_continues": true
+}

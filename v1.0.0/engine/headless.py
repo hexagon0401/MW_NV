@@ -9,7 +9,7 @@ from .orders import OrderError
 from .objectives import summary
 
 
-def run_match(seed=0,swap=False,release=False):
+def run_match(seed=0,swap=False,release=False,stats=None):
     e=Engine((create_release_match if release else create_match)(seed,swap));policies={t:RuleHQ() for t in Team}
     while not getattr(e.world,'ended',False):
         # Both policies see snapshots from the same simulation tick.
@@ -23,6 +23,9 @@ def run_match(seed=0,swap=False,release=False):
     result.update(swapped=swap,captures=sum(x['event_kind']=='OBJECTIVE_CAPTURED' for x in e.world.events),
                   invalid_commands=sum(x['event_kind']=='ORDER_REJECTED' for x in e.world.events),
                   attacks=sum(x['event_kind']=='ABSTRACT_ATTACK' for x in e.world.events))
+    if stats:
+        from learning.results import record_world
+        record_world(stats,e.world,'rules',{'A':'algorithm','B':'algorithm'})
     return result
 
 

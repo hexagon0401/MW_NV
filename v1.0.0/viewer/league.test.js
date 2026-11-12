@@ -1,0 +1,2 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {tacticName} from './src/league-view.js';import {onRequestGet} from './functions/api/insights.js';
+test('learning tactics have human readable names and unavailable data stays unavailable',async()=>{assert.equal(tacticName('capture:flank_north'),'점령 · 북측 경유');const response=await onRequestGet({env:{}});assert.equal(response.status,503);});

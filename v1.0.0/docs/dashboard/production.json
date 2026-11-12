@@ -1,0 +1,61 @@
+{
+  "passed": true,
+  "url": "https://mw-nv.pages.dev/dashboard/",
+  "deployment": "60cf253e-4b40-474b-a3ab-34d15270666f",
+  "actual_storage_api": true,
+  "api": {
+    "summary": {
+      "status": 200,
+      "bytes": 5401,
+      "activity": {
+        "running": 1,
+        "parked": 2,
+        "training": 1,
+        "evaluation": 0,
+        "diagnostic": 0
+      }
+    },
+    "history": {
+      "status": 200,
+      "bytes": 18163,
+      "total": 1426
+    },
+    "trends": {
+      "status": 200,
+      "bytes": 94550
+    },
+    "analysis": {
+      "status": 200,
+      "bytes": 3178,
+      "points": 6
+    },
+    "resources": {
+      "status": 200,
+      "bytes": 538,
+      "points": 1
+    },
+    "admin": {
+      "configured": false,
+      "authenticated": false,
+      "control_enabled": false,
+      "login": null
+    },
+    "control": 401
+  },
+  "desktop": "1440x900",
+  "mobile": "390x844",
+  "spectator_current_match_only": true,
+  "replay_paused_time_preserved": true,
+  "no_dashboard_pixi_or_replay_requests": true,
+  "admin_login_configured": false,
+  "admin_control_enabled": false,
+  "page_errors": [],
+  "mac": "unverified",
+  "public_verification_deployment": "6dfd440c",
+  "production_branch": "dev/v1.0.0",
+  "rollback_deployment": "4c7929b0-ffc8-4d24-b231-3bc4f20f2594",
+  "auth_configuration_verification": "auth-config.json",
+  "current_admin_auth_configured": true,
+  "current_admin_control_enabled": true,
+  "owner_activation_verification": "owner-activation.json"
+}

@@ -1,0 +1,40 @@
+{
+  "python_full_suite": {
+    "passed": 311,
+    "seconds": 416.0,
+    "scope": "before final liveness/dependency hardening"
+  },
+  "python_final_focused": {
+    "passed": 27,
+    "seconds": 14.53,
+    "overlaps_full_suite": true,
+    "includes_registered_runtime_without_proc_cwd": true
+  },
+  "javascript": {
+    "passed": 56,
+    "build": true
+  },
+  "browser": {
+    "fixtures": true,
+    "desktop": "1440x900",
+    "mobile": "390x844",
+    "release_controls": true,
+    "legacy_dashboard": true
+  },
+  "real_mixed_apply": false,
+  "real_pages_release_adapter_apply": false,
+  "long_pilot_complete": false,
+  "production_browser_actual": {
+    "origin": "https://mw-nv.pages.dev",
+    "fixtures": false,
+    "passed": true,
+    "desktop": "1440x900",
+    "mobile": "390x844",
+    "strict_csp": true,
+    "no_map_download": true,
+    "hidden_poll_stopped": true,
+    "public_apply_not_exposed": true,
+    "page_errors": []
+  },
+  "production_api_actual": true
+}

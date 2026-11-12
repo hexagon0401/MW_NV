@@ -1,0 +1,87 @@
+{
+  "pid": 125471,
+  "generation": 123,
+  "games": 51,
+  "models": {
+    "PPO1": {
+      "policy_optimizer_unchanged": true,
+      "steps_unchanged": true
+    },
+    "PPO2": {
+      "policy_optimizer_unchanged": true,
+      "steps_unchanged": true
+    }
+  },
+  "world_unchanged_before_next_training": true,
+  "cpu_budget": 4,
+  "workers_at_start": 1,
+  "parallel_learning_starts_after_frozen_evaluation": true,
+  "measurement": {
+    "phase": "evaluation",
+    "window_seconds": 10.000346405999153,
+    "cpu_cores_average": 1.006965118124208,
+    "cohort_rss_kib": 1736128,
+    "cohort_pss_kib": null,
+    "includes_runner_engine_io": true,
+    "shared_host_load": true,
+    "pss_unavailable": true
+  },
+  "last_observed": {
+    "status": "running",
+    "phase": "evaluation",
+    "games": 51,
+    "evaluation_cases": 26,
+    "sim_speed": 10.7,
+    "updated_at": "2026-10-26T09:35:36.633016+00:00"
+  },
+  "verified_full_recoveries": [
+    {
+      "asset": "games-00000051-82d65ef560f90aa1.tar.gz",
+      "sha256": "82d65ef560f90aa169bab05e7670adb295ce21e1fe5cb0776060603a0d203f32",
+      "release": "training-2026-10-002",
+      "status": "verified"
+    },
+    {
+      "asset": "games-00000051-a266479beb01efc4.tar.gz",
+      "sha256": "a266479beb01efc4284138d1c8edef442441730439b670fd13fa95d8627f660d",
+      "release": "training-2026-10-002",
+      "status": "verified"
+    },
+    {
+      "asset": "league-7be9acf574df-00000051-00000123-recovery-0e788d3b880d65a6.tar.gz",
+      "sha256": "0e788d3b880d65a6f66e53ac736d927f60fec926e3378c418b8e594e915dd02d",
+      "release": "training-2026-10-002",
+      "status": "verified"
+    }
+  ],
+  "teacher_live_since_activation": {
+    "valid_pairs": 2,
+    "attempted_pairs": 4,
+    "observation_scope": "through generation125 timing-fix checkpoint",
+    "configured_max_pairs_per_minute": 2,
+    "last_observed_429_retry_seconds": 60
+  },
+  "proof_scope": "original activation snapshot; policies/world advance during subsequent training",
+  "current": {
+    "pid": 131572,
+    "generation": 127,
+    "completed_games": 53,
+    "phase": "learning",
+    "workers": 2,
+    "cpu_budget": 4,
+    "worker_sim_seconds": {
+      "0": 1470.0,
+      "1": 190.0
+    },
+    "adaptation_reason": "trial_increase",
+    "updated_at": "2026-10-26T11:23:31.079362+00:00",
+    "code_commit": "1d02076a897e40b1aab8146cc5ce24678a670bc0"
+  },
+  "timing_fix": {
+    "verified_tests": 10,
+    "restored_generation": 125,
+    "completed_games": 52,
+    "diagnostic_backup": "validation-before-timing-window",
+    "remote_verified": true
+  }
+}

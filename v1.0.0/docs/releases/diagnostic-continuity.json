@@ -1,0 +1,9 @@
+{
+  "unchanged_original_dependency_files": 53,
+  "changed": [],
+  "preserved_cases": 21,
+  "all_recorded_replay_hashes_verified": true,
+  "observer_replay_parity_test": true,
+  "scope": "observer and rollout control only; no game rules/algorithm catalog changes",
+  "partial_case_resume": "previous in-progress game restarts; former runner had no mid-case checkpoint"
+}

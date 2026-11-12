@@ -1,0 +1,66 @@
+{
+  "verified_at_kst": "2026-10-26T08:48:52.601644+09:00",
+  "site": "https://mw-nv.pages.dev",
+  "html": {
+    "http": 200,
+    "matches_local_build": true,
+    "script": "./assets/index-oMP7zXy1.js"
+  },
+  "javascript": {
+    "http": 200,
+    "sha256_matches": true
+  },
+  "/api/stats": {
+    "http": 200,
+    "total": 1059,
+    "teams": {
+      "A": {
+        "wins": 632,
+        "losses": 427,
+        "draws": 0,
+        "games": 1059,
+        "win_rate": 0.5967894239848914
+      },
+      "B": {
+        "wins": 427,
+        "losses": 632,
+        "draws": 0,
+        "games": 1059,
+        "win_rate": 0.40321057601510857
+      }
+    }
+  },
+  "/api/history?offset=0": {
+    "http": 200,
+    "total": 1059,
+    "rows": 50,
+    "next": 50
+  },
+  "/api/training": {
+    "http": 200,
+    "phase": "evaluation",
+    "games": 650,
+    "policy_steps": 114752,
+    "updated_at": "2026-10-25T23:48:23.921702+00:00",
+    "map_id": "river-districts",
+    "map_version": "2",
+    "backup": "deferred:RuntimeError"
+  },
+  "/api/matches/training-latest/view": {
+    "http": 200,
+    "rules_version": "combined-arms-3",
+    "catalog": "combined-arms-2",
+    "map_id": "river-districts",
+    "map_version": "2",
+    "initial_units": 148,
+    "ended": true
+  },
+  "chromium": {
+    "http": 200,
+    "history_rows": 50,
+    "self_hosted_fonts": true,
+    "page_errors": [],
+    "screenshot": "deployed.png"
+  },
+  "deployment_url": "https://aac65376.mw-nv.pages.dev"
+}

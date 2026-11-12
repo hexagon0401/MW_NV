@@ -1,0 +1,9 @@
+{
+  "rows": 10000,
+  "current_rows": 10,
+  "repetitions": 1000,
+  "old_seconds": 0.3587498639826663,
+  "new_seconds": 0.0018174920114688575,
+  "speedup": 197.3873126918079,
+  "scope": "label metadata scan only; not overall simulation speed"
+}

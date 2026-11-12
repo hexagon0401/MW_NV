@@ -29,7 +29,7 @@ def update_capture(w):
                 w.emit('OBJECTIVE_NEUTRALIZED',objective=f.id)
             else:
                 f.owner=team;f.capturing=None
-                w.emit('OBJECTIVE_CAPTURED',objective=f.id,team=int(team))
+                w.emit('OBJECTIVE_CAPTURED',objective=f.id,team=int(team),participants=sorted(s.id for s in w.soldiers.values() if s.alive and s.carrier_id is None and s.team==team and hypot(s.pos.x_cm-f.pos.x_cm,s.pos.y_cm-f.pos.y_cm)<=f.radius_cm))
 
 
 def update_score(w):

@@ -1,7 +1,7 @@
 LUV:
   size_px:
-  - 15
-  - 9
+  - 60
+  - 36
   footprint_cm:
   - 500
   - 300
@@ -12,10 +12,17 @@ LUV:
   fuel_per_100m: 2
   cost: 100
   grass_factor: 0.65
+  hp: 150
+  armor: soft
+  detection_m: 70
+  weapon: null
+  ammo: 0
+  attack: null
+  role: transport
 APC:
   size_px:
-  - 21
-  - 12
+  - 84
+  - 48
   footprint_cm:
   - 700
   - 400
@@ -26,45 +33,127 @@ APC:
   fuel_per_100m: 3
   cost: 180
   grass_factor: 0.7
+  hp: 350
+  armor: light
+  detection_m: 70
+  weapon: null
+  ammo: 0
+  attack: null
+  role: transport
 IFV:
   size_px:
-  - 24
-  - 12
+  - 96
+  - 48
   footprint_cm:
   - 800
   - 400
   speed_mps: 5
-  capacity: 6
+  capacity: 8
   cargo_capacity: 0
   fuel_max: 100
   fuel_per_100m: 3.5
   cost: 230
   grass_factor: 0.9
+  hp: 450
+  armor: medium
+  detection_m: 120
+  weapon: cannon
+  ammo: 120
+  attack:
+    range_m: 90
+    interval_ms: 1500
+    damage: 35
+    hit_probability: 0.65
+  role: fighting_carrier
 HEL:
   size_px:
-  - 24
-  - 24
+  - 96
+  - 96
   footprint_cm:
   - 800
   - 800
   speed_mps: 11
-  capacity: 8
+  capacity: 16
   cargo_capacity: 0
   fuel_max: 100
   fuel_per_100m: 6
   cost: 220
   grass_factor: 1
+  hp: 300
+  armor: air
+  detection_m: 70
+  weapon: null
+  ammo: 0
+  attack: null
+  role: transport
 TRK:
   size_px:
-  - 21
-  - 12
+  - 84
+  - 48
   footprint_cm:
   - 700
   - 400
   speed_mps: 5
   capacity: 0
-  cargo_capacity: 120
+  cargo_capacity: 240
   fuel_max: 100
   fuel_per_100m: 3
   cost: 95
   grass_factor: 0.7
+  hp: 180
+  armor: soft
+  detection_m: 70
+  weapon: null
+  ammo: 0
+  attack: null
+  role: supply
+MBT:
+  size_px:
+  - 108
+  - 54
+  footprint_cm:
+  - 900
+  - 450
+  speed_mps: 4
+  capacity: 0
+  cargo_capacity: 0
+  fuel_max: 100
+  fuel_per_100m: 5
+  cost: 500
+  grass_factor: 0.7
+  hp: 900
+  armor: heavy
+  detection_m: 180
+  weapon: ap
+  ammo: 30
+  role: armor
+  attack:
+    range_m: 150
+    interval_ms: 6000
+    damage: 180
+    hit_probability: 0.7
+SPH:
+  size_px:
+  - 108
+  - 60
+  footprint_cm:
+  - 900
+  - 450
+  speed_mps: 3
+  capacity: 0
+  cargo_capacity: 0
+  fuel_max: 100
+  fuel_per_100m: 5
+  cost: 400
+  grass_factor: 0.7
+  hp: 280
+  armor: light
+  detection_m: 80
+  weapon: he
+  ammo: 18
+  role: artillery
+  attack:
+    range_m: 420
+    interval_ms: 15000
+    damage: 90
+    hit_probability: 1
